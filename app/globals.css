@@ -2,20 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@import url("https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cabin:ital,wght@0,400..700;1,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Zain:wght@200;300;400;700;800;900&display=swap");
+
+@font-face {
+  font-family: swissra-normal;
+  src: url("/fonts/swissra-normal.otf") format("opentype");
+}
+@font-face {
+  font-family: swissra-medium;
+  src: url("/fonts/swissra-medium.otf") format("opentype");
+}
+@font-face {
+  font-family: swissra-bold;
+  src: url("/fonts/swissra-bold.otf") format("opentype");
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer components {
+  .apply-fonts-normal {
+    font-family: "swissra-normal";
+    font-weight: 100;
   }
-}
+  .apply-fonts-medium {
+    font-family: "swissra-medium";
+  }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  .apply-fonts-bold {
+    font-family: "swissra-bold";
+  }
+  .hoverEle {
+    @apply transition duration-300 cursor-pointer;
+  }
+
+  .custom-before-nav::before {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #3d45ee;
+    transition: transform 2s ease-in-out;
+  }
+  .apply-fonts-test {
+    font-family: "Cabin", sans-serif;
+  }
 }
