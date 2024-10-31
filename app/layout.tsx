@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Footer from "@/components/footer/Footer";
+// import Footer from "@/components/footer/Footer";
 
 export const metadata: Metadata = {
   title: "الرئيسية",

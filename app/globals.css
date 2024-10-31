@@ -46,4 +46,30 @@
   .apply-fonts-test {
     font-family: "Cabin", sans-serif;
   }
+  .custom-width {
+    width: calc(100vw - 300px);
+  }
+}
+
+
+/* تخصيص شريط التمرير لجميع العناصر القابلة للتمرير في الموقع */
+::-webkit-scrollbar {
+  width: 2px; /* عرض شريط التمرير */
+}
+
+/* مسار شريط التمرير */
+::-webkit-scrollbar-track {
+  @apply bg-red-400 rounded-md; /* لون مسار شريط التمرير */
+}
+
+/* مقبض شريط التمرير */
+::-webkit-scrollbar-thumb {
+  background-color: #2b11be; /* لون مقبض شريط التمرير */
+  border-radius: 5px;
+  border: 2px solid #e0e0e0; /* لإضافة مساحة حول المقبض */
+}
+
+/* عند التحويم فوق مقبض شريط التمرير */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* لون مقبض شريط التمرير عند التحويم */
 }

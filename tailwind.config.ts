@@ -15,7 +15,11 @@ const config: Config = {
         starColor: "#FDF0CD",
         starIconColor: "#FFC700",
         startTextColor: "#FFB802",
-        wygColor:"#F3F3F3"
+        wygColor: "#F3F3F3",
+        sideBarBgColo: "#1B1B1B",
+        redColor: "#EE3D45",
+        redColorHoverLight: "#FF5F68",
+        succsseColor: "#45DA10",
       },
       screens: {
         xs: "330px",

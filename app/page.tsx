@@ -14,7 +14,6 @@ export default function Home() {
       <WhyUs />
       <WhatYouGet />
       <CourseSection />
-      
     </div>
   );
 }
