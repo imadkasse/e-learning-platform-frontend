@@ -15,24 +15,24 @@ const AdminCardPage = ({
   studentRole,
 }: Props) => {
   return (
-    <div className="xs:flex-col xs:gap-3 sm:flex-row py-4 px-8 rounded-lg shadow-md shadow-mainColor flex items-center justify-between">
+    <div className="xs:flex-col xs:items-center xs:gap-3 sm:flex-row py-4 px-8 rounded-lg shadow-md shadow-mainColor flex items-center justify-between">
       <div className="w-full text-center">
         <h1 className="apply-fonts-normal text-lg">{studentRole}</h1>
       </div>
 
-      <div className="flex  items-center gap-3 w-full  ">
+      <div className="flex  items-center gap-3 w-full ">
         <div>
           <Image
             src={`/imgs/${studentImg}.png`}
             width={100}
             height={100}
             alt="StudentImg"
-            className="lg:w-12 lg:h-12  xs:hidden rounded-full"
+            className=" w-12 h-12   rounded-full"
           />
         </div>
         <div className="">
           <h1 className="apply-fonts-normal lg:text-lg">{studentName}</h1>
-          <h1 className="text-gray-500">{studentEmail}</h1>
+          <h1 className="text-gray-500 xs:block sm:hidden xl:block">{studentEmail}</h1>
         </div>
       </div>
 

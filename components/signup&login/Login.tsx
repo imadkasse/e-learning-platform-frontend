@@ -9,24 +9,19 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 
-const SignUp = () => {
+const Login = () => {
   const [email, setEmail] = useState("");
-  const [username, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [passwordIsMatch, setPasswordIsMatch] = useState(false);
-
   const [isValid, setIsValid] = useState(false);
 
+  const [password, setPassword] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
     // تحقق من صحة كلمة المرور (مثلاً، يجب أن تكون أطول من 6 حروف)
     setIsPasswordValid(value.length >= 6);
-    setPasswordIsMatch(passwordConfirm === e.target.value);
   };
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,9 +30,8 @@ const SignUp = () => {
     // تحقق من صحة البريد باستخدام تعبير منتظم بسيط
     setIsValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
   };
-
   return (
-    <div className="container mx-auto py-4   w-full flex items-center justify-center flex-col">
+    <div className="container mx-auto py-4  h-[70vh] w-full flex items-center justify-center flex-col">
       <Link
         href={"/"}
         className="flex items-center flex-row-reverse  md:gap-3 mb-4"
@@ -55,28 +49,14 @@ const SignUp = () => {
       </Link>
 
       <form className="space-y-4 font-[sans-serif] max-w-md mx-auto  w-full ">
-        <div>
-          <input
-            type="tetx"
-            value={username}
-            onChange={(e) => {
-              setUserName(e.target.value);
-            }}
-            placeholder="إسم المستخدم"
-            className={`  w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 
-            ${username.length <= 2 ? "border-red-700" : "border-green-400"} `}
-          />
-        </div>
-        <div>
-          <input
-            type="email"
-            value={email}
-            onChange={handleEmailChange}
-            placeholder="البريد الإلكتروني"
-            className={`  w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent rounded 
+        <input
+          type="email"
+          value={email}
+          onChange={handleEmailChange}
+          placeholder="البريد الإلكتروني"
+          className={`  w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 
             ${isValid ? "border-green-400" : "border-red-700"}`}
-          />
-        </div>
+        />
 
         <div className="relative">
           <input
@@ -85,7 +65,11 @@ const SignUp = () => {
             onChange={handlePasswordChange}
             placeholder="كلمة المرور"
             className={` w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 
-            ${isPasswordValid ? "border-green-400" : "border-red-700"}`}
+            ${
+              isPasswordValid
+                ? "border-green-400"
+                : "border-red-700"
+            }`}
           />
           <button
             type="button"
@@ -95,30 +79,16 @@ const SignUp = () => {
             {showPassword ? <VisibilityOff /> : <RemoveRedEye />}
           </button>
         </div>
-        <div>
-          <input
-            type="password"
-            value={passwordConfirm}
-            onChange={(e) => {
-              setPasswordConfirm(e.target.value);
-              setIsPasswordValid(e.target.value.length >= 6);
-              setPasswordIsMatch(password === e.target.value);
-              console.log(password, passwordConfirm);
-            }}
-            placeholder="تأكيد كلمة المرور "
-            className={` w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 
-            ${
-              isPasswordValid && passwordIsMatch
-                ? "border-green-400"
-                : "border-red-700"
-            }`}
-          />
-        </div>
 
-        <div>
-          <Link href={"/login"} className="apply-fonts-normal text-[12px] group  ">
+        <div className="flex justify-between">
+          <Link href={"/"} className="apply-fonts-normal text-[12px] group  ">
             <p className="group-hover:underline  text-gray-600 cursor-pointer">
-              هل لديك حساب؟ إضغط هنا للتسجيل الدخول 
+              نسيت كلمة السر ؟
+            </p>
+          </Link>
+          <Link href={"/signup"} className="apply-fonts-normal text-[12px] group  ">
+            <p className="group-hover:underline  text-gray-600 cursor-pointer">
+              ليس لديك حساب؟ سجل هنا
             </p>
           </Link>
         </div>
@@ -150,4 +120,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default Login;

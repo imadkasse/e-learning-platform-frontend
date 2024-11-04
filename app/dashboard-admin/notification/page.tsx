@@ -1,7 +1,12 @@
+import Notifcations from "@/components/dashboard-admin/notification/Notifications";
 import React from "react";
 
 const page = () => {
-  return <div>page</div>;
+  return (
+    <>
+      <Notifcations />
+    </>
+  );
 };
 
 export default page;

@@ -54,19 +54,19 @@
 
 /* تخصيص شريط التمرير لجميع العناصر القابلة للتمرير في الموقع */
 ::-webkit-scrollbar {
-  width: 2px; /* عرض شريط التمرير */
+  width: 6px; /* عرض شريط التمرير */
 }
 
 /* مسار شريط التمرير */
 ::-webkit-scrollbar-track {
-  @apply bg-red-400 rounded-md; /* لون مسار شريط التمرير */
+  @apply bg-mainColor rounded-md; /* لون مسار شريط التمرير */
 }
 
 /* مقبض شريط التمرير */
 ::-webkit-scrollbar-thumb {
-  background-color: #2b11be; /* لون مقبض شريط التمرير */
+  background-color: #F3F3F3; /* لون مقبض شريط التمرير */
   border-radius: 5px;
-  border: 2px solid #e0e0e0; /* لإضافة مساحة حول المقبض */
+  border: 1px solid #F3F3F3; /* لإضافة مساحة حول المقبض */
 }
 
 /* عند التحويم فوق مقبض شريط التمرير */

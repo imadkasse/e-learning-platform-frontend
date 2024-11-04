@@ -7,7 +7,6 @@ import {
   HomeOutlined,
   LogoutOutlined,
   NotificationsOutlined,
-  PersonOutlineOutlined,
   PlayLessonOutlined,
   SettingsOutlined,
   SupervisorAccountOutlined,
@@ -103,10 +102,6 @@ const SideBar = () => {
         >
           <ul className="list-none text-base w-[200px]">
             <li className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2">
-              <PersonOutlineOutlined />
-              <Link href={`/`}>معلوماتي</Link>
-            </li>
-            <li className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2">
               <ContactSupportOutlined />
               <Link href={`/`}>الدعم</Link>
             </li>
@@ -201,15 +196,6 @@ const SideBar = () => {
         </div>
         <nav className="apply-fonts-normal w-full  flex justify-center">
           <div className="list-none text-base w-[200px] ">
-            <Link
-              href={`/dashboard-admin/my-info`}
-              className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                pathName === "/dashboard-admin/my-info" ? "bg-mainColor/50" : ""
-              } my-2`}
-            >
-              <PersonOutlineOutlined />
-              <p>معلوماتي</p>
-            </Link>
             <Link
               href={`/dashboard-admin/support`}
               className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${

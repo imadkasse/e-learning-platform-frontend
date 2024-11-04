@@ -39,9 +39,9 @@ const StudentCard = ({
 
       <div className="flex gap-2 w-full justify-center">
         <button
-          className={`bg-${
-            studentStatus ? "succsseColor" : "redColor"
-          } py-2 px-4 rounded-3xl apply-fonts-normal`}
+          className={`${
+            studentStatus ? "bg-succsseColor" : "bg-redColor"
+          } py-2 px-4 rounded-3xl apply-fonts-normal `}
         >
           {studentStatus ? "مفعل" : "غير مفعل "}
         </button>

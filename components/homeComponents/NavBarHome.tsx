@@ -50,16 +50,22 @@ const NavBarHome = () => {
         </Link>
       </nav>
 
-      <div className="flex flex-row-reverse xs:gap-2 xs:flex-grow xs:justify-cneter md:flex-grow-0 ">
+      <div className="flex flex-row-reverse items-center xs:gap-2 xs:flex-grow xs:justify-cneter md:flex-grow-0 ">
         <button className="md:hidden" onClick={handleOpenToggle}>
           <MenuOutlined fontSize="large" />
         </button>
-        <button className="hoverEle hover:bg-mainColorHoverLight  bg-mainColor xs:text-base  md:text-[20px] apply-fonts-normal  text-white xs:py-2 xs:px-3 md:py-2 md:px-5 rounded-3xl text-center">
+        <Link
+          href={"/login"}
+          className="hoverEle hover:bg-mainColorHoverLight  bg-mainColor xs:text-base  md:text-[20px] apply-fonts-normal  text-white xs:py-2 xs:px-3 md:py-2 md:px-5 rounded-3xl text-center"
+        >
           تسجيل الدخول
-        </button>
-        <button className="xs:text-base   md:text-[20px] apply-fonts-normal font-light rounded-3xl text-center">
+        </Link>
+        <Link
+          href={"/signup"}
+          className="xs:text-base   md:text-[20px] apply-fonts-normal font-light rounded-3xl text-center"
+        >
           إنشاء حساب
-        </button>
+        </Link>
       </div>
 
       {menuToggle && (

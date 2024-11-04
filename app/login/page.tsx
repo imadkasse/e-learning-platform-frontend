@@ -1,10 +1,10 @@
-import Support from "@/components/dashboard-user/support/Support";
 import React from "react";
+import Login from "../../components/signup&login/Login";
 
 const page = () => {
   return (
     <>
-      <Support />
+      <Login />
     </>
   );
 };
