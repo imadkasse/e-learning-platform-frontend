@@ -1,18 +1,23 @@
 "use client";
-import {
-  GitHub,
-  Google,
-  RemoveRedEye,
-  VisibilityOff,
-} from "@mui/icons-material";
+import { Google, RemoveRedEye, VisibilityOff } from "@mui/icons-material";
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Cookies from "js-cookie";
 
 const SignUp = () => {
-  const [email, setEmail] = useState("");
-  const [username, setUserName] = useState("");
-  const [password, setPassword] = useState("");
+  const router = useRouter();
+
+  const [email, setEmail] = useState<string>("");
+  const [username, setUserName] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const [image, setImage] = useState<File | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [passwordIsMatch, setPasswordIsMatch] = useState(false);
@@ -21,6 +26,7 @@ const SignUp = () => {
 
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
@@ -34,6 +40,54 @@ const SignUp = () => {
     setEmail(value);
     // تحقق من صحة البريد باستخدام تعبير منتظم بسيط
     setIsValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
+  };
+
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    if (image) {
+      formData.append("thumbnail", image);
+    }
+
+    formData.append("email", email);
+    formData.append("username", username);
+    formData.append("password", password);
+    formData.append("passwordConfirm", passwordConfirm);
+
+    console.log(formData);
+
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/signup`,
+        formData
+      );
+      const role = res.data.user.role === "student" ? "user" : "";
+      const token = res.data.token;
+      Cookies.set(`token`, token, { expires: 7 });
+      router.push(`/dashboard-${role}`);
+    } catch (error) {
+      console.log(error);
+      // @ts-expect-error: fix after time
+      toast.error(error.response.data.message, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignupWithGoogle = () => {
+    const googleAuthUrl = `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/google`;
+    window.location.href = googleAuthUrl;
   };
 
   return (
@@ -54,7 +108,11 @@ const SignUp = () => {
         </h1>
       </Link>
 
-      <form className="space-y-4 font-[sans-serif] max-w-md mx-auto  w-full ">
+      <form
+        className="space-y-4 font-[sans-serif] max-w-md mx-auto  w-full "
+        onSubmit={handleSignUp}
+      >
+        {/* username */}
         <div>
           <input
             type="tetx"
@@ -67,6 +125,7 @@ const SignUp = () => {
             ${username.length <= 2 ? "border-red-700" : "border-green-400"} `}
           />
         </div>
+        {/* email */}
         <div>
           <input
             type="email"
@@ -77,7 +136,30 @@ const SignUp = () => {
             ${isValid ? "border-green-400" : "border-red-700"}`}
           />
         </div>
-
+        {/* image */}
+        <div className="flex gap-4 ">
+          <input
+            type="file"
+            onChange={(e) => {
+              if (e.target.files) {
+                setImage(e.target.files[0]);
+                setImageUrl(URL.createObjectURL(e.target.files[0]));
+              }
+            }}
+            placeholder="البريد الإلكتروني"
+            required
+            className={`  w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent rounded 
+            ${isValid ? "border-green-400" : "border-red-700"}`}
+          />
+          <Image
+            src={imageUrl || "/imgs/logoImg.png"}
+            alt="user-image"
+            className="md:w-14 md:h-14 xs:w-12 xs:h-12 rounded-full "
+            width={150}
+            height={150}
+          />
+        </div>
+        {/* password */}
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
@@ -95,6 +177,7 @@ const SignUp = () => {
             {showPassword ? <VisibilityOff /> : <RemoveRedEye />}
           </button>
         </div>
+
         <div>
           <input
             type="password"
@@ -116,34 +199,32 @@ const SignUp = () => {
         </div>
 
         <div>
-          <Link href={"/login"} className="apply-fonts-normal text-[12px] group  ">
+          <Link
+            href={"/login"}
+            className="apply-fonts-normal text-[12px] group  "
+          >
             <p className="group-hover:underline  text-gray-600 cursor-pointer">
-              هل لديك حساب؟ إضغط هنا للتسجيل الدخول 
+              هل لديك حساب؟ إضغط هنا للتسجيل الدخول
             </p>
           </Link>
         </div>
 
         <button
           type="submit"
-          className="apply-fonts-normal !my-4 w-full px-4 py-2.5 mx-auto block text-sm bg-mainColor text-white hoverEle rounded hover:bg-mainColorHoverLight"
+          className={`apply-fonts-normal !my-4 w-full px-4 py-2.5 mx-auto block text-sm bg-mainColor text-white hoverEle rounded hover:bg-mainColorHoverLight ${
+            loading ? "bg-mainColorHoverLight" : "bg-mainColor"
+          }`}
         >
-          التسجيل
+          {loading ? "جاري التسجيل ..." : "التسجيل "}
         </button>
 
         <button
           type="button"
+          onClick={handleSignupWithGoogle}
           className="group flex justify-between items-center  apply-fonts-normal !mt-5 w-full  px-4 py-2.5 mx-auto  text-sm border-mainColor border-2 hoverEle rounded hover:bg-mainColor hover:text-white"
         >
           <p>التسجيل بإستخدام Google </p>
           <Google className="" />
-        </button>
-
-        <button
-          type="button"
-          className="group flex justify-between items-center  apply-fonts-normal !mt-5 w-full  px-4 py-2.5 mx-auto  text-sm border-mainColor border-2 hoverEle rounded hover:bg-mainColor hover:text-white"
-        >
-          <p>التسجيل بإستخدام Github </p>
-          <GitHub className="" />
         </button>
       </form>
     </div>

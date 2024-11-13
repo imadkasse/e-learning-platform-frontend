@@ -1,21 +1,23 @@
 "use client";
-import {
-  GitHub,
-  Google,
-  RemoveRedEye,
-  VisibilityOff,
-} from "@mui/icons-material";
+import { Google, RemoveRedEye, VisibilityOff } from "@mui/icons-material";
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [isValid, setIsValid] = useState(false);
 
   const [password, setPassword] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -29,6 +31,41 @@ const Login = () => {
     setEmail(value);
     // تحقق من صحة البريد باستخدام تعبير منتظم بسيط
     setIsValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
+  };
+  const handleLoginWithGoogle = () => {
+    const googleAuthUrl = `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/google`;
+    window.location.href = googleAuthUrl;
+  };
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const data = { email: email, password: password };
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`,
+        data
+      );
+      const token = res.data.token;
+      Cookies.set("token", token);
+      const role =
+        res.data.user.role === "student" ? "user" : res.data.user.role;
+
+      router.push(`/dashboard-${role}`);
+    } catch (error) {
+      console.log(error);
+      // @ts-expect-error: fix after time
+      toast.error(error.response.data.error, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div className="container mx-auto py-4  h-[70vh] w-full flex items-center justify-center flex-col">
@@ -48,11 +85,15 @@ const Login = () => {
         </h1>
       </Link>
 
-      <form className="space-y-4 font-[sans-serif] max-w-md mx-auto  w-full ">
+      <form
+        className="space-y-4 font-[sans-serif] max-w-md mx-auto  w-full "
+        onSubmit={handleLogin}
+      >
         <input
           type="email"
           value={email}
           onChange={handleEmailChange}
+          required
           placeholder="البريد الإلكتروني"
           className={`  w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 
             ${isValid ? "border-green-400" : "border-red-700"}`}
@@ -64,12 +105,9 @@ const Login = () => {
             value={password}
             onChange={handlePasswordChange}
             placeholder="كلمة المرور"
+            required
             className={` w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 
-            ${
-              isPasswordValid
-                ? "border-green-400"
-                : "border-red-700"
-            }`}
+            ${isPasswordValid ? "border-green-400" : "border-red-700"}`}
           />
           <button
             type="button"
@@ -86,7 +124,10 @@ const Login = () => {
               نسيت كلمة السر ؟
             </p>
           </Link>
-          <Link href={"/signup"} className="apply-fonts-normal text-[12px] group  ">
+          <Link
+            href={"/signup"}
+            className="apply-fonts-normal text-[12px] group  "
+          >
             <p className="group-hover:underline  text-gray-600 cursor-pointer">
               ليس لديك حساب؟ سجل هنا
             </p>
@@ -95,25 +136,20 @@ const Login = () => {
 
         <button
           type="submit"
-          className="apply-fonts-normal !my-4 w-full px-4 py-2.5 mx-auto block text-sm bg-mainColor text-white hoverEle rounded hover:bg-mainColorHoverLight"
+          className={`apply-fonts-normal !my-4 w-full px-4 py-2.5 mx-auto block text-sm  text-white hoverEle rounded hover:bg-mainColorHoverLight ${
+            loading ? "bg-mainColorHoverLight" : "bg-mainColor"
+          }`}
         >
-          التسجيل
+          {loading ? "جاري تسجيل الدخول ..." : "تسجيل الدخول "}
         </button>
 
         <button
           type="button"
+          onClick={handleLoginWithGoogle}
           className="group flex justify-between items-center  apply-fonts-normal !mt-5 w-full  px-4 py-2.5 mx-auto  text-sm border-mainColor border-2 hoverEle rounded hover:bg-mainColor hover:text-white"
         >
           <p>التسجيل بإستخدام Google </p>
           <Google className="" />
-        </button>
-
-        <button
-          type="button"
-          className="group flex justify-between items-center  apply-fonts-normal !mt-5 w-full  px-4 py-2.5 mx-auto  text-sm border-mainColor border-2 hoverEle rounded hover:bg-mainColor hover:text-white"
-        >
-          <p>التسجيل بإستخدام Github </p>
-          <GitHub className="" />
         </button>
       </form>
     </div>

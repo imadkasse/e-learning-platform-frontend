@@ -1,18 +1,38 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
-import { CloseOutlined, MenuOutlined } from "@mui/icons-material";
+import React, { useEffect, useState } from "react";
+import {
+  CloseOutlined,
+  LogoutOutlined,
+  MenuOutlined,
+} from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { Link as ScrollLink } from "react-scroll";
+import { useUserStore } from "@/store/userStore";
 const NavBarHome = () => {
   const [menuToggle, setMenuToggle] = useState<boolean | null>(null);
+  const [userMenuToggle, setUserMenuToggle] = useState<boolean | null>(null);
+
   const handleColseToggle = () => {
     setMenuToggle(false);
+  };
+  const handleColseAndOpenUserToggle = () => {
+    setUserMenuToggle(!userMenuToggle);
   };
   const handleOpenToggle = () => {
     setMenuToggle(true);
   };
+  const fetchUserData = useUserStore((state) => state.fetchUser);
+
+  const user = useUserStore((state) => state);
+
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
   return (
     <div className="h-[80px] flex items-center justify-around  ">
       <Link href={`/`} className="flex items-center flex-row-reverse  md:gap-3">
@@ -50,23 +70,68 @@ const NavBarHome = () => {
         </Link>
       </nav>
 
-      <div className="flex flex-row-reverse items-center xs:gap-2 xs:flex-grow xs:justify-cneter md:flex-grow-0 ">
-        <button className="md:hidden" onClick={handleOpenToggle}>
-          <MenuOutlined fontSize="large" />
-        </button>
-        <Link
-          href={"/login"}
-          className="hoverEle hover:bg-mainColorHoverLight  bg-mainColor xs:text-base  md:text-[20px] apply-fonts-normal  text-white xs:py-2 xs:px-3 md:py-2 md:px-5 rounded-3xl text-center"
-        >
-          تسجيل الدخول
-        </Link>
-        <Link
-          href={"/signup"}
-          className="xs:text-base   md:text-[20px] apply-fonts-normal font-light rounded-3xl text-center"
-        >
-          إنشاء حساب
-        </Link>
-      </div>
+      {user._id !== "" ? (
+        <div className="relative flex gap-2">
+          <div className="w-12 h-12 rounded-full border-2 border-mainColor  ">
+            <button
+              className="w-full h-full "
+              onClick={handleColseAndOpenUserToggle}
+            >
+              <Image
+                src={user.thumbnail}
+                width={100}
+                height={100}
+                className="w-full h-full rounded-full"
+                alt={`img-${user.id}`}
+              />
+            </button>
+          </div>
+          <button className="md:hidden" onClick={handleOpenToggle}>
+            <MenuOutlined fontSize="large" />
+          </button>
+          {userMenuToggle && (
+            <div className="absolute top-12 -left-5 flex flex-col gap-2 bg-mainColor py-2 px-2 rounded-md">
+              <Link
+                href={"/dashboard-user"}
+                className="hoverEle rounded-2xl hover:bg-redColorHoverLight border px-2 py-1 border-redColor text-white hover:text-white text-[14px] apply-fonts-normal    text-center"
+              >
+                الرئيسية
+              </Link>
+              <Link
+                href={"/dashboard-user/courses"}
+                className="hoverEle rounded-2xl hover:bg-redColorHoverLight border px-2 py-1 border-redColor text-white hover:text-white text-[14px] apply-fonts-normal    text-center"
+              >
+                دوراتي
+              </Link>
+              <Link
+                href={"/logout"}
+                className="hoverEle rounded-2xl hover:bg-redColorHoverLight  bg-redColor text-white   apply-fonts-normal text-[14px]   text-center"
+              >
+                <LogoutOutlined />
+                
+              </Link>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className=" flex flex-row-reverse items-center xs:gap-2 xs:flex-grow xs:justify-cneter md:flex-grow-0 ">
+          <button className="md:hidden" onClick={handleOpenToggle}>
+            <MenuOutlined fontSize="large" />
+          </button>
+          <Link
+            href={"/login"}
+            className="hoverEle hover:bg-mainColorHoverLight  bg-mainColor xs:text-base  md:text-[20px] apply-fonts-normal  text-white xs:py-2 xs:px-3 md:py-2 md:px-5 rounded-3xl text-center"
+          >
+            تسجيل الدخول
+          </Link>
+          <Link
+            href={"/signup"}
+            className="xs:text-base   md:text-[20px] apply-fonts-normal font-light rounded-3xl text-center"
+          >
+            إنشاء حساب
+          </Link>
+        </div>
+      )}
 
       {menuToggle && (
         <motion.div

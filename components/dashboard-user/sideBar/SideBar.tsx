@@ -21,7 +21,7 @@ const SideBar = () => {
     setToggleSidebar(!toggleSidebar);
   };
   const pathName = usePathname();
-  console.log(pathName);
+
   return (
     <>
       {/* in the small screen */}
@@ -100,22 +100,38 @@ const SideBar = () => {
           }`}
         >
           <ul className="list-none text-base w-[200px]">
-            <li className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2">
+            <Link
+              href={`/dashboard-user/my-info`}
+              className={` flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2 ${
+                pathName === "/dashboard-user/my-info" ? "bg-mainColor/50" : ""
+              } `}
+            >
               <PersonOutlineOutlined />
-              <Link href={`/`}>معلوماتي</Link>
-            </li>
-            <li className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2">
+              <p>معلوماتي</p>
+            </Link>
+            <Link
+              href={`/dashboard-user/support`}
+              className={` flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2 ${
+                pathName === "/dashboard-user/support" ? "bg-mainColor/50" : ""
+              } `}
+            >
               <ContactSupportOutlined />
-              <Link href={`/`}>الدعم</Link>
-            </li>
-            <li className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2">
+              <p>الدعم</p>
+            </Link>
+            <Link
+              href={`/dashboard-user/settings`}
+              className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2"
+            >
               <SettingsOutlined />
-              <Link href={`/`}>الإعدادات</Link>
-            </li>
-            <li className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2">
+              <p>الإعدادات</p>
+            </Link>
+            <Link
+              href={`/dashboard-user/faq`}
+              className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
+            >
               <LogoutOutlined className="text-red-700" />
-              <Link href={`/`}>تسجيل الخروج</Link>
-            </li>
+              <p>تسجيل الخروج</p>
+            </Link>
           </ul>
         </nav>
       </div>
@@ -180,10 +196,8 @@ const SideBar = () => {
             <Link
               href={`/dashboard-user/my-info`}
               className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-user/my-info"
-                    ? "bg-mainColor/50"
-                    : ""
-                } my-2`}
+                pathName === "/dashboard-user/my-info" ? "bg-mainColor/50" : ""
+              } my-2`}
             >
               <PersonOutlineOutlined />
               <p>معلوماتي</p>
@@ -191,10 +205,8 @@ const SideBar = () => {
             <Link
               href={`/dashboard-user/support`}
               className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-user/support"
-                    ? "bg-mainColor/50"
-                    : ""
-                } my-2`}
+                pathName === "/dashboard-user/support" ? "bg-mainColor/50" : ""
+              } my-2`}
             >
               <ContactSupportOutlined />
               <p>الدعم</p>
@@ -202,10 +214,8 @@ const SideBar = () => {
             <Link
               href={`/dashboard-user/settings`}
               className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-user/settings"
-                    ? "bg-mainColor/50"
-                    : ""
-                } my-2`}
+                pathName === "/dashboard-user/settings" ? "bg-mainColor/50" : ""
+              } my-2`}
             >
               <SettingsOutlined />
               <p>الإعدادات</p>

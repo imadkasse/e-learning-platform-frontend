@@ -62,18 +62,18 @@ const SideBar = () => {
           <nav className="apply-fonts-normal w-full  flex justify-center">
             <div className="list-none text-base w-[200px]">
               <Link
-                href={`/dashboard-user`}
+                href={`/dashboard-admin`}
                 className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-user" ? "bg-mainColor/50" : ""
+                  pathName === "/dashboard-admin" ? "bg-mainColor/50" : ""
                 }  my-2`}
               >
                 <HomeOutlined />
                 <p>الرئيسية</p>
               </Link>
               <Link
-                href={`/dashboard-user/courses`}
+                href={`/dashboard-admin/courses`}
                 className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-user/courses"
+                  pathName === "/dashboard-admin/courses"
                     ? "bg-mainColor/50"
                     : ""
                 }  my-2`}
@@ -82,9 +82,9 @@ const SideBar = () => {
                 <p>الدورات</p>
               </Link>
               <Link
-                href={`/dashboard-user/notification`}
+                href={`/dashboard-admin/notification`}
                 className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-user/notification"
+                  pathName === "/dashboard-admin/notification"
                     ? "bg-mainColor/50"
                     : ""
                 }  my-2`}
