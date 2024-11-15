@@ -20,6 +20,9 @@ const config: Config = {
         redColor: "#EE3D45",
         redColorHoverLight: "#FF5F68",
         succsseColor: "#45DA10",
+        courseIconsSection: "#FF6636",
+        courseTextSection: "#6E7485",
+        courseStarColor: "#FD8E1F",
       },
       screens: {
         xs: "330px",

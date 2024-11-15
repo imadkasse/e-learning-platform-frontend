@@ -108,7 +108,6 @@ const NavBarHome = () => {
                 className="hoverEle rounded-2xl hover:bg-redColorHoverLight  bg-redColor text-white   apply-fonts-normal text-[14px]   text-center"
               >
                 <LogoutOutlined />
-                
               </Link>
             </div>
           )}

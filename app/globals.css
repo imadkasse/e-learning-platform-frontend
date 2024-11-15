@@ -49,8 +49,10 @@
   .custom-width {
     width: calc(100vw - 300px);
   }
+  .custom-width-Course {
+    width: calc(100vw - 400px);
+  }
 }
-
 
 /* تخصيص شريط التمرير لجميع العناصر القابلة للتمرير في الموقع */
 ::-webkit-scrollbar {
@@ -64,9 +66,9 @@
 
 /* مقبض شريط التمرير */
 ::-webkit-scrollbar-thumb {
-  background-color: #F3F3F3; /* لون مقبض شريط التمرير */
+  background-color: #f3f3f3; /* لون مقبض شريط التمرير */
   border-radius: 5px;
-  border: 1px solid #F3F3F3; /* لإضافة مساحة حول المقبض */
+  border: 1px solid #f3f3f3; /* لإضافة مساحة حول المقبض */
 }
 
 /* عند التحويم فوق مقبض شريط التمرير */
