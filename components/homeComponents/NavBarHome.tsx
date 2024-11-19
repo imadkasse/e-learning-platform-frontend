@@ -10,6 +10,10 @@ import {
 import { motion } from "framer-motion";
 import { Link as ScrollLink } from "react-scroll";
 import { useUserStore } from "@/store/userStore";
+import Cookie from "js-cookie";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const NavBarHome = () => {
   const [menuToggle, setMenuToggle] = useState<boolean | null>(null);
   const [userMenuToggle, setUserMenuToggle] = useState<boolean | null>(null);
@@ -25,7 +29,8 @@ const NavBarHome = () => {
   };
   const fetchUserData = useUserStore((state) => state.fetchUser);
 
-  const user = useUserStore((state) => state);
+  const user = useUserStore((state) => state.user);
+  const role = user.role === "student" ? "user" : user.role;
 
   useEffect(() => {
     fetchUserData();
@@ -33,6 +38,24 @@ const NavBarHome = () => {
   useEffect(() => {
     console.log(user);
   }, [user]);
+
+  // const router = useRouter();
+
+  const handleLogout = () => {
+    Cookie.remove("token");
+    toast.success("logout succes ", {
+      position: "top-center",
+      autoClose: 1000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      className: "bg-white text-black dark:bg-gray-800 dark:text-white",
+    });
+    setUserMenuToggle(false);
+    window.location.reload();
+  };
+
   return (
     <div className="h-[80px] flex items-center justify-around  ">
       <Link href={`/`} className="flex items-center flex-row-reverse  md:gap-3">
@@ -78,11 +101,11 @@ const NavBarHome = () => {
               onClick={handleColseAndOpenUserToggle}
             >
               <Image
-                src={user.thumbnail}
+                src={user.thumbnail ? user.thumbnail : "/imgs/personImg.png"}
                 width={100}
                 height={100}
                 className="w-full h-full rounded-full"
-                alt={`img-${user.id}`}
+                alt={`img-${user._id}`}
               />
             </button>
           </div>
@@ -92,23 +115,23 @@ const NavBarHome = () => {
           {userMenuToggle && (
             <div className="absolute top-12 -left-5 flex flex-col gap-2 bg-mainColor py-2 px-2 rounded-md">
               <Link
-                href={"/dashboard-user"}
+                href={`/dashboard-${role}`}
                 className="hoverEle rounded-2xl hover:bg-redColorHoverLight border px-2 py-1 border-redColor text-white hover:text-white text-[14px] apply-fonts-normal    text-center"
               >
                 الرئيسية
               </Link>
               <Link
-                href={"/dashboard-user/courses"}
+                href={`/dashboard-${role}/courses`}
                 className="hoverEle rounded-2xl hover:bg-redColorHoverLight border px-2 py-1 border-redColor text-white hover:text-white text-[14px] apply-fonts-normal    text-center"
               >
                 دوراتي
               </Link>
-              <Link
-                href={"/logout"}
+              <button
+                onClick={handleLogout}
                 className="hoverEle rounded-2xl hover:bg-redColorHoverLight  bg-redColor text-white   apply-fonts-normal text-[14px]   text-center"
               >
                 <LogoutOutlined />
-              </Link>
+              </button>
             </div>
           )}
         </div>

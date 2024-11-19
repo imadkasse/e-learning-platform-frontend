@@ -1,145 +1,82 @@
 import {
-  AccessTimeOutlined,
-  ContentCopyOutlined,
-  Facebook,
-  FileDownloadOutlined,
-  Instagram,
-  OnlinePredictionOutlined,
-  PeopleAltOutlined,
-  PlayCircleOutlined,
-  Twitter,
+  ChatBubbleOutlineOutlined,
+  DescriptionOutlined,
 } from "@mui/icons-material";
 import { Rating } from "@mui/material";
 import Image from "next/image";
-import Link from "next/link";
 import React from "react";
+import VideoPlyr from "./VideoPlyr";
+import CourseCardDetails from "./CourseCardDetails";
 
-export const CoursePage = () => {
+const CoursePage = () => {
   return (
     <div className="mt-6 flex  flex-row-reverse justify-between gap-7 px-3 ">
-      {/*Card Course */}
-      <div className="border shadow-sm h-[80vh] lg:sticky lg:top-4 xs:fixed z-50 bg-wygColor  w-[400px] py-3 px-4 flex flex-col gap-6">
-        {/* price */}
-        <div className="w-full text-lg text-center">
-          <h1 className="border-b border-courseTextSection">1700.00DA</h1>
-        </div>
-        <div className=" flex flex-col gap-1 py-2">
-          {/* duration */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <p className="apply-fonts-normal ">مدة الدورة </p>
-              <AccessTimeOutlined className="text-courseTextSection" />
-            </div>
-            <h1 className="text-courseTextSection">
-              48 <span className="text-[17px] apply-fonts-normal ">ساعة</span>{" "}
-            </h1>
-          </div>
-          {/* student number */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <p className="apply-fonts-normal ">عدد الطلاب </p>
-              <PeopleAltOutlined className="text-courseTextSection" />
-            </div>
-            <h1 className="text-courseTextSection">4800</h1>
-          </div>
-        </div>
-
-        <div className="">
-          <button className="apply-fonts-normal w-full p-2 bg-mainColor text-white rounded-sm hover:bg-mainColorHoverLight hoverEle">
-            الانضمام
-          </button>
-        </div>
-        {/* course features */}
-        <div className=" ">
-          <p className="apply-fonts-medium mb-3">تتضمن هذه الدورة :</p>
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2 cursor-pointer">
-              <AccessTimeOutlined className="text-courseIconsSection" />
-              <p className="apply-fonts-normal text-[15px] text-courseTextSection">
-                وصول الى دورة مدى الحياة
-              </p>
-            </div>
-            <div className="flex items-center gap-2 cursor-pointer">
-              <FileDownloadOutlined className="text-courseIconsSection" />
-              <p className="apply-fonts-normal text-[15px] text-courseTextSection">
-                تحميل مجاني للملفات والتمارين
-              </p>
-            </div>
-            <div className="flex items-center gap-2 cursor-pointer">
-              <OnlinePredictionOutlined className="text-courseIconsSection" />
-              <p className=" text-[15px] text-courseTextSection">
-                <span className="apply-fonts-normal">الدورة أونلاين</span> 100%
-              </p>
-            </div>
-          </div>
-        </div>
-        {/* Share Course Links */}
-        <div className="">
-          <p className="apply-fonts-medium mb-3 ">شارك هذه الدورة :</p>
-          <div className="flex gap-4 justify-center">
-            <Link
-              href="#"
-              className=" px-4 py-2 rounded-lg hover:border-gray-400 hoverEle bg-gray-100"
-            >
-              <Facebook className="text-courseTextSection" />
-            </Link>
-            <Link
-              href="#"
-              className="bg-gray-100 px-4 py-2 rounded-lg hover:border-gray-400 hoverEle"
-            >
-              <Twitter className="text-courseTextSection" />
-            </Link>
-            <Link
-              href="#"
-              className="bg-gray-100 px-4 py-2 rounded-lg hover:border-gray-400 hoverEle"
-            >
-              <Instagram className="text-courseTextSection" />
-            </Link>
-            <Link
-              href="#"
-              className="bg-gray-100 px-3 py-2 rounded-lg hover:border-gray-400 hoverEle flex items-center gap-1"
-            >
-              <h1 className="apply-fonts-normal text-[11px] text-gray-700">
-                نسخ الرابط
-              </h1>
-              <ContentCopyOutlined className="text-courseTextSection" />
-            </Link>
-          </div>
-        </div>
-      </div>
-      {/* Show Course  */}
+      {/* Course Details */}
+      <CourseCardDetails />
+      {/* Show Course */}
       <div className="lg:custom-width-Course ">
-        {/* title Of Course  */}
-        <div>
-          <h1 className="apply-fonts-medium text-lg">
-            الوحدة الثالثة : دور البروتينات في التحفيز الإنزيمي
+        {/* Welcome video */}
+        <VideoPlyr />
+        {/* Video Title */}
+        <div className="my-4">
+          <h1 className="apply-fonts-medium  xs:text-lg lg:text-2xl mb-2">
+            المقدمة
           </h1>
         </div>
-        {/* Teacher Information */}
-        <div className="my-5 flex items-center gap-3">
-          <Image
-            src={"/imgs/personImg.png"}
-            alt="teacher-username"
-            width={150}
-            height={150}
-            className="rounded-full xs:w-14 xs:h-14"
-          />
-          <div className="flex flex-col gap-1">
-            <h3 className="apply-fonts-normal text-courseTextSection text-[14px]">
-              أستاذ الدورة
-            </h3>
-            <h1 className="font-medium">kasse imad</h1>
+        {/* student number and  number of reviews */}
+        <div className="my-4 flex justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex flex-row-reverse -space-x-4 ">
+              <Image
+                width={150}
+                height={150}
+                className="w-10 h-10 border-2 rounded-full border-white"
+                src="/imgs/personImg.png"
+                alt="personImg"
+              />
+              <Image
+                width={150}
+                height={150}
+                className="w-10 h-10 border-2 rounded-full border-white"
+                src="/imgs/personImg.png"
+                alt="personImg"
+              />
+              <Image
+                width={150}
+                height={150}
+                className="w-10 h-10 border-2 rounded-full border-white"
+                src="/imgs/personImg.png"
+                alt="personImg"
+              />
+              <Image
+                width={150}
+                height={150}
+                className="w-10 h-10 border-2 rounded-full border-white"
+                src="/imgs/personImg.png"
+                alt="personImg"
+              />
+            </div>
+            <h2 className="flex flex-col -gap-2">
+              <p className="font-semibold">512</p>
+              <span className="apply-fonts-normal text-[13px] text-courseTextSection">
+                تلميذ
+              </span>
+            </h2>
           </div>
-        </div>
-        {/* Welcome video */}
-        <div className="w-full mt-5">
-          <video src="/videos/videoEx.mp4" controls className="w-full ">
-            متصفحك لا يدعم تشغيل الفيديو.
-          </video>
+          <div>
+            <h2 className="flex flex-col -gap-2">
+              <p className="font-semibold">512</p>
+              <span className="apply-fonts-normal text-[13px] text-courseTextSection">
+                تعليق
+              </span>
+            </h2>
+          </div>
         </div>
         {/* description Course */}
         <div className="my-4">
-          <h1 className="apply-fonts-medium  text-lg mb-2">وصف الدورة</h1>
+          <h1 className="apply-fonts-medium xs:text-lg lg:text-2xl mb-2">
+            وصف الدورة
+          </h1>
           <p className="apply-fonts-normal text-[14px] text-courseTextSection leading-8 pl-5 xs:line-clamp-4  md:line-clamp-6">
             تركز هذه الدورة على دراسة دور البروتينات في التحفيز الإنزيمي، وهو
             جزء أساسي من مادة العلوم الطبيعية لطلاب البكالوريا. سيتم تسليط الضوء
@@ -157,47 +94,41 @@ export const CoursePage = () => {
             البكالوريا بنجاح وتحقيق تفوق أكاديمي في مجال العلوم.
           </p>
         </div>
-        {/* all videos */}
-        <div>
-          <div className="flex justify-between border-b">
-            <h1 className="apply-fonts-medium  text-lg mb-2">المنهاج</h1>
-            <div className="flex  gap-6 px-2">
-              <div className="flex  items-center gap-1">
-                <PlayCircleOutlined className="text-mainColor" />
-                <h1 className="flex  items-center">
-                  30
-                  <span className="apply-fonts-normal text-[13px]">درس</span>
-                </h1>
-              </div>
-              <div className="flex  items-center gap-1">
-                <AccessTimeOutlined className="text-courseIconsSection" />
-                <h1 className="flex  items-center">
-                  30{" "}
-                  <span className="apply-fonts-normal text-[13px]">ساعة</span>
-                </h1>
+        {/* Course Fiels */}
+        <div className="my-4">
+          <h1 className="apply-fonts-medium  xs:text-lg lg:text-2xl mb-2">
+            ملفات الدرس
+          </h1>
+          <div className="bg-wygColor py-4 px-3 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <DescriptionOutlined
+                sx={{ fontSize: "44px" }}
+                className="text-courseIconsSection"
+              />
+              <div>
+                <h1 className="text-md font-medium">ملخص الدرس.pdf</h1>
+                <p className="text-courseTextSection" dir="">
+                  12.9MB
+                </p>
               </div>
             </div>
-          </div>
-          <div>video overView</div>
-        </div>
-        {/* course reviews */}
-        <div className="mt-5 flex  items-center justify-between">
-          <h1 className="apply-fonts-medium  text-lg mb-2">تقييم الدورة</h1>
-          <div className="flex items-center gap-1 px-3">
-            <p className="font-bold text-[15px]">4.5</p>
-            <Rating
-              className="text-courseStarColor"
-              dir="ltr"
-              name="half-rating-read"
-              value={4.5}
-              precision={0.5}
-              readOnly
-            />
+
+            <div>
+              <button className="apply-fonts-normal py-2 px-3 bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white ">
+                تحميل الملف
+              </button>
+            </div>
           </div>
         </div>
+
         {/* stduents reviews */}
         <div className="mt-5">
-          <h1 className="apply-fonts-medium  text-lg mb-8">أراء التلاميذ</h1>
+          <h1 className="mb-8 flex items-center gap-1">
+            <span className="apply-fonts-medium  xs:text-lg lg:text-2xl">
+              التعليقات
+            </span>
+            <p className="font-bold text-courseTextSection">(12)</p>
+          </h1>
 
           <div className="flex flex-col gap-5">
             <div className="border-b pb-3">
@@ -268,8 +199,27 @@ export const CoursePage = () => {
               </div>
             </div>
           </div>
+          <form className="flex w-full gap-3 my-5">
+            <button
+              type="submit"
+              className="apply-fonts-normal rounded-lg py-2 px-4 bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white "
+            >
+              نشر
+            </button>
+            <div className="flex-grow">
+              <label className="relative ">
+                <ChatBubbleOutlineOutlined className="absolute top-0 text-courseTextSection mx-1" />
+                <input
+                  type="text"
+                  className="w-full text-courseTextSection rounded-xl  px-7 py-2 border-2 border-gray-400 focus:border-mainColor focus:outline-none"
+                />
+              </label>
+            </div>
+          </form>
         </div>
       </div>
     </div>
   );
 };
+
+export default CoursePage;

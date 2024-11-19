@@ -1,7 +1,13 @@
 import React from "react";
 import CourseCard from "./CourseCard";
+import axios from "axios";
+import { Course } from "@/types/course";
 
-const Courses = () => {
+const Courses = async () => {
+  const data = await axios.get(`${process.env.BACK_URL}/api/courses`);
+
+  const allCourses: Course[] = data.data.courses;
+
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 ">
       <div className="mb-5 flex items-center gap-6">
@@ -41,54 +47,28 @@ const Courses = () => {
         </form>
       </div>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-7">
-        <CourseCard
-          coursePrice={1200}
-          Almada={"علوم"}
-          numberOfVideo={200}
-          courseImg={"course1"}
-          courseName={"الوحدة الأولى : تركيب البروتين"}
-          courseUrl={"/"}
-        />
-        <CourseCard
-          coursePrice={1200}
-          Almada={"علوم"}
-          numberOfVideo={200}
-          courseImg={"course2"}
-          courseName={"الوحدة الأولى : تركيب البروتين"}
-          courseUrl={"/"}
-        />
-        <CourseCard
-          coursePrice={1000}
-          Almada={"علوم"}
-          numberOfVideo={200}
-          courseImg={"course3"}
-          courseName={"الوحدة الأولى : تركيب البروتين"}
-          courseUrl={"/"}
-        />
-        <CourseCard
-          coursePrice={1200}
-          Almada={"علوم"}
-          numberOfVideo={200}
-          courseImg={"course1"}
-          courseName={"الوحدة الأولى : تركيب البروتين"}
-          courseUrl={"/"}
-        />
-        <CourseCard
-          coursePrice={1700}
-          Almada={"علوم"}
-          numberOfVideo={200}
-          courseImg={"course3"}
-          courseName={"الوحدة الأولى : تركيب البروتين"}
-          courseUrl={"/"}
-        />
-        <CourseCard
-          coursePrice={1700}
-          Almada={"علوم"}
-          numberOfVideo={200}
-          courseImg={"course2"}
-          courseName={"الوحدة الأولى : تركيب البروتين"}
-          courseUrl={"/"}
-        />
+        {allCourses.length ? (
+          allCourses.map((course) => {
+            return (
+              <div key={course._id}>
+                <CourseCard
+                  courseId={course._id}
+                  courseDescription={course.description}
+                  courseImg={course.imageCover}
+                  courseName={course.title}
+                  coursePrice={course.price}
+                  courseRating={course.avgRatings}
+                  students={course.studentsCount}
+                  numberOfVideo={course.videos.length}
+                />
+              </div>
+            );
+          })
+        ) : (
+          <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor h-[100vh]">
+            ليس لديك أي دورات يمكنك إضافة دوراتك
+          </h1>
+        )}
       </div>
     </div>
   );

@@ -119,7 +119,10 @@ const Login = () => {
         </div>
 
         <div className="flex justify-between">
-          <Link href={"/"} className="apply-fonts-normal text-[12px] group  ">
+          <Link
+            href={"/reset-password"}
+            className="apply-fonts-normal text-[12px] group  "
+          >
             <p className="group-hover:underline  text-gray-600 cursor-pointer">
               نسيت كلمة السر ؟
             </p>

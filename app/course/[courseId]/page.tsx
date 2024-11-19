@@ -1,4 +1,4 @@
-import { CoursePage } from "@/components/coursePage/CoursePage";
+import CoursePage from "@/components/coursePage/CoursePage";
 import NavBarCourse from "@/components/coursePage/NavBarCourse";
 import React from "react";
 

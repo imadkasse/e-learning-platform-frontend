@@ -82,6 +82,28 @@ const SideBar = () => {
                 <p>الدورات</p>
               </Link>
               <Link
+                href={`/dashboard-admin/students`}
+                className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                  pathName === "/dashboard-admin/students"
+                    ? "bg-mainColor/50"
+                    : ""
+                }  my-2`}
+              >
+                <GroupsOutlined />
+                <p>الطلاب</p>
+              </Link>
+              <Link
+                href={`/dashboard-admin/administration`}
+                className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                  pathName === "/dashboard-admin/administration"
+                    ? "bg-mainColor/50"
+                    : ""
+                }  my-2`}
+              >
+                <SupervisorAccountOutlined />
+                <p>الإدارة</p>
+              </Link>
+              <Link
                 href={`/dashboard-admin/notification`}
                 className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                   pathName === "/dashboard-admin/notification"

@@ -75,3 +75,7 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: #555; /* لون مقبض شريط التمرير عند التحويم */
 }
+
+:root {
+  --plyr-color-main: #3d45ee; /* اللون الرئيسي */
+}

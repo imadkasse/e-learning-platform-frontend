@@ -12,6 +12,7 @@ const config: Config = {
         mainColor: "#3D45EE",
         mainColorHoverLight: "#2E36C0",
         mainColorHoverDark: "#5C66FF",
+        secondColor: "#B9BCFF",
         starColor: "#FDF0CD",
         starIconColor: "#FFC700",
         startTextColor: "#FFB802",

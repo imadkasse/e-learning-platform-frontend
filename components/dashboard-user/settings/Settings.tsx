@@ -1,11 +1,20 @@
 "use client";
+import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Settings = () => {
-  const [name, setName] = useState("عماد");
-  const [email, setEmail] = useState("ex@example.com");
-  const [numPhone, setNumPhone] = useState("0660-60-60-60");
+  const fetchUser = useUserStore((state) => state.fetchUser);
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+  const user = useUserStore((state) => state.user);
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [numPhone, setNumPhone] = useState("");
+
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-screen">
       <div className="mb-5">
@@ -13,113 +22,122 @@ const Settings = () => {
           إعدادات الحساب
         </h1>
       </div>
-      <form>
-        {/* Name */}
-        <div className="flex flex-col  justify-center gap-3 ">
-          <label className="apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
-            الصورة
-          </label>
-          <Image
-            src="/imgs/personImg.png"
-            width={150}
-            height={150}
-            alt="personImg"
-            className="w-36 h-36  rounded-xl"
-          />
-          <div className="flex flex-col  items-start w-36 ">
-            <label
-              htmlFor="image"
-              className="cursor-pointer text-sm w-full text-center font-medium text-white bg-mainColor hover:bg-mainColorHoverLight  rounded-lg px-4 py-2 hoverEle"
-            >
-              اختر صورة
-            </label>
-            <input
-              type="file"
-              name="image"
-              id="image"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  console.log("Selected file:", file);
-                }
-              }}
-              className="hidden" // اجعل حقل الإدخال غير مرئي
-            />
-          </div>
-        </div>
-
-        <div className="grid gap-4 mb-4 sm:grid-cols-2">
-          {/* Name */}
-          <div>
+      {user && (
+        <form>
+          {/* Image */}
+          <div className="flex flex-col  justify-center gap-3 ">
             <label className="apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
-              الإسم
+              الصورة
             </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="apply-fonts-normal bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+            <Image
+              src={user.thumbnail ? user.thumbnail : "/imgs/personImg.png"}
+              width={150}
+              height={150}
+              alt="personImg"
+              className="w-36 h-36  rounded-xl"
             />
+            <div className="flex flex-col  items-start w-36 ">
+              <label
+                htmlFor="image"
+                className="cursor-pointer text-sm w-full text-center font-medium text-white bg-mainColor hover:bg-mainColorHoverLight  rounded-lg px-4 py-2 hoverEle"
+              >
+                اختر صورة
+              </label>
+              <input
+                type="file"
+                name="image"
+                id="image"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    console.log("Selected file:", file);
+                  }
+                }}
+                className="hidden" // اجعل حقل الإدخال غير مرئي
+              />
+            </div>
           </div>
 
-          {/* Email */}
-          <div>
-            <label className=" apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
-              البريد الإلكتروني
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="apply-fonts-normal bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
-            />
+          <div className="grid gap-4 mb-4 sm:grid-cols-2">
+            {/* Name */}
+            <div>
+              <label className="apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
+                الإسم
+              </label>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                value={name}
+                placeholder={user.username}
+                onChange={(e) => setName(e.target.value)}
+                className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className=" apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
+                البريد الإلكتروني
+              </label>
+              <input
+                type="email"
+                value={email}
+                placeholder={user.email}
+                onChange={(e) => setEmail(e.target.value)}
+                className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+              />
+            </div>
+
+            {/* Phone Number */}
+            <div>
+              <label className="apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
+                رقم الهاتف
+              </label>
+              <input
+                type="text"
+                value={numPhone}
+                placeholder={user.phoneNumber}
+                onChange={(e) => setNumPhone(e.target.value)}
+                name="price"
+                id="price"
+                className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+              />
+            </div>
+
+            {/* Role */}
+            <div>
+              <label className=" apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
+                الدور
+              </label>
+              <select
+                id="role"
+                className="apply-fonts-normal bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                defaultValue="user"
+              >
+                <option value="user" className="apply-fonts-normal">
+                  {user.role === "teacher"
+                    ? "أستاذ"
+                    : user.role === "admin"
+                    ? "أدمن"
+                    : "طالب"}
+                </option>
+              </select>
+            </div>
           </div>
 
-          {/* Phone Number */}
-          <div>
-            <label className="apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
-              رقم الهاتف
-            </label>
-            <input
-              type="text"
-              value={numPhone}
-              onChange={(e) => setNumPhone(e.target.value)}
-              name="price"
-              id="price"
-              className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
-            />
-          </div>
-
-          {/* Role */}
-          <div>
-            <label className=" apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
-              الدور
-            </label>
-            <select
-              id="role"
-              className="apply-fonts-normal bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
-              defaultValue="user"
+          {/* Buttons */}
+          <div className="flex items-center space-x-4">
+            <button
+              type="submit"
+              className="apply-fonts-normal text-white  bg-mainColor  hover:bg-mainColorHoverLight hoverEle  focus:ring-4 focus:outline-none focus:ring-mainColor  font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
             >
-              <option value="user" className="apply-fonts-normal">
-                أستاذ
-              </option>
-            </select>
+              تعديل
+            </button>
           </div>
-        </div>
-
-        {/* Buttons */}
-        <div className="flex items-center space-x-4">
-          <button
-            type="submit"
-            className="apply-fonts-normal text-white  bg-mainColor  hover:bg-mainColorHoverLight hoverEle  focus:ring-4 focus:outline-none focus:ring-mainColor  font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-          >
-            تعديل  
-          </button>
-        </div>
-      </form>
+        </form>
+      )}
     </div>
   );
 };
