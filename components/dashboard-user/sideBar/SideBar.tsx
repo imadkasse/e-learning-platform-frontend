@@ -12,15 +12,22 @@ import {
 } from "@mui/icons-material";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
+import Cookies from "js-cookie";
 
 const SideBar = () => {
+  const router = useRouter();
   const [toggleSidebar, setToggleSidebar] = useState<boolean>(false);
   const handleToggle = () => {
     setToggleSidebar(!toggleSidebar);
   };
   const pathName = usePathname();
+
+  const handleLogout = () => {
+    Cookies.remove("token");
+    router.push("/");
+  };
 
   return (
     <>
@@ -125,13 +132,13 @@ const SideBar = () => {
               <SettingsOutlined />
               <p>الإعدادات</p>
             </Link>
-            <Link
-              href={`/dashboard-user/faq`}
-              className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
+            <button
+              onClick={handleLogout}
+              className="group w-full flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
             >
-              <LogoutOutlined className="text-red-700" />
+              <LogoutOutlined className="text-red-700 group-hover:text-white hoverEle" />
               <p>تسجيل الخروج</p>
-            </Link>
+            </button>
           </ul>
         </nav>
       </div>
@@ -220,13 +227,13 @@ const SideBar = () => {
               <SettingsOutlined />
               <p>الإعدادات</p>
             </Link>
-            <Link
-              href={`/`}
-              className="group flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
+            <button
+              onClick={handleLogout}
+              className="group w-full flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
             >
               <LogoutOutlined className="text-red-700 hoverEle group-hover:text-white" />
               <p>تسجيل الخروج</p>
-            </Link>
+            </button>
           </div>
         </nav>
       </div>

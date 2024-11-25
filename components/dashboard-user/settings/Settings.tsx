@@ -1,9 +1,17 @@
 "use client";
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
-
+import React, { FormEvent, useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const Settings = () => {
+  const router = useRouter();
+  const token = Cookies.get("token");
+  const [loading, setloading] = useState<boolean>(false);
   const fetchUser = useUserStore((state) => state.fetchUser);
 
   useEffect(() => {
@@ -11,9 +19,77 @@ const Settings = () => {
   }, [fetchUser]);
   const user = useUserStore((state) => state.user);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [numPhone, setNumPhone] = useState("");
+  const [name, setName] = useState(user.username);
+  const [email, setEmail] = useState(user.email);
+  const [numPhone, setNumPhone] = useState(user.phoneNumber);
+  const [image, setImage] = useState<File>();
+
+  if (!token || user.role !== "student") {
+    return (
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+        <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor ">
+          أنت غير مسجل أو لا تملك الصلاحية للوصول الى هذه الصفحة
+        </h1>
+        <div className="mt-5 flex justify-center ">
+          <Link
+            href={"/login"}
+            className="apply-fonts-normal py-2 px-4  bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white rounded-lg"
+          >
+            سجل الدخول من هنا
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const handelupdate = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData();
+    if (image) {
+      formData.append("thumbnail", image);
+    }
+    formData.append("usernam", name);
+    formData.append("email", email);
+    formData.append("phoneNumber", numPhone);
+    setloading(true);
+    try {
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/updateMe`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(res);
+
+      toast.success("تم تحديث البيانات بنجاح ", {
+        position: "top-center",
+        autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
+      });
+      router.refresh();
+    } catch (error) {
+      console.log(error);
+      //@ts-expect-error:fix error agin
+      toast.error(error.response.data.message, {
+        position: "top-center",
+        autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
+      });
+    } finally {
+      setloading(false);
+    }
+  };
 
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-screen">
@@ -23,7 +99,7 @@ const Settings = () => {
         </h1>
       </div>
       {user && (
-        <form>
+        <form onSubmit={handelupdate}>
           {/* Image */}
           <div className="flex flex-col  justify-center gap-3 ">
             <label className="apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
@@ -51,7 +127,7 @@ const Settings = () => {
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    console.log("Selected file:", file);
+                    setImage(file);
                   }
                 }}
                 className="hidden" // اجعل حقل الإدخال غير مرئي
@@ -117,11 +193,11 @@ const Settings = () => {
                 defaultValue="user"
               >
                 <option value="user" className="apply-fonts-normal">
-                  {user.role === "teacher"
-                    ? "أستاذ"
+                  {user.role === "student"
+                    ? "طالب"
                     : user.role === "admin"
                     ? "أدمن"
-                    : "طالب"}
+                    : "أستاذ"}
                 </option>
               </select>
             </div>
@@ -131,9 +207,9 @@ const Settings = () => {
           <div className="flex items-center space-x-4">
             <button
               type="submit"
-              className="apply-fonts-normal text-white  bg-mainColor  hover:bg-mainColorHoverLight hoverEle  focus:ring-4 focus:outline-none focus:ring-mainColor  font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              className={`apply-fonts-normal text-white ${loading ?'animate-pulse bg-mainColorHoverLight cursor-not-allowed':''}  bg-mainColor  hover:bg-mainColorHoverLight hoverEle  focus:ring-4 focus:outline-none focus:ring-mainColor  font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800`}
             >
-              تعديل
+              {loading ? "جاري التعديل..." : "التعديل"}
             </button>
           </div>
         </form>

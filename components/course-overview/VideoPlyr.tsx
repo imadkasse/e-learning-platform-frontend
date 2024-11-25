@@ -3,12 +3,16 @@ import React from "react";
 import "plyr/dist/plyr.css";
 import Plyr, { PlyrProps } from "plyr-react";
 
-const VideoPlyr = () => {
+type Props = {
+  videoSrc: string;
+};
+
+const VideoPlyr = ({ videoSrc }: Props) => {
   const videoOptions: PlyrProps["source"] = {
     type: "video",
     sources: [
       {
-        src: "/videos/videoEx.mp4", // مسار الفيديو
+        src: videoSrc, // مسار الفيديو
         type: "video/mp4",
       },
     ],

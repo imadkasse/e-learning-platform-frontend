@@ -19,6 +19,7 @@ export const useUserStore = create<{
     progress: 0,
     thumbnail: "",
     enrolledCourses: [],
+    phoneNumber: "",
   },
   fetchUser: async () => {
     try {

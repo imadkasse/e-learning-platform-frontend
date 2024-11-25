@@ -82,10 +82,10 @@ const CourseCard = ({
       </div>
       <div className="flex items-center justify-center mt-4">
         <Link
-          href={`/${courseId}`}
+          href={`/course-overview/${courseId}`}
           className="apply-fonts-normal bg-mainColor hoverEle hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white"
         >
-          شراء الدوراة
+          تفاصيل الدوراة
         </Link>
       </div>
     </div>

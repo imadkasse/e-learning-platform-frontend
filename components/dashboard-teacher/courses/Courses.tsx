@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { Course } from "@/types/course";
 import { User } from "@/types/user";
 import Link from "next/link";
+import SearchCourseTeacher from "./SearchCourseTeacher";
 
 const Courses = async () => {
   const cookiesStore = await cookies();
@@ -55,19 +56,24 @@ const Courses = async () => {
 
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 relative">
-      <div className="mb-5 flex items-center gap-6">
+      <div className="mb-5 flex items-center gap-6 ">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الدورات</h1>
-
-        <section className="flex items-center flex-grow">
-          <div className="flex-grow"></div>
-          <button className="apply-fonts-normal  py-2.5 mx-3 rounded-lg text-white px-4 bg-mainColor hover:bg-mainColorHoverLight hoverEle">
+        <section className="flex items-center flex-grow ">
+          <div className="flex-grow ">
+            <SearchCourseTeacher />
+          </div>
+          <Link
+            href={"/add-course"}
+            className="apply-fonts-normal  py-2.5 mx-3 rounded-lg text-white px-4 bg-mainColor hover:bg-mainColorHoverLight hoverEle"
+          >
             إضافة
-          </button>
+          </Link>
         </section>
       </div>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-7">
         {myCourses.length ? (
           myCourses.map((course) => {
+            console.log(course.videos)
             return (
               <div key={course._id}>
                 <CourseCard

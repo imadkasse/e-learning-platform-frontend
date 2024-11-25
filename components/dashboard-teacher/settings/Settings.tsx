@@ -2,11 +2,18 @@
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
 
 const Settings = () => {
+  const router = useRouter();
   const token = Cookies.get("token");
+  const [loading, setloading] = useState<boolean>(false);
+
   const fetchUser = useUserStore((state) => state.fetchUser);
 
   useEffect(() => {
@@ -14,9 +21,11 @@ const Settings = () => {
   }, [fetchUser]);
   const user = useUserStore((state) => state.user);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [numPhone, setNumPhone] = useState("");
+  const [name, setName] = useState(user.username);
+  const [email, setEmail] = useState(user.email);
+  const [numPhone, setNumPhone] = useState(user.phoneNumber);
+  const [image, setImage] = useState<File>();
+  const [imageUrl, setImageUrl] = useState<string>("");
 
   if (!token || user.role !== "teacher") {
     return (
@@ -35,6 +44,56 @@ const Settings = () => {
       </div>
     );
   }
+
+  const handelupdate = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData();
+    if (image) {
+      formData.append("thumbnail", image);
+    }
+    formData.append("usernam", name);
+    formData.append("email", email);
+    formData.append("phoneNumber", numPhone);
+    setloading(true);
+    try {
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/updateMe`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(res);
+
+      toast.success("تم تحديث البيانات بنجاح ", {
+        position: "top-center",
+        autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
+      });
+      router.refresh();
+    } catch (error) {
+      console.log(error);
+      //@ts-expect-error:fix error agin
+      toast.error(error.response.data.message, {
+        position: "top-center",
+        autoClose: 1000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
+      });
+    } finally {
+      setloading(false);
+    }
+  };
+
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-screen">
       <div className="mb-5">
@@ -42,17 +101,20 @@ const Settings = () => {
           إعدادات الحساب
         </h1>
       </div>
-      <form>
+      <form onSubmit={handelupdate}>
         {/* Image */}
         <div className="flex flex-col  justify-center gap-3 ">
           <label className="apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
             الصورة
           </label>
           <Image
-            src={user.thumbnail ? user.thumbnail : `/imgs/personImg.png`}
+            src={
+              user.thumbnail ? user.thumbnail : imageUrl || "/imgs/person.png"
+            }
             width={150}
             height={150}
             alt="personImg"
+            unoptimized
             className="w-36 h-36  rounded-xl"
           />
           <div className="flex flex-col  items-start w-36 ">
@@ -70,7 +132,8 @@ const Settings = () => {
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  console.log("Selected file:", file);
+                  setImage(file);
+                  setImageUrl(URL.createObjectURL(file));
                 }
               }}
               className="hidden" // اجعل حقل الإدخال غير مرئي
@@ -116,6 +179,7 @@ const Settings = () => {
             </label>
             <input
               type="text"
+              placeholder={user.phoneNumber}
               value={numPhone}
               onChange={(e) => setNumPhone(e.target.value)}
               name="price"
@@ -149,9 +213,13 @@ const Settings = () => {
         <div className="flex items-center space-x-4">
           <button
             type="submit"
-            className="apply-fonts-normal text-white  bg-mainColor  hover:bg-mainColorHoverLight hoverEle  focus:ring-4 focus:outline-none focus:ring-mainColor  font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            className={`apply-fonts-normal text-white  bg-mainColor  hover:bg-mainColorHoverLight hoverEle  focus:ring-4 focus:outline-none focus:ring-mainColor  font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 ${
+              loading
+                ? "animate-pulse bg-mainColorHoverLight cursor-not-allowed"
+                : ""
+            }`}
           >
-            تعديل
+            {loading ? "جاري التعديل " : "التعديل"}
           </button>
         </div>
       </form>

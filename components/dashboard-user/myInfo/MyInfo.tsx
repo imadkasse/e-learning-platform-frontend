@@ -3,8 +3,10 @@ import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
+import Cookies from "js-cookie";
 
 const MyInfo = () => {
+  const token = Cookies.get("token");
   const fetchUserData = useUserStore((state) => state.fetchUser);
 
   const user = useUserStore((state) => state.user);
@@ -12,6 +14,23 @@ const MyInfo = () => {
   useEffect(() => {
     fetchUserData();
   }, [fetchUserData]);
+  if (!token || user.role !== "student") {
+    return (
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+        <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor ">
+          أنت غير مسجل أو لا تملك الصلاحية للوصول الى هذه الصفحة
+        </h1>
+        <div className="mt-5 flex justify-center ">
+          <Link
+            href={"/login"}
+            className="apply-fonts-normal py-2 px-4  bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white rounded-lg"
+          >
+            سجل الدخول من هنا
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-screen  ">
@@ -46,11 +65,11 @@ const MyInfo = () => {
             <p className=" text-sm text-gray-400">
               <span className="apply-fonts-normal">
                 الدور :
-                {user.role === "teacher"
-                  ? "أستاذ"
+                {user.role === "student"
+                  ? "طالب"
                   : user.role === "admin"
                   ? "أدمن"
-                  : "طالب"}
+                  : "أستاذ"}
               </span>
             </p>
           </div>
