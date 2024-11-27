@@ -57,7 +57,7 @@ const HomePage = async () => {
   await fetchUser();
 
   //@ts-expect-error: fix afte time in user
-  if (!token || user.role !== "teacher") {
+  if (!token || user?.role !== "teacher") {
     return (
       <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
         You are not logged in.

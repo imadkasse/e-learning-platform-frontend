@@ -19,11 +19,12 @@ export type Course = {
   published: boolean;
   createdAt: string;
   videos: Videos[]; //edit in feature
-  files: string[]; //edit in feature
+  files: File[]; //edit in feature
   avgRatings: number;
   active: boolean;
   progress?: number;
   reviews: review[]; //edit in feature
+  category: string;
 };
 
 type Instructor = {
@@ -37,4 +38,10 @@ type review = {
   rating: number;
   createdAt: string;
   content: string;
+};
+export type File = {
+  _id: string;
+  filename: string;
+  size: number;
+  url: string;
 };

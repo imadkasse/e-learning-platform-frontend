@@ -27,7 +27,7 @@ const Settings = () => {
   const [image, setImage] = useState<File>();
   const [imageUrl, setImageUrl] = useState<string>("");
 
-  if (!token || user.role !== "teacher") {
+  if (!token || user?.role !== "teacher") {
     return (
       <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
         <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor ">

@@ -24,6 +24,7 @@ const CourseCard = ({
   courseDescription,
   courseId,
 }: Props) => {
+  console.log(numberOfVideo)
   return (
     <div className="my-3 shadow-lg shadow-mainColor/60 bg-wygColor  flex flex-col max-h-[80vh]  justify-between px-3 py-4 rounded-lg">
       <div className="relative min-w-full max-w-sm ">

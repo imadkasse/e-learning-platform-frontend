@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import showToast from "@/utils/showToast";
 
 interface CourseDetails {
   imageCover: File | null;
@@ -103,6 +104,7 @@ const Details: React.FC = () => {
         }
       );
       console.log(res);
+
       toast.success("تم نشر الدورة بنجاح", {
         position: "top-center",
         autoClose: 3000,
@@ -125,17 +127,8 @@ const Details: React.FC = () => {
         category: "",
       });
     } catch (error) {
-      console.log(error);
       //@ts-expect-error:fix
-      toast.error(error.response.data.error, {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
-      });
+      showToast("error", error.response.data.message);
     } finally {
       setLoading(false);
     }

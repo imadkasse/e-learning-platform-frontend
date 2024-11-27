@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import Image from "next/image";
 import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
@@ -7,35 +8,53 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Course } from "@/types/course";
 import Link from "next/link";
-import { Lesson } from "@/types/lesson";
-import { Close, DeleteOutline, Edit } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
+
+import { Close, DeleteOutline, Edit, ErrorOutline } from "@mui/icons-material";
 
 interface CourseDetails {
-  imageCover: File | null;
-  lessonName: string;
-  lessonVideo: File | null;
-  pdfFiles: File[];
-  courseTitle: string;
-  coursePrice: string;
-  courseDescription: string;
+  //
+  imageCover: any;
+  title: string;
+  price: number;
+  description: string;
   category: string;
-  lessonVideoName: string;
-  pdfFilesNames: string[];
 }
+type Lesson = {
+  lessonTitle: string;
+  video: File | null;
+};
+type file = {
+  filename: string;
+  file: File | null;
+};
 
 type Props = {
   id: string;
 };
 
+const showToast = (type: "success" | "error", message: string) => {
+  toast[type](message, {
+    position: "top-center",
+    autoClose: 3000,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    className: "bg-white text-black dark:bg-gray-800 dark:text-white",
+  });
+};
+
 const EditCourse = ({ id }: Props) => {
   const token = Cookies.get("token");
-  const router = useRouter();
+
   const [course, setCourse] = useState<Course>();
 
   const getCourse = async (id: string) => {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${id}`
+      `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${id}`,
+      {
+        cache: "no-store",
+      }
     );
 
     const data = await res.json();
@@ -45,20 +64,32 @@ const EditCourse = ({ id }: Props) => {
 
   const [formData, setFormData] = useState<CourseDetails>({
     imageCover: null,
-    lessonName: "",
-    lessonVideo: null,
-    pdfFiles: [],
-    lessonVideoName: "",
-    pdfFilesNames: [],
-    courseTitle: "",
-    coursePrice: "",
-    courseDescription: "",
+    title: "",
+    price: 0,
+    description: "",
     category: "",
   });
-  const [lessons, setLessons] = useState<Lesson>();
+
+  const [lessons, setLessons] = useState<Lesson>({
+    lessonTitle: "",
+    video: null,
+  });
+  const [editLessons, setEditLessons] = useState<Lesson>({
+    lessonTitle: "",
+    video: null,
+  });
+  const [file, setFile] = useState<file>({
+    filename: "",
+    file: null,
+  });
 
   const [showComponent, setShowComponent] = useState<boolean>(true);
   const [showEdit, setShowEdit] = useState<boolean>(false);
+  const [showDelete, setShowDelete] = useState<boolean>(false);
+  const [showDeleteFile, setShowDeleteFile] = useState<boolean>(false);
+
+  const [videoId, setVideoId] = useState<string>("");
+  const [fileId, setFileId] = useState<string>("");
 
   const [imageCoverPreview, setImageCoverPreview] = useState<string | null>(
     null
@@ -68,6 +99,10 @@ const EditCourse = ({ id }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingDeleteBtn, setLoadingDeleteBtn] = useState<boolean>(false);
   const [loadingEditBtn, setLoadingEditBtn] = useState<boolean>(false);
+  const [loadingAddBtn, setLoadingAddBtn] = useState<boolean>(false);
+  const [loadingAddFile, setLoadingAddFile] = useState<boolean>(false);
+  const [loadingDeleteFileBtn, setLoadingDeleteFileBtn] =
+    useState<boolean>(false);
 
   const handleImageCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -75,25 +110,6 @@ const EditCourse = ({ id }: Props) => {
       setFormData((prev) => ({ ...prev, imageCover: file }));
       setImageCoverPreview(URL.createObjectURL(file));
     }
-  };
-
-  const handleLessonVideoChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setFormData((prev) => ({
-      ...prev,
-      lessonVideo: file,
-      // @ts-expect-error:fix that agin
-      lessonVideoName: file.name, // تحديث اسم الفيديو
-    }));
-  };
-
-  const handlePdfFilesChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setFormData((prev) => ({
-      ...prev,
-      pdfFiles: files,
-      pdfFilesNames: files.map((file) => file.name), // تحديث أسماء ملفات PDF
-    }));
   };
 
   const handleInputChange = (
@@ -107,78 +123,101 @@ const EditCourse = ({ id }: Props) => {
     getCourse(id);
   }, [id]);
 
-  const handelEditCourse = async (e: FormEvent) => {
+  const handelEditCourse = async (e: FormEvent, courseId: string) => {
     e.preventDefault();
 
     const courseData = new FormData();
 
     if (formData.imageCover)
       courseData.append("imageCover", formData.imageCover);
-    courseData.append("lessonTitle", formData.lessonName);
-    if (formData.lessonVideo) courseData.append("videos", formData.lessonVideo);
-    formData.pdfFiles.forEach((file) => courseData.append("files", file));
-    courseData.append("title", formData.courseTitle);
-    courseData.append("price", formData.coursePrice);
-    courseData.append("description", formData.courseDescription);
-    courseData.append("category", formData.category);
+
+    if (formData.title) courseData.append("title", formData.title);
+    if (formData.price) courseData.append("price", formData.price.toString());
+    if (formData.description) {
+      courseData.append("description", formData.description);
+    }
+    if (formData.category) courseData.append("category", formData.category);
 
     setLoading(true);
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`,
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`,
         courseData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
           },
         }
       );
-      console.log(res);
-      toast.success("تم نشر الدورة بنجاح", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
-      });
+
+      showToast("success", "تم تعديل الدورة بنجاح");
       setFormData({
-        imageCover: null,
-        lessonName: "",
-        lessonVideo: null,
-        pdfFiles: [],
-        lessonVideoName: "",
-        pdfFilesNames: [],
-        courseTitle: "",
-        coursePrice: "",
-        courseDescription: "",
+        imageCover: course?.imageCover,
+        title: "",
+        price: 0,
+        description: "",
         category: "",
       });
+
+      await getCourse(courseId);
     } catch (error) {
-      console.log(error);
       //@ts-expect-error:fix
-      toast.error(error.response.data.error, {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
-      });
+      showToast("error", error.response.data.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handelAddLesson = () => {};
+  const handelAddLesson = async (e: FormEvent, id: string) => {
+    e.preventDefault();
+
+    const lessonData = new FormData();
+    if (lessons.video) {
+      lessonData.append("video", lessons.video);
+    }
+    lessonData.append("lessonTitle", lessons.lessonTitle);
+
+    setLoadingAddBtn(true);
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${id}`,
+        lessonData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const newLesson = res.data.newLesson;
+      showToast("success", "تم إضافة الدرس بنجاح");
+
+      setCourse((prevCourse) => {
+        if (!prevCourse) return undefined;
+        return {
+          ...prevCourse,
+          videos: [...(prevCourse.videos || []), newLesson],
+        };
+      });
+      setLessons({
+        video: null,
+        lessonTitle: "",
+      });
+
+      await getCourse(id);
+
+      setShowEdit(false);
+    } catch (error) {
+      //@ts-expect-error:fix agin
+      showToast("error", error.response.data.message);
+    } finally {
+      setLoadingAddBtn(false);
+    }
+  };
 
   const handelDeleteLesson = async (videoId: string) => {
     setLoadingDeleteBtn(true);
     try {
-      const data = await axios.delete(
+      await axios.delete(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${id}/videos/${videoId}`,
         {
           headers: {
@@ -187,16 +226,63 @@ const EditCourse = ({ id }: Props) => {
         }
       );
 
-      toast.success("تم حذف الفيديو بنجاح", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
+      showToast("success", "تم حذف الفيديو بنجاح");
+
+      setCourse((prevCourse) => {
+        if (!prevCourse) return undefined;
+        return {
+          ...prevCourse,
+          videos: [...prevCourse.videos.filter((v) => v._id !== v._id)],
+        };
       });
-      router.refresh();
+      setShowDelete(false);
+
+      await getCourse(id);
+    } catch (error) {
+      //@ts-expect-error:fix agin
+      showToast("error", error.response.data.message);
+    } finally {
+      setLoadingDeleteBtn(false);
+    }
+  };
+
+  const handelEditLesson = async (e: FormEvent, videoId: string) => {
+    e.preventDefault();
+    setLoadingEditBtn(true);
+    const lessonData = new FormData();
+    if (editLessons.video) {
+      lessonData.append("video", editLessons.video);
+    }
+    lessonData.append("lessonTitle", editLessons.lessonTitle);
+
+    try {
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${id}/videos/${videoId}`,
+        lessonData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const updatedLesson = res.data.updatedLesson;
+
+      showToast("success", "تم تعديل الدرس بنجاح");
+
+      setCourse((prevCourse) => {
+        if (!prevCourse) return undefined;
+        return {
+          ...prevCourse,
+          videos: [...(prevCourse.videos || []), updatedLesson],
+        };
+      });
+      setEditLessons({
+        video: null,
+        lessonTitle: "",
+      });
+      setShowEdit(false);
+
+      await getCourse(id);
     } catch (error) {
       //@ts-expect-error:fix agin
       toast.error(error.response.data.message, {
@@ -209,11 +295,82 @@ const EditCourse = ({ id }: Props) => {
         className: "bg-white text-black dark:bg-gray-800 dark:text-white",
       });
     } finally {
-      setLoadingDeleteBtn(false);
+      setLoadingEditBtn(false);
     }
   };
+  const addFile = async (e: FormEvent, courseId: string) => {
+    e.preventDefault();
+    const fileData = new FormData();
 
-  const handelEditLesson = () => {};
+    if (file.file) {
+      fileData.append("file", file.file);
+    }
+    fileData.append("filename", file.filename);
+    setLoadingAddFile(true);
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}/files`,
+        fileData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const newFile = res.data.file;
+      showToast("success", "تم رفع الملف بنجاح");
+
+      setCourse((prevCourse) => {
+        if (!prevCourse) return undefined;
+        return {
+          ...prevCourse,
+          files: [...(prevCourse.files || []), newFile],
+        };
+      });
+
+      setFile({
+        file: null,
+        filename: "",
+      });
+
+      await getCourse(courseId);
+    } catch (error) {
+      //@ts-expect-error:fix agin
+      showToast("error", error.response.data.message);
+    } finally {
+      setLoadingAddFile(false);
+    }
+  };
+  const deleteFile = async (fileId: string, courseId: string) => {
+    setLoadingDeleteFileBtn(true);
+    try {
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}/files/${fileId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      showToast("success", "تم حذف الملف بنجاح");
+
+      setCourse((prevCourse) => {
+        if (!prevCourse) return undefined;
+        return {
+          ...prevCourse,
+          files: [...prevCourse.files.filter((f) => f._id !== f._id)],
+        };
+      });
+      setShowDeleteFile(false);
+
+      await getCourse(id);
+    } catch (error) {
+      //@ts-expect-error:fix agin
+      showToast("error", error.response.data.message);
+    } finally {
+      setLoadingDeleteFileBtn(false);
+    }
+  };
   return (
     <div className="p-6 bg-wygColor shadow-xl rounded-xl shadow-mainColorHoverLight min-h-screen ">
       {/* Btns */}
@@ -228,6 +385,7 @@ const EditCourse = ({ id }: Props) => {
         >
           تفاصيل الدورة
         </button>
+
         <button
           onClick={() => {
             setShowComponent(!showComponent);
@@ -236,16 +394,21 @@ const EditCourse = ({ id }: Props) => {
             showComponent ? "" : "border-b-2 border-mainColor"
           } apply-fonts-normal  w-full py-2 px-4`}
         >
-          دروس الدورة
+          دروس و ملفات الدورة
         </button>
       </div>
 
       {showComponent ? (
-        <div className=" p-6 bg-wygColor shadow-xl rounded-xl shadow-mainColorHoverLight min-h-screen">
+        <div className=" p-6  rounded-xl  min-h-screen">
           <h1 className="text-2xl font-bold mb-4 apply-fonts-normal">
             تعديل تفاصيل الدورة
           </h1>
-          <section className="space-y-6 bg-white p-6 rounded shadow">
+          <form
+            className="space-y-6 bg-white p-6 rounded "
+            onSubmit={(e) => {
+              handelEditCourse(e, id);
+            }}
+          >
             {/* صورة الغلاف */}
             <div className="flex items-center space-x-4">
               <div className="w-full">
@@ -289,14 +452,14 @@ const EditCourse = ({ id }: Props) => {
 
             {/* عنوان الدورة */}
             <div>
-              <label htmlFor="courseTitle" className="block font-medium mb-2">
+              <label htmlFor="title" className="block font-medium mb-2">
                 عنوان الدورة
               </label>
               <input
                 type="text"
-                id="courseTitle"
-                name="courseTitle"
-                value={formData.courseTitle}
+                id="title"
+                name="title"
+                value={formData.title || course?.title || ""}
                 onChange={handleInputChange}
                 className="w-full p-2 border rounded"
               />
@@ -304,14 +467,14 @@ const EditCourse = ({ id }: Props) => {
 
             {/* سعر الدورة */}
             <div>
-              <label htmlFor="coursePrice" className="block font-medium mb-2">
+              <label htmlFor="price" className="block font-medium mb-2">
                 سعر الدورة
               </label>
               <input
                 type="number"
-                id="coursePrice"
-                name="coursePrice"
-                value={formData.coursePrice}
+                id="price"
+                name="price"
+                value={formData.price || course?.price || ""}
                 onChange={handleInputChange}
                 className="w-full p-2 border rounded"
               />
@@ -319,16 +482,13 @@ const EditCourse = ({ id }: Props) => {
 
             {/* وصف الدورة */}
             <div>
-              <label
-                htmlFor="courseDescription"
-                className="block font-medium mb-2"
-              >
+              <label htmlFor="description" className="block font-medium mb-2">
                 وصف الدورة
               </label>
               <textarea
-                id="courseDescription"
-                name="courseDescription"
-                value={formData.courseDescription}
+                id="description"
+                name="description"
+                value={formData.description || course?.description || ""}
                 onChange={handleInputChange}
                 className="w-full p-2 border rounded"
                 rows={4}
@@ -342,69 +502,36 @@ const EditCourse = ({ id }: Props) => {
               <select
                 id="category"
                 name="category"
-                value={formData.category}
                 onChange={handleInputChange}
                 className="apply-fonts-normal block w-full border rounded p-2"
                 required
               >
                 <option className="apply-fonts-normal" value="">
-                  اختر الفئة
+                  {course?.category || "إختر الفئة"}
                 </option>
-                <option className="apply-fonts-normal" value="development">
+                <option className="apply-fonts-normal" value="علوم">
                   علوم
                 </option>
-                <option className="apply-fonts-normal" value="design">
+                <option className="apply-fonts-normal" value="فيزياء">
                   فيزياء
                 </option>
-                <option className="apply-fonts-normal" value="marketing">
+                <option className="apply-fonts-normal" value="رياضيات">
                   رياضيات
                 </option>
-                <option className="apply-fonts-normal" value="business">
+                <option className="apply-fonts-normal" value="أدب">
                   أدب عربي
                 </option>
-                <option className="apply-fonts-normal" value="other">
+                <option className="apply-fonts-normal" value="فلسفة">
                   فلسفة
                 </option>
               </select>
-            </div>
-            {/* ملفات PDF */}
-            <div className="flex items-center space-x-4">
-              <div className="w-full">
-                <label
-                  htmlFor="pdfFiles"
-                  className="block font-medium mb-2 text-gray-700"
-                >
-                  ملفات PDF
-                </label>
-                <div className="relative">
-                  <input
-                    type="file"
-                    id="pdfFiles"
-                    accept=".docx, .pdf"
-                    multiple
-                    onChange={handlePdfFilesChange}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="pdfFiles"
-                    className="cursor-pointer bg-purple-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-purple-700 transition-colors duration-300"
-                  >
-                    اختر ملفات PDF
-                  </label>
-                </div>
-                {formData.pdfFilesNames.length > 0 && (
-                  <ul className="mt-5 text-sm text-gray-500">
-                    {formData.pdfFilesNames.map((fileName, index) => (
-                      <li key={index}>- {fileName}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
             </div>
 
             {/* زر الإرسال */}
             <button
               type="submit"
+              disabled={loading}
+              aria-busy={loading}
               className={`w-full p-2  text-white font-medium rounded  ${
                 loading
                   ? "bg-mainColorHoverLight cursor-not-allowed"
@@ -413,10 +540,10 @@ const EditCourse = ({ id }: Props) => {
             >
               {loading ? "جاري التعديل ..." : "تعديل "}
             </button>
-          </section>
+          </form>
         </div>
       ) : (
-        <div className=" p-6 bg-wygColor shadow-xl rounded-xl shadow-mainColorHoverLight min-h-screen ">
+        <div className=" p-6  ">
           <h1 className="text-2xl font-bold mb-4 apply-fonts-normal">
             تعديل دروس الدورة
           </h1>
@@ -426,7 +553,7 @@ const EditCourse = ({ id }: Props) => {
               <h1 className="text-2xl apply-fonts-normal mb-6 ">
                 قائمة الدروس الحالية
               </h1>
-              {/*Edit Toogle*/}
+              {/*Edit Toggle*/}
               {showEdit && (
                 <div className=" bg-black/60 absolute top-0 rounded left-0 w-full h-full px-6 z-10 flex flex-col items-start gap-5">
                   <button
@@ -437,7 +564,12 @@ const EditCourse = ({ id }: Props) => {
                   >
                     <Close className="text-redColor hoverEle hover:text-redColorHoverLight hover:rotate-180 " />
                   </button>
-                  <form className="w-full  flex-grow">
+                  <form
+                    className="w-full  flex-grow"
+                    onSubmit={(e) => {
+                      handelEditLesson(e, videoId);
+                    }}
+                  >
                     {/* إسم الدرس */}
                     <div>
                       <label
@@ -450,6 +582,12 @@ const EditCourse = ({ id }: Props) => {
                         type="text"
                         id="lessonName"
                         name="lessonName"
+                        onChange={(e) => {
+                          setEditLessons({
+                            ...lessons,
+                            lessonTitle: e.target.value,
+                          });
+                        }}
                         className="w-full p-2 border rounded"
                       />
                     </div>
@@ -467,7 +605,15 @@ const EditCourse = ({ id }: Props) => {
                             type="file"
                             id="lessonVideo"
                             accept="video/*"
-                            onChange={handleLessonVideoChange}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              const video = e.target.files?.[0] || null;
+                              if (video) {
+                                setEditLessons({
+                                  ...lessons,
+                                  video: video,
+                                });
+                              }
+                            }}
                             className="hidden"
                           />
                           <label
@@ -477,20 +623,71 @@ const EditCourse = ({ id }: Props) => {
                             اختر فيديو
                           </label>
                         </div>
-                        {formData.lessonVideoName && (
-                          <p className="mt-5 text-sm text-gray-500">
-                            الفيديو المرفوع: {formData.lessonVideoName}
+                        {editLessons.video && (
+                          <p className="mt-5 text-sm text-white">
+                            الفيديو المرفوع: {editLessons.video.name}
                           </p>
                         )}
                       </div>
                     </div>
-                    <button className="mt-5 flex gap-3 apply-fonts-normal rounded-lg bg-mainColor hoverEle hover:bg-mainColorHoverLight text-white py-2 px-4">
-                      <p>تعديل </p>
+                    <button
+                      type="submit"
+                      className={`mt-5 flex gap-3 apply-fonts-normal rounded-lg ${
+                        loadingEditBtn
+                          ? "bg-mainColorHoverLight cursor-not-allowed"
+                          : "bg-mainColor hoverEle hover:bg-mainColorHoverLight"
+                      }  text-white py-2 px-4`}
+                    >
+                      <p>{loadingEditBtn ? "جاري التعديل ..." : "تعديل "} </p>
                       <Edit />
                     </button>
                   </form>
                 </div>
               )}
+              {/* Delete Toggle */}
+              {showDelete && (
+                <div className=" bg-black/60 absolute top-0 rounded left-0 w-full h-full lg:px-16 xs:px-1 sm:px-7  z-10 flex flex-col items-center justify-center gap-5">
+                  {/*  */}
+                  <div className=" bg-white rounded-lg w-full ">
+                    <div className="relative md:py-5 xs:py-3  w-full flex flex-col gap-6 ">
+                      <div className="w-full flex items-center flex-col ">
+                        <ErrorOutline fontSize="large" />
+                        <h1 className="apply-fonts-normal lg:text-lg sm:text-base xs:text-[14px] text-center">
+                          هل أنت متأكد من حذف هذا الدرس ؟
+                        </h1>
+                      </div>
+                      <div className="w-full flex items-center justify-center xs:gap-2 md:gap-5">
+                        <button
+                          className="flex items-center gap-2 group py-2 lg:px-4  xs:px-2 apply-fonts-normal sm:text-base xs:text-[13px] bg-mainColor hover:bg-mainColorHoverLight hoverEle rounded-lg text-white"
+                          onClick={() => {
+                            setShowDelete(!showDelete);
+                          }}
+                        >
+                          <Close className="group-hover:text-redColor hoverEle" />
+                          <p>إغلاق</p>
+                        </button>
+                        <button
+                          onClick={() => {
+                            handelDeleteLesson(videoId);
+                          }}
+                          className={`${
+                            loadingDeleteBtn
+                              ? "bg-redColorHoverLight cursor-not-allowed"
+                              : "bg-redColor hover:bg-redColorHoverLight"
+                          } py-2 lg:px-4 xs:px-2 apply-fonts-normal sm:text-base xs:text-[13px]  hoverEle rounded-lg text-white`}
+                        >
+                          <p>
+                            {loadingDeleteBtn
+                              ? "جاري حذف الدرس ...."
+                              : "نعم، أنا متأكد"}
+                          </p>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white shadow-md rounded-lg overflow-hidden">
                 <table className="table-auto w-full overflow-x-scroll">
                   <thead className="bg-gray-100">
@@ -536,6 +733,7 @@ const EditCourse = ({ id }: Props) => {
                           <button
                             onClick={() => {
                               setShowEdit(!showEdit);
+                              setVideoId(video._id);
                             }}
                             className="flex gap-1 apply-fonts-normal text-white bg-mainColor hover:bg-mainColorHoverLight hoverEle px-4 py-2 rounded-md"
                           >
@@ -545,18 +743,13 @@ const EditCourse = ({ id }: Props) => {
                           <button
                             type="button"
                             onClick={() => {
-                              handelDeleteLesson(video._id);
+                              setShowDelete(!showDelete);
+                              setVideoId(video._id);
                             }}
-                            className={`${
-                              loadingDeleteBtn
-                                ? "bg-redColorHoverLight cursor-not-allowed"
-                                : "bg-redColor hover:bg-redColorHoverLight"
-                            } flex gap-1 apply-fonts-normal text-white  hoverEle px-4 py-2 rounded-md`}
+                            className={` bg-redColor hover:bg-redColorHoverLight flex gap-1 apply-fonts-normal text-white  hoverEle px-4 py-2 rounded-md`}
                           >
                             <DeleteOutline />
-                            <p>
-                              {loadingDeleteBtn ? "جاري حذف الدرس ...." : "حذف"}
-                            </p>
+                            <p>حذف</p>
                           </button>
                         </td>
                       </tr>
@@ -566,7 +759,12 @@ const EditCourse = ({ id }: Props) => {
               </div>
             </div>
 
-            <form>
+            {/* add new lesson */}
+            <form
+              onSubmit={(e) => {
+                handelAddLesson(e, id);
+              }}
+            >
               {/* اسم الدرس */}
               <div>
                 <label
@@ -579,8 +777,12 @@ const EditCourse = ({ id }: Props) => {
                   type="text"
                   id="lessonName"
                   name="lessonName"
-                  value={formData.lessonName}
-                  onChange={handleInputChange}
+                  onChange={(e) =>
+                    setLessons({
+                      ...lessons,
+                      lessonTitle: e.target.value,
+                    })
+                  }
                   className="w-full p-2 border rounded"
                 />
               </div>
@@ -598,7 +800,15 @@ const EditCourse = ({ id }: Props) => {
                       type="file"
                       id="lessonVideo"
                       accept="video/*"
-                      onChange={handleLessonVideoChange}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                        const video = e.target.files?.[0] || null;
+                        if (video) {
+                          setLessons({
+                            ...lessons,
+                            video: video,
+                          });
+                        }
+                      }}
                       className="hidden"
                     />
                     <label
@@ -608,9 +818,9 @@ const EditCourse = ({ id }: Props) => {
                       اختر فيديو
                     </label>
                   </div>
-                  {formData.lessonVideoName && (
+                  {lessons.video && (
                     <p className="mt-5 text-sm text-gray-500">
-                      الفيديو المرفوع: {formData.lessonVideoName}
+                      الفيديو المرفوع: {lessons.video.name}
                     </p>
                   )}
                 </div>
@@ -619,12 +829,181 @@ const EditCourse = ({ id }: Props) => {
               <button
                 type="submit"
                 className={`mt-4 p-2  text-white font-medium rounded  ${
-                  loading
+                  loadingAddBtn
                     ? "bg-mainColorHoverLight cursor-not-allowed"
                     : "bg-mainColor hover:bg-mainColorHoverLight"
                 } hoverEle`}
               >
-                {loading ? "جاري الإضافة ..." : "إضافة "}
+                {loadingAddBtn ? "جاري الإضافة ..." : "إضافة "}
+              </button>
+            </form>
+
+            {/* قائمة الملفات */}
+            <div className=" mx-auto p-4">
+              <h1 className="text-2xl apply-fonts-normal mb-6 ">
+                قائمة الملفات الحالية
+              </h1>
+              {/* Delete File Toggle */}
+              {showDeleteFile && (
+                <div className=" bg-black/60 absolute top-0 rounded left-0 w-full h-full lg:px-16 xs:px-1 sm:px-7  z-10 flex flex-col items-center justify-center gap-5">
+                  {/*  */}
+                  <div className=" bg-white rounded-lg w-full ">
+                    <div className="relative md:py-5 xs:py-3  w-full flex flex-col gap-6 ">
+                      <div className="w-full flex items-center flex-col ">
+                        <ErrorOutline fontSize="large" />
+                        <h1 className="apply-fonts-normal lg:text-lg sm:text-base xs:text-[14px] text-center">
+                          هل أنت متأكد من حذف هذا الملف ؟
+                        </h1>
+                      </div>
+                      <div className="w-full flex items-center justify-center xs:gap-2 md:gap-5">
+                        <button
+                          className="flex items-center gap-2 group py-2 lg:px-4  xs:px-2 apply-fonts-normal sm:text-base xs:text-[13px] bg-mainColor hover:bg-mainColorHoverLight hoverEle rounded-lg text-white"
+                          onClick={() => {
+                            setShowDeleteFile(!showDeleteFile);
+                          }}
+                        >
+                          <Close className="group-hover:text-redColor hoverEle" />
+                          <p>إغلاق</p>
+                        </button>
+                        <button
+                          onClick={() => {
+                            deleteFile(fileId, id);
+                          }}
+                          className={`${
+                            loadingDeleteFileBtn
+                              ? "bg-redColorHoverLight cursor-not-allowed"
+                              : "bg-redColor hover:bg-redColorHoverLight"
+                          } py-2 lg:px-4 xs:px-2 apply-fonts-normal sm:text-base xs:text-[13px]  hoverEle rounded-lg text-white`}
+                        >
+                          <p>
+                            {loadingDeleteFileBtn
+                              ? "جاري حذف الدرس ...."
+                              : "نعم، أنا متأكد"}
+                          </p>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                <table className="table-auto w-full overflow-x-scroll">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-4 py-2 text-right text-gray-600">
+                        اسم الدرس
+                      </th>
+                      <th className="px-4 py-2 text-right text-gray-600">
+                        رابط الفيديو
+                      </th>
+                      <th className="px-4 py-2 text-right text-gray-600">
+                        حجم الملف
+                      </th>
+                      <th className="px-4 py-2 text-right text-gray-600"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {course?.files.map((file, index) => (
+                      <tr
+                        key={index}
+                        className={`border-b ${
+                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                        }`}
+                      >
+                        <td className="apply-fonts-normal text-[14px] px-4 py-2 text-gray-800">
+                          {file.filename}
+                        </td>
+                        <td className="px-4 py-2 text-blue-600 underline">
+                          <a href={file.url} download target="_blank">
+                            الملف
+                          </a>
+                        </td>
+                        <td className="px-4 py-2 text-gray-600 ">
+                          <p>{file.size}Kb</p>
+                        </td>
+
+                        <td className="px-4 py-2 flex justify-center gap-4  ">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowDeleteFile(!showDeleteFile);
+                              setFileId(file._id);
+                            }}
+                            className={` bg-redColor hover:bg-redColorHoverLight flex gap-1 apply-fonts-normal text-white  hoverEle px-4 py-2 rounded-md`}
+                          >
+                            <DeleteOutline />
+                            <p>حذف</p>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {/* ملفات PDF */}
+            <form
+              className="flex gap-3 space-x-4 flex-col items-start"
+              onSubmit={(e) => {
+                addFile(e, id);
+              }}
+            >
+              <h1 className="apply-fonts-normal ">رفع ملفات PDF</h1>
+              {/* إسم الملف  */}
+              <div className="w-full flex flex-col gap-4">
+                <label htmlFor="pdfFiles" className="apply-fonts-normal ">
+                  إسم الملف
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={file.filename}
+                    onChange={(e) => {
+                      setFile({
+                        ...file,
+                        filename: e.target.value,
+                      });
+                    }}
+                    className="bg-wygColor w-full py-2 px-3 rounded-md "
+                    placeholder="أكتب إسم الملف"
+                  />
+                </div>
+              </div>
+              {/* الملف */}
+
+              <div className="relative w-full mt-6">
+                <input
+                  type="file"
+                  id="pdfFiles"
+                  accept=".docx, .pdf"
+                  multiple
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setFile({
+                        ...file,
+                        file: e.target.files[0],
+                      });
+                    }
+                  }}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="pdfFiles"
+                  className="cursor-pointer bg-purple-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-purple-700 transition-colors duration-300"
+                >
+                  إرفع الملف
+                </label>
+              </div>
+
+              <button
+                className={`py-2 px-3 ${
+                  loadingAddFile
+                    ? "bg-mainColorHoverLight cursor-not-allowed"
+                    : "bg-mainColor hover:bg-mainColorHoverLight"
+                } hoverEle rounded-lg text-white apply-fonts-normal`}
+              >
+                {loadingAddFile ? "جاري الإضافة ..." : "إضافة الملف"}
               </button>
             </form>
           </section>
