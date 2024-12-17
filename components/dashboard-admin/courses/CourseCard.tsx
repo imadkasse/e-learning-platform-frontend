@@ -23,7 +23,7 @@ const CourseCard = ({
     <div className="my-3 shadow-lg shadow-mainColor/60 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg">
       <div className="w-full flex ">
         <Image
-          src={`/imgs/${courseImg}.png`}
+          src={courseImg}
           alt="course1"
           width={300}
           height={200}

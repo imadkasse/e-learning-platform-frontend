@@ -2,8 +2,9 @@ type Videos = {
   _id: string;
   lessonTitle: string;
   url: string;
-  duration: string;
-  //... Add more
+  duration: number;
+  isCompleted: boolean;
+  completedBy: string[];
 };
 
 export type Course = {
@@ -33,7 +34,7 @@ type Instructor = {
   thumbnail: string;
 };
 type review = {
-  id: string;
+  _id: string;
   user: Instructor;
   rating: number;
   createdAt: string;

@@ -24,7 +24,7 @@ const CourseCard = ({
   courseId,
 }: Props) => {
   return (
-    <div className="my-3 shadow-lg shadow-mainColor/60 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg">
+    <div className="my-3 shadow-lg shadow-mainColor/60 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg ">
       <div className="w-full flex ">
         <Image
           src={courseImg}
@@ -39,7 +39,7 @@ const CourseCard = ({
         <h1 className="apply-fonts-medium text-base">{courseName} </h1>
       </div>
       <div className="my-1">
-        <h1 className="apply-fonts-normal text-[12px] line-clamp-2 text-courseTextSection">
+        <h1 className="apply-fonts-normal text-[12px] h-10  line-clamp-2 text-courseTextSection">
           {courseDescription}
         </h1>
       </div>

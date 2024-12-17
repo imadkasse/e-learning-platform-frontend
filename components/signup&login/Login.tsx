@@ -5,9 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { FormEvent, useState } from "react";
 import Cookies from "js-cookie";
-import { toast } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
+import showToast from "@/utils/showToast";
 
 const Login = () => {
   const router = useRouter();
@@ -53,17 +54,9 @@ const Login = () => {
       router.push(`/dashboard-${role}`);
     } catch (error) {
       console.log(error);
-      console.log(error)
+      console.log(error);
       // @ts-expect-error: fix after time
-      toast.error(error.response.data.error, {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
-      });
+      showToast("error", error.response.data.error);
     } finally {
       setLoading(false);
     }

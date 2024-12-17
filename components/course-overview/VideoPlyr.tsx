@@ -24,4 +24,5 @@ const VideoPlyr = ({ videoSrc }: Props) => {
   );
 };
 
+
 export default VideoPlyr;

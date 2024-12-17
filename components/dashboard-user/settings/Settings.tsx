@@ -6,12 +6,16 @@ import Cookies from "js-cookie";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import showToast from "@/utils/showToast";
+import UpdatePassword from "@/components/utlisComponenets/UpdatePassword";
+
 const Settings = () => {
   const router = useRouter();
   const token = Cookies.get("token");
+
   const [loading, setloading] = useState<boolean>(false);
+
   const fetchUser = useUserStore((state) => state.fetchUser);
 
   useEffect(() => {
@@ -63,29 +67,13 @@ const Settings = () => {
         }
       );
       console.log(res);
+      showToast("success", "تم تحديث البيانات بنجاح ");
 
-      toast.success("تم تحديث البيانات بنجاح ", {
-        position: "top-center",
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
-      });
       router.refresh();
     } catch (error) {
       console.log(error);
       //@ts-expect-error:fix error agin
-      toast.error(error.response.data.message, {
-        position: "top-center",
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
-      });
+      showToast("success", error.response.data.message);
     } finally {
       setloading(false);
     }
@@ -207,13 +195,19 @@ const Settings = () => {
           <div className="flex items-center space-x-4">
             <button
               type="submit"
-              className={`apply-fonts-normal text-white ${loading ?'animate-pulse bg-mainColorHoverLight cursor-not-allowed':''}  bg-mainColor  hover:bg-mainColorHoverLight hoverEle  focus:ring-4 focus:outline-none focus:ring-mainColor  font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800`}
+              className={`apply-fonts-normal text-white ${
+                loading
+                  ? "animate-pulse bg-mainColorHoverLight cursor-not-allowed"
+                  : ""
+              }  bg-mainColor  hover:bg-mainColorHoverLight hoverEle  focus:ring-4 focus:outline-none focus:ring-mainColor  font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800`}
             >
               {loading ? "جاري التعديل..." : "التعديل"}
             </button>
           </div>
         </form>
       )}
+      {/* Edit Password*/}
+      <UpdatePassword />
     </div>
   );
 };

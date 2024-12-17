@@ -5,9 +5,8 @@ import { Person, PlayLesson } from "@mui/icons-material";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { User } from "@/types/user";
-import axios from "axios";
 
-const HomePage = async() => {
+const HomePage = async () => {
   const cookiesStore = await cookies();
 
   const token = cookiesStore.get("token")?.value;
@@ -16,16 +15,14 @@ const HomePage = async() => {
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await fetch(`${process.env.BACK_URL}/api/users/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
       // console.log(res.data.user);
-      user = res.data.user;
+      user = data.user;
     } catch (err) {
       console.log(err);
     }
@@ -51,37 +48,38 @@ const HomePage = async() => {
       </div>
     );
   }
+  //@ts-expect-error:fix agin
+  const courses = user.enrolledCourses;
+
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 ">
       <div className="mb-5">
         <h1 className="apply-fonts-normal text-2xl font-semibold "> دوراتك</h1>
       </div>
+      {/* My Courses */}
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-7">
-        <CardCourse
-          progresBar={20}
-          studentsNumber={2}
-          numberOfVideo={2}
-          courseImg="course1"
-          courseUrl="/"
-          courseName="الوحدة الثالثة : دور البروتينات في التحفيز الإنزيمي"
-        />
-        <CardCourse
-          progresBar={50}
-          studentsNumber={2}
-          numberOfVideo={2}
-          courseImg="course1"
-          courseUrl="/"
-          courseName="الوحدة الثالثة : دور البروتينات في التحفيز الإنزيمي"
-        />
-        <CardCourse
-          progresBar={80}
-          studentsNumber={2}
-          numberOfVideo={2}
-          courseImg="course1"
-          courseUrl="/"
-          courseName="الوحدة الثالثة : دور البروتينات في التحفيز الإنزيمي"
-        />
+        {courses.length > 0 ? (
+          courses.map((course) => {
+            return (
+              <CardCourse
+                key={course._id}
+                progresBar={
+                  user.progress.find((p) => p.course === course._id)
+                    ?.percentage || 0
+                }
+                studentsNumber={course.enrolledStudents.length}
+                numberOfVideo={course.videos.length}
+                courseImg={course.imageCover}
+                courseUrl={`/course/${course._id}`}
+                courseName="الوحدة الثالثة : دور البروتينات في التحفيز الإنزيمي"
+              />
+            );
+          })
+        ) : (
+          <h1>لاتوجد أي كورسات</h1>
+        )}
       </div>
+      {/* Other Courses */}
       <div className="my-5">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">
           دورات أخرى
@@ -157,7 +155,6 @@ const HomePage = async() => {
             </Link>
           </div>
         </div>
-        
       </div>
     </div>
   );

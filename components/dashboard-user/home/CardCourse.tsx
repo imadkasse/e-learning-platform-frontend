@@ -9,7 +9,7 @@ type Props = {
   studentsNumber: number;
   numberOfVideo: number;
   courseUrl: string;
-  progresBar:number
+  progresBar: number;
 };
 const CardCourse = ({
   courseName,
@@ -17,13 +17,13 @@ const CardCourse = ({
   numberOfVideo,
   courseUrl,
   courseImg,
-  progresBar
+  progresBar,
 }: Props) => {
   return (
     <div className="my-3 shadow-lg shadow-mainColor/60 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg">
       <div className="w-full flex ">
         <Image
-          src={`/imgs/${courseImg}.png`}
+          src={courseImg}
           alt="course1"
           width={300}
           height={200}
@@ -59,7 +59,7 @@ const CardCourse = ({
       <div className="w-full">
         <div className="w-full bg-gray-200 rounded-full h-6 mb-4 dark:bg-gray-700">
           <div
-            className="bg-mainColor h-6 rounded-s-full "
+            className="bg-mainColor h-6 rounded-full "
             style={{ width: `${progresBar}%` }}
           ></div>
         </div>

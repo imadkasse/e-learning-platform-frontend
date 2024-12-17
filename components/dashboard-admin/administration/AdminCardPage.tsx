@@ -1,43 +1,45 @@
 import Image from "next/image";
 import React from "react";
 type Props = {
-  studentName: string;
-  studentEmail: string;
-  studentJoinDate: string;
-  studentImg: string;
-  studentRole: string; // Admin, Teacher, Student
+  userName: string;
+  userEmail: string;
+  userJoinDate: string | undefined;
+  userImg: string;
+  userRole: string; // Admin, Teacher, student
 };
 const AdminCardPage = ({
-  studentName,
-  studentJoinDate,
-  studentEmail,
-  studentImg,
-  studentRole,
+  userName,
+  userJoinDate,
+  userEmail,
+  userImg,
+  userRole,
 }: Props) => {
   return (
-    <div className="xs:flex-col xs:items-center xs:gap-3 sm:flex-row py-4 px-8 rounded-lg shadow-md shadow-mainColor flex items-center justify-between">
-      <div className="w-full text-center">
-        <h1 className="apply-fonts-normal text-lg">{studentRole}</h1>
+    <div className="xs:flex-col xs:items-center xs:gap-3 sm:flex-row py-4 px-8 rounded-lg my-2 shadow-sm  shadow-mainColor flex items-center justify-between">
+      <div className="w-full text-center ">
+        <h1 className="apply-fonts-normal text-lg">{userRole}</h1>
       </div>
 
       <div className="flex  items-center gap-3 w-full ">
         <div>
           <Image
-            src={`/imgs/${studentImg}.png`}
+            src={userImg}
             width={100}
             height={100}
-            alt="StudentImg"
+            alt="userImg"
             className=" w-12 h-12   rounded-full"
           />
         </div>
         <div className="">
-          <h1 className="apply-fonts-normal lg:text-lg">{studentName}</h1>
-          <h1 className="text-gray-500 xs:block sm:hidden xl:block">{studentEmail}</h1>
+          <h1 className="apply-fonts-normal lg:text-lg">{userName}</h1>
+          <h1 className="text-gray-500 xs:block sm:hidden xl:block">
+            {userEmail}
+          </h1>
         </div>
       </div>
 
-      <div className="w-full text-center">
-        <p className="md:text-xl ">{studentJoinDate}</p>
+      <div className="w-full ">
+        <p className="md:text-xl ">{userJoinDate}</p>
       </div>
 
       <div className="flex gap-2 w-full justify-center">

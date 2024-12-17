@@ -1,7 +1,13 @@
 import React from "react";
 import CourseCard from "./CourseCard";
+import { Course } from "@/types/course";
 
-const Courses = () => {
+const Courses = async () => {
+  const res = await fetch(`${process.env.BACK_URL}/api/courses`);
+  const data = await res.json();
+  const courses: Course[] = data.courses;
+  console.log(courses);
+
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 ">
       <div className="mb-5 flex items-center gap-6">
@@ -41,54 +47,23 @@ const Courses = () => {
         </form>
       </div>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-7">
-        <CourseCard
-          courseImg="course1"
-          students={1200}
-          numberOfVideo={123}
-          courseUrl="/"
-          coursePrice={1200}
-          courseName="الوحدة الثانية :"
-        />
-        <CourseCard
-          courseImg="course1"
-          students={1200}
-          numberOfVideo={123}
-          courseUrl="/"
-          coursePrice={1200}
-          courseName="الوحدة الثانية :"
-        />
-        <CourseCard
-          courseImg="course1"
-          students={1200}
-          numberOfVideo={123}
-          courseUrl="/"
-          coursePrice={1200}
-          courseName="الوحدة الثانية :"
-        />
-        <CourseCard
-          courseImg="course1"
-          students={1200}
-          numberOfVideo={123}
-          courseUrl="/"
-          coursePrice={1200}
-          courseName="الوحدة الثانية :"
-        />
-        <CourseCard
-          courseImg="course1"
-          students={1200}
-          numberOfVideo={123}
-          courseUrl="/"
-          coursePrice={1200}
-          courseName="الوحدة الثانية :"
-        />
-        <CourseCard
-          courseImg="course1"
-          students={1200}
-          numberOfVideo={123}
-          courseUrl="/"
-          coursePrice={1200}
-          courseName="الوحدة الثانية :"
-        />
+        {courses.length > 0 ? (
+          courses.map((c) => {
+            return (
+              <CourseCard
+                key={c._id}
+                courseImg={c.imageCover}
+                students={c.studentsCount}
+                numberOfVideo={123}
+                courseUrl={c._id}
+                coursePrice={c.price}
+                courseName={c.title}
+              />
+            );
+          })
+        ) : (
+          <h1>course Not Found</h1>
+        )}
       </div>
     </div>
   );

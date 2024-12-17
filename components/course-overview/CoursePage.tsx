@@ -1,8 +1,11 @@
-import { AccessTimeOutlined, PlayCircleOutlined } from "@mui/icons-material";
+import {
+  AccessTimeOutlined,
+  PlayArrow,
+  PlayCircleOutlined,
+} from "@mui/icons-material";
 import { Rating } from "@mui/material";
 import Image from "next/image";
 
-import React from "react";
 import CourseCard from "./CourseCard";
 import DynamicVideoPlyr from "./DynamicVideoPlyr";
 import { Course } from "@/types/course";
@@ -15,14 +18,17 @@ export const CoursePage = async ({ id }: Props) => {
   const data = await res.json();
   const course: Course = data.course;
   const instructor = course.instructor;
-
-  console.log(3600/60)
-
+  console.log(course.duration)
 
   return (
     <div className="mt-6 flex  flex-row-reverse justify-between gap-7 px-3 ">
       {/* Course Card */}
-      <CourseCard />
+      <CourseCard
+        price={course.price}
+        duration={course.duration}
+        studentNumber={course.enrolledStudents.length}
+        courseLink={course._id}
+      />
       {/* Show Course  */}
       <div className="lg:custom-width-Course ">
         {/* title Of Course  */}
@@ -46,7 +52,9 @@ export const CoursePage = async ({ id }: Props) => {
           </div>
         </div>
         {/* Welcome video */}
-        <DynamicVideoPlyr videoSrc={course.videos[0].url}/>
+
+        <DynamicVideoPlyr videoSrc={course.videos[0]?.url} />
+
         {/* description Course */}
         <div className="my-4">
           <h1 className="apply-fonts-medium  text-lg mb-2">وصف الدورة</h1>
@@ -70,13 +78,41 @@ export const CoursePage = async ({ id }: Props) => {
                 <AccessTimeOutlined className="text-courseIconsSection" />
                 <h1 className="flex  items-center">
                   {/* added after time */}
-                  30
+                  {(course.duration / 3600).toFixed(5)}
                   <span className="apply-fonts-normal text-[13px]">ساعة</span>
                 </h1>
               </div>
             </div>
           </div>
-          <div>video overView</div>
+          <div className="">
+            <table className="table-auto w-full  ">
+              <tbody>
+                {course.videos.map((video) => (
+                  <tr
+                    key={video._id}
+                    className="bg-white hover:bg-gray-50 transition"
+                  >
+                    {/* زر التشغيل */}
+                    <td className="px-4 py-2 text-right">
+                      <button className="text-mainColor hover:text-mainColorHover transition">
+                        <PlayArrow />
+                      </button>
+                    </td>
+
+                    {/* اسم الدرس */}
+                    <td className="px-4 py-2 text-right apply-fonts-normal">
+                      {video.lessonTitle}
+                    </td>
+
+                    {/* مدة الدرس */}
+                    <td className="px-4 py-2 text-right text-gray-600">
+                      {(Number(video.duration) / 60).toFixed(3)} دقيقة
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {/* course reviews */}
         <div className="mt-5 flex  items-center justify-between">

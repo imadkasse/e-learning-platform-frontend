@@ -1,9 +1,45 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import AdminCardPage from "./AdminCardPage";
+import Cookies from "js-cookie";
+import { User } from "@/types/user";
+import Spinner from "@/components/spinner/Spinner";
 
 const AdminHomePage = () => {
+  const token = Cookies.get("token");
+
+  const [users, setusers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await res.json();
+        setusers(
+          data.users.filter(
+            (user: User) => user.role === "admin" || user.role === "teacher"
+          )
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
+  }, [token]);
+
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 ">
+    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-[95vh] ">
       <div className="mb-5 flex items-center lg:gap-6 ">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الإدارة </h1>
 
@@ -43,51 +79,43 @@ const AdminHomePage = () => {
           إضافة
         </button>
       </div>
+
       <div>
-        <div className="xs:hidden sm:flex mb-4 w-full rounded-lg bg-mainColor text-white py-4 px-8  justify-between">
-          <div className="apply-fonts-normal   flex w-full justify-center">
-            نوع الحساب
-          </div>
-          <div className="apply-fonts-normal   flex w-full justify-center">
-            الشخص
-          </div>
-          <div className="apply-fonts-normal  flex w-full justify-center">
-            التاريخ
-          </div>
-          <div className="apply-fonts-normal  flex w-full justify-center">
-            تعديل | حدف
-          </div>
-        </div>
-        <div className="flex flex-col gap-3">
-          <AdminCardPage
-            studentImg="course1"
-            studentEmail="email@exmple.com"
-            studentJoinDate="2023-12-12"
-            studentName="عماد"
-            studentRole="أدمن"
-          />
-          <AdminCardPage
-            studentImg="course2"
-            studentEmail="email@exmple.com"
-            studentJoinDate="2023-12-12"
-            studentName="محمد"
-            studentRole="أستاذ"
-          />
-          <AdminCardPage
-            studentImg="course3"
-            studentEmail="email@exmple.com"
-            studentJoinDate="2023-12-12"
-            studentName="عبد الله"
-            studentRole="أستاذ"
-          />
-          <AdminCardPage
-            studentImg="course3"
-            studentEmail="email@exmple.com"
-            studentJoinDate="2023-12-12"
-            studentName="عبد الإله"
-            studentRole="أدمن"
-          />
-        </div>
+        <table className="table-auto w-full">
+          <thead className="bg-mainColor text-white ">
+            <tr className="text-center ">
+              <th className="apply-fonts-normal py-2 ">الدور</th>
+              <th className="apply-fonts-normal py-2 ">التلميذ</th>
+              <th className="apply-fonts-normal py-2">تاريخ</th>
+              <th className="apply-fonts-normal py-2">العمليات</th>
+            </tr>
+          </thead>
+          <tbody className="">
+            {loading ? (
+              <tr>
+                <td colSpan={4} className="text-center">
+                  <Spinner />
+                </td>
+              </tr>
+            ) : (
+              users.map((user) => {
+                return (
+                  <tr key={user._id}>
+                    <td colSpan={4}>
+                      <AdminCardPage
+                        userName={user.username}
+                        userJoinDate={user.createdAt?.split("T")[0]}
+                        userEmail={user.email}
+                        userImg={user.thumbnail || "/imgs/logoImg.png"}
+                        userRole={user.role === "admin" ? "أدمن" : "أستاذ"}
+                      />
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

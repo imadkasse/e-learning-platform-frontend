@@ -1,9 +1,49 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import StudentCard from "./StudentCard";
+import { User } from "@/types/user";
+import Cookies from "js-cookie";
+import Spinner from "@/components/spinner/Spinner";
 
 const Students = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState<number>(6);
+  const [totalPageArr, setTotalPageArr] = useState<number[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const token = Cookies.get("token");
+
+  useEffect(() => {
+    const fetchAllUsers = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users?page=${currentPage}&limit=5`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await res.json();
+        setUsers(data.users);
+        setTotalPage(data.totalPages);
+        setTotalPageArr(
+          Array.from({ length: data.totalPages }, (_, i) => i + 1)
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllUsers();
+  }, [token, currentPage]);
+
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 ">
+    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-[100vh]">
       <div className="mb-5 flex items-center gap-6">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الطلاب</h1>
         <form className="flex items-center flex-grow">
@@ -40,55 +80,131 @@ const Students = () => {
         </form>
       </div>
       <div className="">
-        <div className="xs:hidden sm:flex mb-4 w-full rounded-lg bg-mainColor text-white py-4 px-8  justify-between">
-          <h1 className="apply-fonts-normal flex w-full justify-center">التلميذ</h1>
-          <h1 className="apply-fonts-normal flex w-full justify-center ">تاريخ</h1>
-          <h1 className="apply-fonts-normal flex w-full justify-center">حالة الحساب</h1>
+        <div className="w-full rounded-lg  py-4 px-8 mb-4">
+          <table className="table-auto w-full">
+            <thead className="bg-mainColor text-white ">
+              <tr className="text-center">
+                <th className="apply-fonts-normal py-2 ">التلميذ</th>
+                <th className="apply-fonts-normal py-2">تاريخ</th>
+                <th className="apply-fonts-normal py-2">العمليات</th>
+              </tr>
+            </thead>
+            <tbody className="">
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="text-center py-4">
+                    <Spinner />
+                  </td>
+                </tr>
+              ) : (
+                <>
+                  {users.length > 0 ? (
+                    users.map((user) => (
+                      <tr key={user._id} className="">
+                        <td colSpan={4} className="">
+                          <StudentCard
+                            studentImg={user.thumbnail || "/imgs/logoImg.png"}
+                            studentName={user.username}
+                            studentEmail={user.email}
+                            studentJoinDate={user.createdAt?.split("T")[0]}
+                            studentUrl={user._id}
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={3} className="text-center py-4">
+                        لا يوجد أي مستخدمين
+                      </td>
+                    </tr>
+                  )}
+                </>
+              )}
+            </tbody>
+          </table>
         </div>
-        <div className="flex flex-col gap-6">
-          <StudentCard
-          studentImg='course1'
-            studentName="عماد"
-            studentEmail="im@gm.com"
-            studentJoinDate="2014-12-12"
-            studentStatus={true}
-          />
-          <StudentCard
-          studentImg='course2'
-            studentName="محمد"
-            studentEmail="ims@gm.com"
-            studentJoinDate="2016-10-12"
-            studentStatus={false}
-          />
-          <StudentCard
-          studentImg='course3'
-            studentName="عمر"
-            studentEmail="omar@gm.com"
-            studentJoinDate="2024-10-12"
-            studentStatus={true}
-          />
-          <StudentCard
-          studentImg='course4'
-            studentName="عادل "
-            studentEmail="adel@gm.com"
-            studentJoinDate="2024-10-12"
-            studentStatus={false}
-          />
-          <StudentCard
-          studentImg='course3'
-            studentName="نسيم "
-            studentEmail="adel@gm.com"
-            studentJoinDate="2024-10-12"
-            studentStatus={true}
-          />
-          <StudentCard
-          studentImg='course2'
-            studentName="إسلام "
-            studentEmail="adel@gm.com"
-            studentJoinDate="2024-10-12"
-            studentStatus={false}
-          />
-        </div>
+
+        <nav className="flex justify-center">
+          <ul className="flex items-center -space-x-px h-16 text-md">
+            {/* الزر السابق */}
+            <li>
+              <button
+                onClick={() => {
+                  if (currentPage <= totalPage && currentPage != 1) {
+                    setCurrentPage(currentPage - 1);
+                    console.log("first");
+                  }
+                }}
+                className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-white bg-mainColor border border-mainColor hover:bg-mainColorHoverLight hover:text-white rounded-s-lg"
+              >
+                <span className="sr-only">Previous</span>
+                <svg
+                  className="w-2.5 h-2.5 rtl:rotate-180"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 6 10"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 1 1 5l4 4"
+                  />
+                </svg>
+              </button>
+            </li>
+
+            {/* أزرار الأرقام */}
+            {totalPageArr.map((num) => (
+              <li key={num}>
+                <button
+                  onClick={() => {
+                    setCurrentPage(num);
+                  }}
+                  className={`flex items-center justify-center px-3 h-8 leading-tight text-mainColor  border border-mainColor ${
+                    currentPage === num
+                      ? "bg-mainColor text-white "
+                      : "bg-white hover:bg-mainColorHoverLight hoverEle hover:text-white "
+                  }`}
+                >
+                  {num}
+                </button>
+              </li>
+            ))}
+
+            {/* الزر التالي */}
+            <li>
+              <button
+                onClick={() => {
+                  if (currentPage < totalPage) {
+                    setCurrentPage(currentPage + 1);
+                  }
+                }}
+                className="flex items-center justify-center px-3 h-8 leading-tight text-white bg-mainColor border border-mainColor hover:bg-mainColorHoverLight hover:text-white rounded-e-lg"
+              >
+                <span className="sr-only">Next</span>
+                <svg
+                  className="w-2.5 h-2.5 rtl:rotate-180"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 6 10"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m1 9 4-4-4-4"
+                  />
+                </svg>
+              </button>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
   );

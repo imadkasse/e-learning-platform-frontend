@@ -5,9 +5,11 @@ import Link from "next/link";
 import React, { FormEvent, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { toast } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
+import showToast from "@/utils/showToast";
+import UpdatePassword from "@/components/utlisComponenets/UpdatePassword";
 
 const Settings = () => {
   const router = useRouter();
@@ -66,29 +68,12 @@ const Settings = () => {
         }
       );
       console.log(res);
-
-      toast.success("تم تحديث البيانات بنجاح ", {
-        position: "top-center",
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
-      });
+      showToast("success", "تم تحديث البيانات بنجاح ");
       router.refresh();
     } catch (error) {
       console.log(error);
       //@ts-expect-error:fix error agin
-      toast.error(error.response.data.message, {
-        position: "top-center",
-        autoClose: 1000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
-      });
+      showToast("error", error.response.data.message);
     } finally {
       setloading(false);
     }
@@ -223,6 +208,8 @@ const Settings = () => {
           </button>
         </div>
       </form>
+      {/* Edit Password */}
+      <UpdatePassword />
     </div>
   );
 };

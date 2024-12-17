@@ -15,14 +15,14 @@ import {
 import Link from "next/link";
 
 // add this on other time
-// type Props = {
-//   price: number;
-//   duration: number;
-//   studentNumber: number;
-//   courseLink: string;
-// };
+type Props = {
+  price: number;
+  duration: number;
+  studentNumber: number;
+  courseLink: string;
+};
 
-const CourseCard = () => {
+const CourseCard = ({ price, duration, studentNumber, courseLink }: Props) => {
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const handelOpenAndColsed = () => {
     setIsOpen(!isOpen);
@@ -54,7 +54,7 @@ const CourseCard = () => {
       >
         {/* price */}
         <div className="w-full text-lg text-center">
-          <h1 className="border-b border-courseTextSection">1700.00DA</h1>
+          <h1 className="border-b border-courseTextSection">{price}DA</h1>
         </div>
         <div className=" flex flex-col gap-1 py-2">
           {/* duration */}
@@ -64,7 +64,8 @@ const CourseCard = () => {
               <AccessTimeOutlined className="text-courseTextSection" />
             </div>
             <h1 className="text-courseTextSection">
-              48 <span className="text-[17px] apply-fonts-normal ">ساعة</span>{" "}
+              {(duration / 3600).toFixed(5)}
+              <span className="text-[17px] apply-fonts-normal ">ساعة</span>
             </h1>
           </div>
           {/* student number */}
@@ -73,7 +74,7 @@ const CourseCard = () => {
               <p className="apply-fonts-normal ">عدد الطلاب </p>
               <PeopleAltOutlined className="text-courseTextSection" />
             </div>
-            <h1 className="text-courseTextSection">4800</h1>
+            <h1 className="text-courseTextSection">{studentNumber}</h1>
           </div>
         </div>
 
@@ -111,25 +112,25 @@ const CourseCard = () => {
           <p className="apply-fonts-medium mb-3 ">شارك هذه الدورة :</p>
           <div className="flex gap-4 justify-center">
             <Link
-              href="#"
+              href={`/${courseLink}`}
               className=" px-4 py-2 rounded-lg hover:border-gray-400 hoverEle bg-gray-100"
             >
               <Facebook className="text-courseTextSection" />
             </Link>
             <Link
-              href="#"
+              href={`/${courseLink}`}
               className="bg-gray-100 px-4 py-2 rounded-lg hover:border-gray-400 hoverEle"
             >
               <Twitter className="text-courseTextSection" />
             </Link>
             <Link
-              href="#"
+              href={`/${courseLink}`}
               className="bg-gray-100 px-4 py-2 rounded-lg hover:border-gray-400 hoverEle"
             >
               <Instagram className="text-courseTextSection" />
             </Link>
             <Link
-              href="#"
+              href={`/${courseLink}`}
               className="bg-gray-100 px-3 py-2 rounded-lg hover:border-gray-400 hoverEle flex items-center gap-1"
             >
               <h1 className="apply-fonts-normal text-[11px] text-gray-700">

@@ -5,9 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
+import showToast from "@/utils/showToast";
 
 const SignUp = () => {
   const router = useRouter();
@@ -71,15 +71,7 @@ const SignUp = () => {
     } catch (error) {
       console.log(error);
       // @ts-expect-error: fix after time
-      toast.error(error.response.data.message, {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
-      });
+      showToast("error", error.response.data.message);
     } finally {
       setLoading(false);
     }

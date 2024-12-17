@@ -1,11 +1,12 @@
 "use client";
 import Image from "next/image";
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import showToast from "@/utils/showToast";
+import { useUserStore } from "@/store/userStore";
+import Link from "next/link";
 
 interface CourseDetails {
   imageCover: File | null;
@@ -21,6 +22,16 @@ interface CourseDetails {
 }
 
 const Details: React.FC = () => {
+  // add protected
+  const token = Cookies.get("token");
+
+  const fetchUser = useUserStore((state) => state.fetchUser);
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+  const user = useUserStore((state) => state.user);
+
   const [formData, setFormData] = useState<CourseDetails>({
     imageCover: null,
     lessonName: "",
@@ -38,6 +49,25 @@ const Details: React.FC = () => {
     null
   );
   const [loading, setLoading] = useState<boolean>(false);
+
+  //return this if the user is Not authenticated
+  if (!token || user?.role !== "teacher") {
+    return (
+      <div className="bg-wygColor flex flex-col justify-center rounded-xl px-4 py-5 h-[100vh] ">
+        <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor ">
+          أنت غير مسجل أو لا تملك الصلاحية للوصول الى هذه الصفحة
+        </h1>
+        <div className="mt-5 flex justify-center ">
+          <Link
+            href={"/login"}
+            className="apply-fonts-normal py-2 px-4  bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white rounded-lg"
+          >
+            سجل الدخول من هنا
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const handleImageCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -88,9 +118,6 @@ const Details: React.FC = () => {
     courseData.append("description", formData.courseDescription);
     courseData.append("category", formData.category);
 
-    const token = Cookies.get("token");
-    console.log(token);
-
     setLoading(true);
     try {
       const res = await axios.post(
@@ -104,16 +131,8 @@ const Details: React.FC = () => {
         }
       );
       console.log(res);
+      showToast("success", "تم نشر الدورة بنجاح");
 
-      toast.success("تم نشر الدورة بنجاح", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        className: "bg-white text-black dark:bg-gray-800 dark:text-white",
-      });
       setFormData({
         imageCover: null,
         lessonName: "",
