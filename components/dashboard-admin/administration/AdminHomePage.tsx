@@ -85,7 +85,7 @@ const AdminHomePage = () => {
           <thead className="bg-mainColor text-white ">
             <tr className="text-center ">
               <th className="apply-fonts-normal py-2 ">الدور</th>
-              <th className="apply-fonts-normal py-2 ">التلميذ</th>
+              <th className="apply-fonts-normal py-2 ">الحساب</th>
               <th className="apply-fonts-normal py-2">تاريخ</th>
               <th className="apply-fonts-normal py-2">العمليات</th>
             </tr>

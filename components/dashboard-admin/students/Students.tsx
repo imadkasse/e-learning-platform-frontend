@@ -1,17 +1,17 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import StudentCard from "./StudentCard";
-import { User } from "@/types/user";
 import Cookies from "js-cookie";
 import Spinner from "@/components/spinner/Spinner";
+import { useSearchUser } from "@/store/searchUser";
+import SearchUsers from "./SearchUsers";
 
 const Students = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState<number>(6);
-  const [totalPageArr, setTotalPageArr] = useState<number[]>([]);
+  const { users, setUsers, loading, setLoading } = useSearchUser();
 
-  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState<number>(0);
+  const [totalPageArr, setTotalPageArr] = useState<number[]>([]);
 
   const token = Cookies.get("token");
 
@@ -40,44 +40,13 @@ const Students = () => {
       }
     };
     fetchAllUsers();
-  }, [token, currentPage]);
+  }, [token, currentPage, setUsers, setLoading]);
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-[100vh]">
+    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-[100vh] relative ">
       <div className="mb-5 flex items-center gap-6">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الطلاب</h1>
-        <form className="flex items-center flex-grow">
-          <label className="sr-only">Search</label>
-          <div className="relative w-full">
-            <div className="absolute  inset-y-0 start-0 flex items-center ps-3 pointer-events-none  ">
-              <svg
-                className="w-4 h-4 text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                />
-              </svg>
-            </div>
-            <input
-              type="text"
-              id="simple-search"
-              className="apply-fonts-normal  block w-full ps-10 p-2.5  rounded-3xl   focus:border-red-400 "
-              placeholder="البحث..."
-              required
-            />
-          </div>
-          <button className="apply-fonts-normal py-2.5 mx-3 rounded-lg text-white px-4 bg-mainColor hover:bg-mainColorHoverLight hoverEle">
-            إبحث
-          </button>
-        </form>
+        <SearchUsers />
       </div>
       <div className="">
         <div className="w-full rounded-lg  py-4 px-8 mb-4">
@@ -98,7 +67,7 @@ const Students = () => {
                 </tr>
               ) : (
                 <>
-                  {users.length > 0 ? (
+                  {users?.length > 0 ? (
                     users.map((user) => (
                       <tr key={user._id} className="">
                         <td colSpan={4} className="">
@@ -107,7 +76,8 @@ const Students = () => {
                             studentName={user.username}
                             studentEmail={user.email}
                             studentJoinDate={user.createdAt?.split("T")[0]}
-                            studentUrl={user._id}
+                            studentId={user._id}
+                            studentStatus={user.active}
                           />
                         </td>
                       </tr>

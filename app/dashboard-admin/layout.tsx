@@ -1,6 +1,8 @@
 import SideBar from "@/components/dashboard-admin/sideBar/SideBar";
 import { Metadata } from "next";
 import React from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: "dashboard-admin",
@@ -15,6 +17,7 @@ export default function RootLayout({
     <>
       <div className="flex gap-3 ">
         <SideBar />
+        <ToastContainer />
         <main className="flex-1">{children}</main>
       </div>
     </>
