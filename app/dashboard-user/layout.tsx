@@ -2,6 +2,7 @@ import SideBar from "@/components/dashboard-user/sideBar/SideBar";
 import { Metadata } from "next";
 import React from "react";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: "dashboard-user",

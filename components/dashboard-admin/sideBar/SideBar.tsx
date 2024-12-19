@@ -123,18 +123,29 @@ const SideBar = () => {
           }`}
         >
           <ul className="list-none text-base w-[200px]">
-            <li className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2">
+            <Link
+              href={`/dashboard-admin/support`}
+              className={` flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                pathName === "/dashboard-admin/support" ? "bg-mainColor/50" : ""
+              }my-2`}
+            >
               <ContactSupportOutlined />
-              <Link href={`/`}>الدعم</Link>
-            </li>
-            <li className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2">
+              <p>الدعم</p>
+            </Link>
+            <Link
+              href={`/`}
+              className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2"
+            >
               <SettingsOutlined />
-              <Link href={`/`}>الإعدادات</Link>
-            </li>
-            <li className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2">
+              <p>الإعدادات</p>
+            </Link>
+            <Link
+              href={`/`}
+              className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
+            >
               <LogoutOutlined className="text-red-700" />
-              <Link href={`/`}>تسجيل الخروج</Link>
-            </li>
+              <p>تسجيل الخروج</p>
+            </Link>
           </ul>
         </nav>
       </div>

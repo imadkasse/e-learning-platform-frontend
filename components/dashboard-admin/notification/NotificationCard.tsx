@@ -19,7 +19,7 @@ const NotificationCard = ({
     <div className="w-full my-3 shadow-lg shadow-mainColor/60 bg-wygColor  flex gap-4 items-center  px-3 py-4 rounded-lg">
       <div>
         <Image
-          src={`/imgs/${notifcationImg}`}
+          src={notifcationImg}
           alt="NotifactionImg"
           width={250}
           height={250}

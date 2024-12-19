@@ -46,6 +46,13 @@ const Login = () => {
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`,
         data
       );
+      if (!res.data.user.active) {
+        showToast(
+          "error",
+          "الحساب غير مفعل حاليا الرجاء التواصل مع الدعم لتفعيله"
+        );
+        return;
+      }
       const token = res.data.token;
       Cookies.set("token", token);
       const role =
