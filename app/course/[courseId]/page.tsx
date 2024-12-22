@@ -10,12 +10,11 @@ const page = async ({
     courseId: string;
   };
 }) => {
-  const { courseId } = await params;
   return (
     <div className="py-3 container mx-auto ">
       <NavBarCourse />
       <ToastContainer />
-      <CoursePage courseId={courseId} />
+      <CoursePage courseId={params.courseId} />
     </div>
   );
 };
