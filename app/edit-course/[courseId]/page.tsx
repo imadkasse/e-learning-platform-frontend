@@ -1,14 +1,9 @@
 import EditCourse from "@/components/dashboard-teacher/edit-course/EditCourse";
 import React from "react";
 
-const page = async ({
-  params,
-}: {
-  params: {
-    courseId: string;
-  };
-}) => {
-  const { courseId } = await params;
+type PageProps = { params: Promise<{ courseId: string }> };
+const page = async ({ params }: PageProps) => {
+  const courseId = (await params).courseId;
   return (
     <div>
       <EditCourse id={courseId} />

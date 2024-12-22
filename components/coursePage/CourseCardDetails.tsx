@@ -199,7 +199,13 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
                           }`}
                         >
                           <AccessTimeOutlined />
-                          <p>{formatDuration(l.duration.toFixed(0))}</p>
+
+                          <p>
+                            {
+                              //@ts-expect-error:fix
+                              formatDuration(l.duration.toFixed(0))
+                            }
+                          </p>
                         </div>
                       </div>
                     </div>

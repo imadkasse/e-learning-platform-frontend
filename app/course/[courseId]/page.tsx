@@ -3,18 +3,14 @@ import NavBarCourse from "@/components/coursePage/NavBarCourse";
 import React from "react";
 import { ToastContainer } from "react-toastify";
 
-const page = async ({
-  params,
-}: {
-  params: {
-    courseId: string;
-  };
-}) => {
+type PageProps = { params: Promise<{ courseId: string }> };
+const page = async ({ params }: PageProps) => {
+  const courseId = (await params).courseId;
   return (
     <div className="py-3 container mx-auto ">
       <NavBarCourse />
       <ToastContainer />
-      <CoursePage courseId={params.courseId} />
+      <CoursePage courseId={courseId} />
     </div>
   );
 };

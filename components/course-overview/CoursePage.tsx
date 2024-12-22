@@ -18,7 +18,7 @@ export const CoursePage = async ({ id }: Props) => {
   const data = await res.json();
   const course: Course = data.course;
   const instructor = course.instructor;
-  console.log(course.duration)
+  console.log(course.duration);
 
   return (
     <div className="mt-6 flex  flex-row-reverse justify-between gap-7 px-3 ">
@@ -140,7 +140,7 @@ export const CoursePage = async ({ id }: Props) => {
             {course.reviews.length > 0 ? (
               course.reviews.map((review) => {
                 return (
-                  <div key={review.id} className="border-b pb-3">
+                  <div key={review._id} className="border-b pb-3">
                     <div className="flex items-center gap-2">
                       <Image
                         src={review.user.thumbnail || "/imgs/personImg.png"}

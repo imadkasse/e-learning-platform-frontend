@@ -63,7 +63,7 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
         _id: "",
         lessonTitle: "",
         url: "",
-        duration: "",
+        duration: 0,
         isCompleted: false,
         completedBy: [],
       }

@@ -9,7 +9,7 @@ export const useLesson = create<{
     _id: "",
     lessonTitle: "",
     url: "",
-    duration: "",
+    duration: 0,
     isCompleted: false,
     completedBy: [],
   },
