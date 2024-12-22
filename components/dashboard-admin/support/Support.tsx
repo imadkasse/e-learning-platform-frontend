@@ -1,19 +1,20 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import MsgCard from "./MsgCard";
 
 import { io } from "socket.io-client";
 import Cookies from "js-cookie";
+import { useFaq } from "@/store/faqStore";
 
 //connect with server
 const socket = io("http://localhost:5000");
 
 const Support = () => {
   const token = Cookies.get("token");
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const { faqs, setFaqs } = useFaq();
 
   useEffect(() => {
-    const fetchedNotifications = async () => {
+    const fetchedFaqs = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/faq`, {
           headers: {
@@ -21,43 +22,42 @@ const Support = () => {
           },
         });
         const data = await res.json();
-        setNotifications(data.data.faqs);
-        console.log(data.data.faqs);
+        setFaqs(data.data.faqs);
       } catch (error) {
         console.log(error);
       }
     };
-    fetchedNotifications();
+    fetchedFaqs();
 
-    // عند استقبال إشعار جديد
     socket.on("newFaq", (data) => {
-      // إضافة الإشعار الجديد إلى قائمة الإشعارات
-      setNotifications((prevNotifications) => [
-        ...prevNotifications,
-        data.faq, // يتم استلام `faq` من الخادم
-      ]);
+      setFaqs([...faqs, data.faq]);
+    });
+    socket.on("deleteFaq", (data) => {
+      setFaqs(faqs.filter((faq) => faq._id !== data.faq._id));
     });
 
     // تنظيف الاتصال عند إلغاء التثبيت
     return () => {
       socket.off("newFaq");
+      socket.off("deleteFaq");
     };
-  }, [token]);
+  }, [token, faqs, setFaqs]);
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 ">
+    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 relative">
       <h1 className="apply-fonts-normal text-2xl font-semibold ">الرسائل</h1>
       <div className=" grid grid-cols-1 mt-7">
-        {notifications?.length === 0 ? (
+        {faqs?.length === 0 ? (
           <p>لا توجد إشعارات حالياً</p>
         ) : (
-          notifications?.map((no) => (
+          faqs?.map((no) => (
             <MsgCard
               key={no._id}
               username={no.user.username}
               subject={no.subject}
               date={no.createdAt.split("T")[0]}
               description={no.description}
+              ticketId={no._id}
             />
           ))
         )}
