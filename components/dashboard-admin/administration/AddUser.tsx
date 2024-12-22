@@ -197,7 +197,7 @@ const AddUser = () => {
                   }}
                   className="apply-fonts-normal w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-mainColor focus:border-mainColor"
                 >
-                  <option value="user">طالب</option>
+                  <option value="student">طالب</option>
                   <option value="teacher">معلم</option>
                   <option value="admin">أدمن</option>
                 </select>

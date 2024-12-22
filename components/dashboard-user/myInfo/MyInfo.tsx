@@ -14,6 +14,7 @@ const MyInfo = () => {
   useEffect(() => {
     fetchUserData();
   }, [fetchUserData]);
+
   if (!token || user.role !== "student") {
     return (
       <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
