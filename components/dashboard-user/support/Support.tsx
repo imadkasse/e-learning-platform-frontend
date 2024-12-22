@@ -9,7 +9,7 @@ import MsgCard from "./MsgCard";
 import { useFaq } from "@/store/faqStore";
 
 // إنشاء اتصال مع الخادم
-const socket = io("http://localhost:5000"); // تأكد من استبدال الرابط برابط الخادم الخاص بك
+const socket = io("https://e-leraning-backend.onrender.com"); // تأكد من استبدال الرابط برابط الخادم الخاص بك
 
 const Support = () => {
   const token = Cookies.get("token");

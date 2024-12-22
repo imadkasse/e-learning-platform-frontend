@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import { useFaq } from "@/store/faqStore";
 
 //connect with server
-const socket = io("http://localhost:5000");
+const socket = io("https://e-leraning-backend.onrender.com");
 
 const Support = () => {
   const token = Cookies.get("token");
