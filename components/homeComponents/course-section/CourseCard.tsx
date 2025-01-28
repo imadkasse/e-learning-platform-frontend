@@ -22,8 +22,8 @@ const CourseCard = ({
     <div className="my-3 shadow-lg shadow-mainColor bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg">
       <div className="w-full flex ">
         <Image
-          src={`/imgs/${courseImg}.png`}
-          alt="course1"
+          src={courseImg}
+          alt={`course-${courseUrl}`}
           width={300}
           height={200}
           className="rounded-lg w-full h-full"
@@ -56,7 +56,7 @@ const CourseCard = ({
       </div>
       <div className="apply-fonts-normal mt-2">
         <Link
-          href={courseUrl}
+          href={`/course-overview/${courseUrl}`}
           className="bg-mainColor hoverEle hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white"
         >
           تصفح الدوراة

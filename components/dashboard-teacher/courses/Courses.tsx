@@ -27,7 +27,8 @@ const Courses = async () => {
       // console.log(res.data.user);
       user = res.data.user;
     } catch (err) {
-      console.log(err);
+      //@ts-expect-error:fix agin
+      console.log(err.response.data.message);
     }
   };
 
@@ -51,11 +52,11 @@ const Courses = async () => {
       </div>
     );
   }
-  //@ts-expect-error:fix in After time
+
   const myCourses: Course[] = user.publishedCourses;
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 relative">
+    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll relative">
       <div className="mb-5 flex items-center gap-6 ">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الدورات</h1>
         <section className="flex items-center flex-grow ">
@@ -73,7 +74,7 @@ const Courses = async () => {
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-7">
         {myCourses.length ? (
           myCourses.map((course) => {
-            console.log(course.videos)
+            console.log(course.videos);
             return (
               <div key={course._id}>
                 <CourseCard

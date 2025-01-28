@@ -1,4 +1,5 @@
 import { Course } from "./course";
+import { Notifcation } from "./notification";
 
 type ProgresItems = {
   course: string;
@@ -14,8 +15,9 @@ export type User = {
   active: boolean;
   progress: ProgresItems[];
   thumbnail: string;
-  publishedCourses: string[];
+  publishedCourses: Course[];
   enrolledCourses: Course[]; //قابل للتعديل في لاحق
   phoneNumber: string;
+  notifications: Notifcation[];
   createdAt?: string;
 };

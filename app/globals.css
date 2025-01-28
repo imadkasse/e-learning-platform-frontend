@@ -79,3 +79,13 @@
 :root {
   --plyr-color-main: #3d45ee; /* اللون الرئيسي */
 }
+
+/* تعريف تأثير التعتيم */
+#video-container {
+  filter: blur(0); /* قيمة التعتيم الافتراضية */
+  transition: filter 0.3s ease; /* إضافة تأثير التدرج عند التغيير */
+}
+
+#video-container.blurred {
+  filter: blur(5px); /* قيمة التعتيم عند اكتشاف التفاعل */
+}

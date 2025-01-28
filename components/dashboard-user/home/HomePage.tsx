@@ -52,7 +52,7 @@ const HomePage = async () => {
   const courses = user.enrolledCourses;
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 ">
+    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll ">
       <div className="mb-5">
         <h1 className="apply-fonts-normal text-2xl font-semibold "> دوراتك</h1>
       </div>
@@ -71,7 +71,7 @@ const HomePage = async () => {
                 numberOfVideo={course.videos.length}
                 courseImg={course.imageCover}
                 courseUrl={`/course/${course._id}`}
-                courseName="الوحدة الثالثة : دور البروتينات في التحفيز الإنزيمي"
+                courseName={course.title}
               />
             );
           })

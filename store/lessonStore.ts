@@ -2,7 +2,7 @@ import { Lesson } from "@/types/lesson";
 import { create } from "zustand";
 
 export const useLesson = create<{
-  lesson: Lesson | undefined;
+  lesson: Lesson;
   setLesson: (newLesson: Lesson) => void;
 }>((set) => ({
   lesson: {
@@ -12,6 +12,7 @@ export const useLesson = create<{
     duration: 0,
     isCompleted: false,
     completedBy: [],
+    comments: [],
   },
   setLesson: (newLesson: Lesson) => {
     set(() => ({ lesson: newLesson }));

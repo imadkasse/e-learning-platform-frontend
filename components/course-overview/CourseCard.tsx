@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import {
   AccessTimeOutlined,
   ArrowBackIos,
@@ -13,20 +13,58 @@ import {
   Twitter,
 } from "@mui/icons-material";
 import Link from "next/link";
+import showToast from "@/utils/showToast";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { useUserStore } from "@/store/userStore";
 
 // add this on other time
 type Props = {
+  id: string;
   price: number;
   duration: number;
   studentNumber: number;
   courseLink: string;
 };
 
-const CourseCard = ({ price, duration, studentNumber, courseLink }: Props) => {
+const CourseCard = ({
+  price,
+  duration,
+  studentNumber,
+  courseLink,
+  id,
+}: Props) => {
+  const token = Cookies.get("token");
+  const { user, fetchUser } = useUserStore();
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const handelOpenAndColsed = () => {
     setIsOpen(!isOpen);
   };
+  const enrollmentCourse = async (e: FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (!token) {
+      showToast("error", "يجب تسجيل الدخول أولا");
+      return;
+    }
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/enrolled/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      showToast("success", res.data.message);
+    } catch (error) {
+      //@ts-expect-error:fix agin
+      showToast("error", error.response.data.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
   return (
     <>
       <button
@@ -54,7 +92,10 @@ const CourseCard = ({ price, duration, studentNumber, courseLink }: Props) => {
       >
         {/* price */}
         <div className="w-full text-lg text-center">
-          <h1 className="border-b border-courseTextSection">{price}DA</h1>
+          <h1 className="border-b border-courseTextSection font-bold">
+            {price === 0 ? "مجاناً الأن" : price}
+            {price === 0 ? "" : "DA"}
+          </h1>
         </div>
         <div className=" flex flex-col gap-1 py-2">
           {/* duration */}
@@ -79,9 +120,22 @@ const CourseCard = ({ price, duration, studentNumber, courseLink }: Props) => {
         </div>
 
         <div className="">
-          <button className="apply-fonts-normal w-full p-2 bg-mainColor text-white rounded-sm hover:bg-mainColorHoverLight hoverEle">
-            الانضمام
-          </button>
+          {user.role === "teacher" || user.role === "admin" ? (
+            <hr />
+          ) : (
+            <button
+              onClick={enrollmentCourse}
+              className={`apply-fonts-normal w-full p-2  text-white rounded-sm  hoverEle ${
+                user.enrolledCourses.some((c) => c._id === id)
+                  ? "bg-mainColorHoverLight cursor-not-allowed  "
+                  : "bg-mainColor hover:bg-mainColorHoverLight"
+              }`}
+            >
+              {user.enrolledCourses.some((c) => c._id === id)
+                ? "أنت منضم بالفعل"
+                : "الانضمام"}
+            </button>
+          )}
         </div>
         {/* course features */}
         <div className=" ">

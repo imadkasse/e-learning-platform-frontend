@@ -11,6 +11,7 @@ import Link from "next/link";
 
 import { Close, DeleteOutline, Edit, ErrorOutline } from "@mui/icons-material";
 import { useUserStore } from "@/store/userStore";
+import Spinner from "@/components/spinner/Spinner";
 
 interface CourseDetails {
   //
@@ -50,6 +51,7 @@ const EditCourse = ({ id }: Props) => {
   const token = Cookies.get("token");
 
   const fetchUser = useUserStore((state) => state.fetchUser);
+  const loadingUser = useUserStore((state) => state.loading);
 
   useEffect(() => {
     fetchUser();
@@ -116,6 +118,10 @@ const EditCourse = ({ id }: Props) => {
   useEffect(() => {
     getCourse(id);
   }, [id]);
+
+  if (loadingUser) {
+    return <Spinner />;
+  }
 
   //return this if the user is Not authenticated
   if (!token || user?.role !== "teacher") {
@@ -532,7 +538,6 @@ const EditCourse = ({ id }: Props) => {
                 name="category"
                 onChange={handleInputChange}
                 className="apply-fonts-normal block w-full border rounded p-2"
-                required
               >
                 <option className="apply-fonts-normal" value="">
                   {course?.category || "إختر الفئة"}

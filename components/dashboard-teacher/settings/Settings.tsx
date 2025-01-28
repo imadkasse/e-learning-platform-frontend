@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import showToast from "@/utils/showToast";
 import UpdatePassword from "@/components/utlisComponenets/UpdatePassword";
+import Spinner from "@/components/spinner/Spinner";
 
 const Settings = () => {
   const router = useRouter();
@@ -17,6 +18,7 @@ const Settings = () => {
   const [loading, setloading] = useState<boolean>(false);
 
   const fetchUser = useUserStore((state) => state.fetchUser);
+  const loadingUser = useUserStore((state) => state.loading);
 
   useEffect(() => {
     fetchUser();
@@ -29,9 +31,13 @@ const Settings = () => {
   const [image, setImage] = useState<File>();
   const [imageUrl, setImageUrl] = useState<string>("");
 
+  if (loadingUser) {
+    return <Spinner />;
+  }
+
   if (!token || user?.role !== "teacher") {
     return (
-      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh]  overflow-y-scroll ">
         <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor ">
           أنت غير مسجل أو لا تملك الصلاحية للوصول الى هذه الصفحة
         </h1>
@@ -80,7 +86,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-screen">
+    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll">
       <div className="mb-5">
         <h1 className="apply-fonts-normal text-2xl font-semibold">
           إعدادات الحساب

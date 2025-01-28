@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import showToast from "@/utils/showToast";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
+import Spinner from "@/components/spinner/Spinner";
 
 interface CourseDetails {
   imageCover: File | null;
@@ -14,17 +15,18 @@ interface CourseDetails {
   lessonVideo: File | null;
   pdfFiles: File[];
   courseTitle: string;
-  coursePrice: string;
+  coursePrice: number;
   courseDescription: string;
   category: string;
   lessonVideoName: string;
   pdfFilesNames: string[];
+  concepts: string[];
 }
 
 const Details: React.FC = () => {
   // add protected
   const token = Cookies.get("token");
-
+  const loadingUser = useUserStore((state) => state.loading);
   const fetchUser = useUserStore((state) => state.fetchUser);
 
   useEffect(() => {
@@ -40,15 +42,39 @@ const Details: React.FC = () => {
     lessonVideoName: "",
     pdfFilesNames: [],
     courseTitle: "",
-    coursePrice: "",
+    coursePrice: 0,
     courseDescription: "",
     category: "",
+    concepts: [],
   });
+  // دالة لإضافة مفهوم جديد
+  const handleAddConcept = (concept: string) => {
+    if (concept.trim() === "") return;
+    setFormData((prevState) => ({
+      ...prevState,
+      concepts: [...prevState.concepts, concept],
+    }));
+  };
+
+  // دالة لحذف مفهوم
+  const handleRemoveConcept = (index: number) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      concepts: prevState.concepts.filter((_, i) => i !== index),
+    }));
+  };
+
+  // تخزين قيمة الإدخال الحالي للمفهوم
+  const [conceptInput, setConceptInput] = useState("");
 
   const [imageCoverPreview, setImageCoverPreview] = useState<string | null>(
     null
   );
   const [loading, setLoading] = useState<boolean>(false);
+
+  if (loadingUser) {
+    return <Spinner />;
+  }
 
   //return this if the user is Not authenticated
   if (!token || user?.role !== "teacher") {
@@ -114,9 +140,12 @@ const Details: React.FC = () => {
     if (formData.lessonVideo) courseData.append("videos", formData.lessonVideo);
     formData.pdfFiles.forEach((file) => courseData.append("files", file));
     courseData.append("title", formData.courseTitle);
-    courseData.append("price", formData.coursePrice);
+    courseData.append("price", formData.coursePrice.toString());
     courseData.append("description", formData.courseDescription);
     courseData.append("category", formData.category);
+    formData.concepts.forEach((concept, index) => {
+      courseData.append(`concepts[${index}]`, concept);
+    });
 
     setLoading(true);
     try {
@@ -141,9 +170,10 @@ const Details: React.FC = () => {
         lessonVideoName: "",
         pdfFilesNames: [],
         courseTitle: "",
-        coursePrice: "",
+        coursePrice: 0,
         courseDescription: "",
         category: "",
+        concepts: [],
       });
     } catch (error) {
       //@ts-expect-error:fix
@@ -338,6 +368,65 @@ const Details: React.FC = () => {
             className="w-full p-2 border rounded"
             rows={4}
           ></textarea>
+        </div>
+        {/* مفاهيم الدورة */}
+        <div>
+          <label
+            htmlFor="conceptInput"
+            className="apply-fonts-normal block font-medium mb-2"
+          >
+            مفاهيم الدورة
+          </label>
+          <div className="flex items-center space-x-2 gap-2">
+            <input
+              type="text"
+              id="conceptInput"
+              value={conceptInput}
+              onChange={(e) => setConceptInput(e.target.value)}
+              className="w-full p-2 border rounded"
+              placeholder="أدخل مفهومًا"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                handleAddConcept(conceptInput);
+                setConceptInput("");
+              }}
+              className="apply-fonts-normal p-2 bg-mainColor text-white rounded"
+            >
+              أضف
+            </button>
+          </div>
+        </div>
+
+        {/* عرض المفاهيم المضافة */}
+        <div>
+          <h3 className="apply-fonts-normal font-medium mb-2">
+            المفاهيم المضافة:
+          </h3>
+          {formData.concepts.length > 0 ? (
+            <ul className="space-y-2">
+              {formData.concepts.map((concept, index) => (
+                <li
+                  key={index}
+                  className="apply-fonts-normal flex justify-between items-center bg-gray-100 p-2 rounded shadow"
+                >
+                  <span>{concept}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveConcept(index)}
+                    className="apply-fonts-normal text-redColor"
+                  >
+                    حذف
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 apply-fonts-normal">
+              لم تتم إضافة أي مفاهيم بعد.
+            </p>
+          )}
         </div>
         {/* الفئات */}
         <div>

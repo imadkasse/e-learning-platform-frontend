@@ -131,7 +131,7 @@ const StudentCard = ({
       </div>
       {/* Edit User  */}
       {showEdit && (
-        <div className="rounded-xl absolute bg-black/40 w-full h-full top-0 left-0 flex flex-col items-center justify-center gap-3 ">
+        <div className="rounded-xl absolute bg-black/40 w-full h-full   top-0 left-0 flex flex-col items-center justify-center gap-3 ">
           <div className="rounded-xl flex flex-col justify-center gap-4 bg-wygColor w-96 h-72  px-6">
             <button
               className="text-right mb-4"
@@ -175,7 +175,7 @@ const StudentCard = ({
       )}
       {/* Delete User */}
       {showDelete && (
-        <div className="rounded-xl absolute bg-black/40 w-full h-full top-0 left-0 flex flex-col items-center justify-center gap-3 ">
+        <div className="rounded-xl fixed bg-black/40 lg:custom-width h-full top-0 left-0 flex flex-col items-center justify-center gap-3 ">
           <div className="rounded-xl flex flex-col justify-center gap-4 bg-wygColor py-2  px-6">
             <h1 className="apply-fonts-normal">
               هل أنت متأكد من حذف هذا المستخدم !

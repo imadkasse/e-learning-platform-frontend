@@ -28,6 +28,7 @@ const NavBarHome = () => {
     setMenuToggle(true);
   };
   const fetchUserData = useUserStore((state) => state.fetchUser);
+  const loading = useUserStore((state) => state.loading);
 
   const user = useUserStore((state) => state.user);
   const role = user.role === "student" ? "user" : user.role;
@@ -35,9 +36,6 @@ const NavBarHome = () => {
   useEffect(() => {
     fetchUserData();
   }, [fetchUserData]);
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
 
   // const router = useRouter();
 
@@ -93,11 +91,16 @@ const NavBarHome = () => {
         </Link>
       </nav>
 
-      {user._id !== "" ? (
+      {loading ? (
+        <div className="flex justify-center items-center">
+          {/* Spinner */}
+          <div className="w-8 h-8 border-2 border-t-transparent border-mainColor rounded-full animate-spin"></div>
+        </div>
+      ) : user._id !== "" ? (
         <div className="relative flex gap-2">
-          <div className="w-12 h-12 rounded-full border-2 border-mainColor  ">
+          <div className="w-12 h-12 rounded-full border-2 border-mainColor">
             <button
-              className="w-full h-full "
+              className="w-full h-full"
               onClick={handleColseAndOpenUserToggle}
             >
               <Image
@@ -116,19 +119,19 @@ const NavBarHome = () => {
             <div className="absolute top-12 -left-5 flex flex-col gap-2 bg-mainColor py-2 px-2 rounded-md">
               <Link
                 href={`/dashboard-${role}`}
-                className="hoverEle rounded-2xl hover:bg-redColorHoverLight border px-2 py-1 border-redColor text-white hover:text-white text-[14px] apply-fonts-normal    text-center"
+                className="hoverEle rounded-2xl hover:bg-redColorHoverLight border px-2 py-1 border-redColor text-white hover:text-white text-[14px] apply-fonts-normal text-center"
               >
                 الرئيسية
               </Link>
               <Link
                 href={`/dashboard-${role}/courses`}
-                className="hoverEle rounded-2xl hover:bg-redColorHoverLight border px-2 py-1 border-redColor text-white hover:text-white text-[14px] apply-fonts-normal    text-center"
+                className="hoverEle rounded-2xl hover:bg-redColorHoverLight border px-2 py-1 border-redColor text-white hover:text-white text-[14px] apply-fonts-normal text-center"
               >
                 دوراتي
               </Link>
               <button
                 onClick={handleLogout}
-                className="hoverEle rounded-2xl hover:bg-redColorHoverLight  bg-redColor text-white   apply-fonts-normal text-[14px]   text-center"
+                className="hoverEle rounded-2xl hover:bg-redColorHoverLight bg-redColor text-white apply-fonts-normal text-[14px] text-center"
               >
                 <LogoutOutlined />
               </button>
@@ -136,19 +139,19 @@ const NavBarHome = () => {
           )}
         </div>
       ) : (
-        <div className=" flex flex-row-reverse items-center xs:gap-2 xs:flex-grow xs:justify-cneter md:flex-grow-0 ">
+        <div className="flex flex-row-reverse items-center xs:gap-2 xs:flex-grow xs:justify-cneter md:flex-grow-0">
           <button className="md:hidden" onClick={handleOpenToggle}>
             <MenuOutlined fontSize="large" />
           </button>
           <Link
             href={"/login"}
-            className="hoverEle hover:bg-mainColorHoverLight  bg-mainColor xs:text-base  md:text-[20px] apply-fonts-normal  text-white xs:py-2 xs:px-3 md:py-2 md:px-5 rounded-3xl text-center"
+            className="hoverEle hover:bg-mainColorHoverLight bg-mainColor xs:text-base md:text-[20px] apply-fonts-normal text-white xs:py-2 xs:px-3 md:py-2 md:px-5 rounded-3xl text-center"
           >
             تسجيل الدخول
           </Link>
           <Link
             href={"/signup"}
-            className="xs:text-base   md:text-[20px] apply-fonts-normal font-light rounded-3xl text-center"
+            className="xs:text-base md:text-[20px] apply-fonts-normal font-light rounded-3xl text-center"
           >
             إنشاء حساب
           </Link>

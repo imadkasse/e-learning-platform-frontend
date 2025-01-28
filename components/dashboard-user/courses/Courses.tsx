@@ -57,7 +57,7 @@ const Courses = async () => {
   const allCourses: Course[] = data.data.courses;
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 relative">
+    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll relative">
       <div className="mb-5 flex items-center gap-6">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الدورات</h1>
         <SearchCourse />
@@ -82,7 +82,7 @@ const Courses = async () => {
           })
         ) : (
           <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor h-[100vh]">
-            ليس لديك أي دورات يمكنك إضافة دوراتك
+            لا توجد دورات متاحة حاليا
           </h1>
         )}
       </div>

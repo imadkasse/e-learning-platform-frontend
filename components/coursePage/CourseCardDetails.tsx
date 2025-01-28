@@ -18,6 +18,7 @@ import { usePathname } from "next/navigation";
 import showToast from "@/utils/showToast";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useUserStore } from "@/store/userStore";
 
 type Props = {
   courseId: string | undefined;
@@ -28,6 +29,8 @@ type Props = {
 const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
   const token = Cookies.get("token");
   const pathname = usePathname();
+
+  const { user } = useUserStore();
 
   const courseUrl = encodeURIComponent(
     `${process.env.NEXT_PUBLIC_BASE_URL}${pathname}`
@@ -52,6 +55,8 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
 
   const [isOpenAccordion, setIsOpenAccordion] = useState<boolean>(true);
   const [loadingVideoId, setLoadingVideoId] = useState<string | null>(null);
+  //TODO: can you remove and replace with better logic
+  const [completedVideos, setCompletedVideos] = useState<string[]>([]); // fix the error in mark as completed
   const toggleAccordion = () => setIsOpenAccordion((prev) => !prev);
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const handelOpenAndColsed = () => {
@@ -76,6 +81,14 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
       );
       const updatedLesson = res.data.lesson;
       setLesson(updatedLesson);
+
+      setCompletedVideos((prev) =>
+        prev.includes(videoId)
+          ? prev.filter((id) => id !== videoId)
+          : [...prev, videoId]
+      );
+
+      showToast("success", "تم تمكين الفيديو بنجاح");
     } catch (error) {
       //@ts-expect-error:fix agin
       showToast("error", error.response.data.message);
@@ -175,15 +188,20 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
                           {loadingVideoId === l._id ? (
                             // Spinner أثناء التحميل
                             <div className="w-4 h-4 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                          ) : user.role === "teacher" ||
+                            user.role === "admin" ? (
+                            <></>
                           ) : (
                             <input
                               type="checkbox"
                               className="w-4 h-4 cursor-pointer"
-                              checked={l.completedBy.includes(userId || "no")}
+                              checked={
+                                l.completedBy.includes(userId || "no") ||
+                                completedVideos.includes(l._id)
+                              }
                               onChange={() => {
                                 handleCompleteVideo(l._id);
                               }}
-                              readOnly
                             />
                           )}
                           <h1 className="font-semibold text-base">

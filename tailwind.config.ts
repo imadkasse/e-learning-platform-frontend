@@ -24,6 +24,7 @@ const config: Config = {
         courseIconsSection: "#FF6636",
         courseTextSection: "#6E7485",
         courseStarColor: "#FD8E1F",
+        courseConseptColor: "#E1F7E366",
       },
       screens: {
         xs: "330px",

@@ -1,40 +1,31 @@
 import React from "react";
 import CourseCard from "./CourseCard";
 import Link from "next/link";
+import { Course } from "@/types/course";
 
-const CourseSection = () => {
+const CourseSection = async () => {
+  const res = await fetch(`${process.env.BACK_URL}/api/courses?page=1&limit=4`);
+  const data = await res.json();
+  const courses: Course[] = data.courses;
+
   return (
     <>
-      <div className="w-full grid lg:grid-cols-4 md:grid-cols-3 md:gap-2   xs:grid-cols-1  " id="courses">
-        <CourseCard
-          courseImg="course1"
-          courseName="الوحدة الثالثة : دور البروتينات في التحفيز الإنزيمي"
-          numberOfVideo={23}
-          courseUrl="/"
-          studentsNumber={400}
-        />
-        <CourseCard
-          courseImg="course2"
-          courseName="الوحدة الثانية : العلاقة بين بنية 
-ووظيفة البروتين"
-          numberOfVideo={40}
-          courseUrl="/"
-          studentsNumber={1100}
-        />
-        <CourseCard
-          courseImg="course3"
-          courseName="المنهجية"
-          numberOfVideo={10}
-          courseUrl="/"
-          studentsNumber={2000}
-        />
-        <CourseCard
-          courseImg="course4"
-          courseName="الوحدة الأولى : تركيب البروتين"
-          numberOfVideo={15}
-          courseUrl="/"
-          studentsNumber={1500}
-        />
+      <div
+        className="w-full grid lg:grid-cols-4 md:grid-cols-3 md:gap-2   xs:grid-cols-1  "
+        id="courses"
+      >
+        {courses.map((course) => {
+          return (
+            <CourseCard
+              key={course._id}
+              courseImg={course.imageCover}
+              courseName={course.title}
+              numberOfVideo={course.videos.length}
+              courseUrl={course._id}
+              studentsNumber={course.enrolledStudents.length}
+            />
+          );
+        })}
       </div>
 
       <div className="apply-fonts-normal flex justify-center w-full mt-12">

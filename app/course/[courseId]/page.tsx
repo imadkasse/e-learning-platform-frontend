@@ -7,7 +7,7 @@ type PageProps = { params: Promise<{ courseId: string }> };
 const page = async ({ params }: PageProps) => {
   const courseId = (await params).courseId;
   return (
-    <div className="py-3 container mx-auto ">
+    <div className="py-3 container mx-auto relative">
       <NavBarCourse />
       <ToastContainer />
       <CoursePage courseId={courseId} />

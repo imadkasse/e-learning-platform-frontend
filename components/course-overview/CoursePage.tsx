@@ -1,5 +1,7 @@
+"use client";
 import {
   AccessTimeOutlined,
+  CheckCircle,
   PlayArrow,
   PlayCircleOutlined,
 } from "@mui/icons-material";
@@ -8,22 +10,47 @@ import Image from "next/image";
 
 import CourseCard from "./CourseCard";
 import DynamicVideoPlyr from "./DynamicVideoPlyr";
-import { Course } from "@/types/course";
+import AddReview from "./Reviews/AddReview";
+import { useEffect, useState } from "react";
+import { useCourse } from "@/store/courseStore";
+import Spinner from "../spinner/Spinner";
+import { useUserStore } from "@/store/userStore";
 
 type Props = {
   id: string;
 };
-export const CoursePage = async ({ id }: Props) => {
-  const res = await fetch(`${process.env.BACK_URL}/api/courses/${id}`);
-  const data = await res.json();
-  const course: Course = data.course;
+export const CoursePage = ({ id }: Props) => {
+  const { course, setCourse } = useCourse();
+  const { user } = useUserStore();
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const getCourse = async (courseId: string) => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`,
+          {
+            cache: "no-store",
+          }
+        );
+        const data = await res.json();
+        setCourse(data.course);
+      } catch (error) {
+        console.error("Failed to fetch course:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getCourse(id);
+  }, [id, setCourse]);
   const instructor = course.instructor;
-  console.log(course.duration);
 
   return (
     <div className="mt-6 flex  flex-row-reverse justify-between gap-7 px-3 ">
       {/* Course Card */}
       <CourseCard
+        id={id}
         price={course.price}
         duration={course.duration}
         studentNumber={course.enrolledStudents.length}
@@ -61,6 +88,22 @@ export const CoursePage = async ({ id }: Props) => {
           <p className="apply-fonts-normal text-[14px] text-courseTextSection leading-8 pl-5 xs:line-clamp-4  md:line-clamp-6">
             {course.description}
           </p>
+        </div>
+        {/* Consepts Course */}
+        <div className="my-4  px-5 py-2 bg-courseConseptColor">
+          <h1 className="apply-fonts-medium text-lg ">
+            المفاهيم التي سنتطرق إليها
+          </h1>
+          <div className="mt-2 py-2 flex flex-col gap-2">
+            {course.concepts?.map((concept, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <CheckCircle fontSize="small" className="text-green-500" />
+                <h1 className="apply-fonts-normal text-[14px] text-courseTextSection">
+                  {concept}
+                </h1>
+              </div>
+            ))}
+          </div>
         </div>
         {/* all videos */}
         <div>
@@ -137,7 +180,11 @@ export const CoursePage = async ({ id }: Props) => {
           </h1>
 
           <div className="flex flex-col gap-5">
-            {course.reviews.length > 0 ? (
+            {loading ? (
+              <div className="flex justify-center items-center min-h-[200px]">
+                <Spinner />
+              </div>
+            ) : course.reviews.length > 0 ? (
               course.reviews.map((review) => {
                 return (
                   <div key={review._id} className="border-b pb-3">
@@ -149,7 +196,7 @@ export const CoursePage = async ({ id }: Props) => {
                         height={150}
                         className="rounded-full xs:w-12 xs:h-12"
                       />
-                      <div className="flex flex-col gap-1 ">
+                      <div className="flex flex-col gap-1">
                         <h1 className="font-semibold">imad</h1>
                         <Rating
                           className="text-courseStarColor"
@@ -168,7 +215,7 @@ export const CoursePage = async ({ id }: Props) => {
                         </h1>
                       </div>
                     </div>
-                    <div dir="rtl" className=" mt-1 mx-3">
+                    <div dir="rtl" className="mt-1 mx-3">
                       <p className="p-2 apply-fonts-normal text-[14px] text-courseTextSection">
                         {review.content}
                       </p>
@@ -177,12 +224,16 @@ export const CoursePage = async ({ id }: Props) => {
                 );
               })
             ) : (
-              <h1 className=" apply-fonts-medium text-courseTextSection text-center lg:text-xl sm:text-lg xs:text-base">
+              <h1 className="apply-fonts-medium text-courseTextSection text-center lg:text-xl sm:text-lg xs:text-base">
                 لا توجد تعليقات
               </h1>
             )}
           </div>
         </div>
+
+        {/* add review */}
+
+        {user.role === "teacher" ? <></> : <AddReview courseId={id} />}
       </div>
     </div>
   );

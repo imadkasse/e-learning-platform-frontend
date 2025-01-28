@@ -29,7 +29,7 @@ const SideBar = () => {
     <>
       {/* in the small screen */}
       <div
-        className={`bg-sideBarBgColo text-white py-4   mb-2 px-3 rounded-xl h-screen transition-all duration-300 ease-in-out ${
+        className={`bg-sideBarBgColo text-white py-4 mb-2 px-3 rounded-xl h-screen transition-all duration-300 ease-in-out ${
           toggleSidebar ? `w-[300px] ` : `w-[0px]`
         }  lg:hidden sm:sticky xs:fixed xs:z-50 top-2 xs:right-0  xs:flex flex-col justify-between`}
       >
@@ -115,7 +115,10 @@ const SideBar = () => {
               <SettingsOutlined />
               <p>الإعدادات</p>
             </Link>
-            <button onClick={handleLogout} className="group w-full flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2">
+            <button
+              onClick={handleLogout}
+              className="group w-full flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
+            >
               <LogoutOutlined className="text-red-700 group-hover:text-white hoverEle" />
               <p>تسجيل الخروج</p>
             </button>

@@ -9,14 +9,15 @@ import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import showToast from "@/utils/showToast";
 import UpdatePassword from "@/components/utlisComponenets/UpdatePassword";
+import Spinner from "@/components/spinner/Spinner";
 
 const Settings = () => {
   const router = useRouter();
   const token = Cookies.get("token");
 
-  const [loading, setloading] = useState<boolean>(false);
+  const [loadingUpdate, setLoadingUpdate] = useState<boolean>(false);
 
-  const fetchUser = useUserStore((state) => state.fetchUser);
+  const { fetchUser, loading } = useUserStore();
 
   useEffect(() => {
     fetchUser();
@@ -27,6 +28,10 @@ const Settings = () => {
   const [email, setEmail] = useState(user.email);
   const [numPhone, setNumPhone] = useState(user.phoneNumber);
   const [image, setImage] = useState<File>();
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   if (!token || user.role !== "student") {
     return (
@@ -52,10 +57,10 @@ const Settings = () => {
     if (image) {
       formData.append("thumbnail", image);
     }
-    formData.append("usernam", name);
+    formData.append("username", name);
     formData.append("email", email);
     formData.append("phoneNumber", numPhone);
-    setloading(true);
+    setLoadingUpdate(true);
     try {
       const res = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/updateMe`,
@@ -75,12 +80,12 @@ const Settings = () => {
       //@ts-expect-error:fix error agin
       showToast("success", error.response.data.message);
     } finally {
-      setloading(false);
+      setLoadingUpdate(false);
     }
   };
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-screen">
+    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll">
       <div className="mb-5">
         <h1 className="apply-fonts-normal text-2xl font-semibold">
           إعدادات الحساب
@@ -196,12 +201,12 @@ const Settings = () => {
             <button
               type="submit"
               className={`apply-fonts-normal text-white ${
-                loading
+                loadingUpdate
                   ? "animate-pulse bg-mainColorHoverLight cursor-not-allowed"
                   : ""
               }  bg-mainColor  hover:bg-mainColorHoverLight hoverEle  focus:ring-4 focus:outline-none focus:ring-mainColor  font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800`}
             >
-              {loading ? "جاري التعديل..." : "التعديل"}
+              {loadingUpdate ? "جاري التعديل..." : "التعديل"}
             </button>
           </div>
         </form>

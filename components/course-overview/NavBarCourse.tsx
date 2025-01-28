@@ -8,9 +8,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import Cookies from "js-cookie";
 
 const NavBarCourse = () => {
   const pathName = usePathname();
+  const token = Cookies.get("token");
+
   return (
     <div className="sticky top-3 z-20 bg-sideBarBgColo text-white  rounded-3xl flex items-center flex-row-reverse justify-between px-5 py-1">
       <Link href={`/`} className="flex items-center flex-row-reverse  md:gap-3">
@@ -26,31 +29,33 @@ const NavBarCourse = () => {
         </h1>
       </Link>
 
-      <div className="flex sm:gap-5 xs:gap-1 ">
-        <Link
-          href={"/dashboard-user"}
-          className={`flex items-center gap-2 hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md ${
-            pathName === "/course-overview/asd" ? "bg-mainColor/50" : ""
-          } `}
-        >
-          <HomeOutlined />
-          <p className="apply-fonts-normal">الرئيسية</p>
-        </Link>
-        <Link
-          href={"/"}
-          className="flex items-center gap-2  hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md "
-        >
-          <BookOutlined />
-          <p className="apply-fonts-normal">الدورات</p>
-        </Link>
-        <Link
-          href={"/"}
-          className="flex items-center gap-2 hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md "
-        >
-          <NotificationsNoneOutlined />
-          <p className="apply-fonts-normal">الاشعارات</p>
-        </Link>
-      </div>
+      {token && (
+        <div className="flex sm:gap-5 xs:gap-1 ">
+          <Link
+            href={"/dashboard-user"}
+            className={`flex items-center gap-2 hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md ${
+              pathName === "/course-overview/asd" ? "bg-mainColor/50" : ""
+            } `}
+          >
+            <HomeOutlined />
+            <p className="apply-fonts-normal">الرئيسية</p>
+          </Link>
+          <Link
+            href={"/"}
+            className="flex items-center gap-2  hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md "
+          >
+            <BookOutlined />
+            <p className="apply-fonts-normal">الدورات</p>
+          </Link>
+          <Link
+            href={"/"}
+            className="flex items-center gap-2 hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md "
+          >
+            <NotificationsNoneOutlined />
+            <p className="apply-fonts-normal">الاشعارات</p>
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

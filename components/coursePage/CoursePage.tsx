@@ -1,12 +1,8 @@
 "use client";
-import {
-  ChatBubbleOutlineOutlined,
-  DescriptionOutlined,
-  LoginOutlined,
-} from "@mui/icons-material";
-import { Rating } from "@mui/material";
+import { DescriptionOutlined, LoginOutlined } from "@mui/icons-material";
+
 import Image from "next/image";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CourseCardDetails from "./CourseCardDetails";
 import { Course } from "@/types/course";
 import DynamicVideoPlyr from "./DynamicVideoPlyr";
@@ -15,18 +11,18 @@ import Link from "next/link";
 import Spinner from "../spinner/Spinner";
 import { useLesson } from "@/store/lessonStore";
 import "react-toastify/dist/ReactToastify.css";
-import showToast from "@/utils/showToast";
-import axios from "axios";
-import Cookies from "js-cookie";
 import { redirect } from "next/navigation";
+import { Reply } from "./comments and replies/Reply";
+import AddComment from "./comments and replies/AddComment";
+import AddReply from "./comments and replies/AddReply";
 
 const CoursePage = ({ courseId }: { courseId: string }) => {
-  const token = Cookies.get("token");
   const { lesson, setLesson } = useLesson();
 
   const [isEnrolled, setIsEnrolled] = useState<boolean | undefined>(undefined);
-  const [rating, setRating] = useState<number>();
-  const [content, setContent] = useState<string>("");
+  const [isPublichedCourse, setIsPublichedCourse] = useState<
+    boolean | undefined
+  >(undefined);
 
   const checkIsEnrolledCourse = (
     userId: string,
@@ -34,6 +30,7 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
   ) => {
     return course?.enrolledStudents.some((s) => s === userId);
   };
+
   const [course, setCourse] = useState<Course>();
   const { user, fetchUser } = useUserStore();
 
@@ -66,19 +63,32 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
         duration: 0,
         isCompleted: false,
         completedBy: [],
+        comments: [],
       }
     );
   }, [setLesson, course]);
 
   useEffect(() => {
+    const checkIsPublichedCourse = (
+      userId: string,
+      course: Course | undefined
+    ) => {
+      return (
+        course?.instructor._id === userId &&
+        user.publishedCourses.some((c) => c._id === course?._id)
+      );
+    };
     if (user._id && course) {
       const enrollmentStatus = checkIsEnrolledCourse(user._id, course);
       setIsEnrolled(enrollmentStatus);
-    } else {
-      setIsEnrolled(undefined);
+      const publichedStatus = checkIsPublichedCourse(user._id, course);
+      setIsPublichedCourse(publichedStatus);
     }
-  }, [user._id, course]);
-
+  }, [user, course]);
+  //add spinner
+  if (isEnrolled === undefined || isPublichedCourse === undefined) {
+    return <Spinner />;
+  }
   //check is user logged in
   if (!user._id) {
     return (
@@ -99,13 +109,8 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
       </div>
     );
   }
-  //add spinner
-  if (isEnrolled === undefined) {
-    return <Spinner />;
-  }
-
   //check is user buying course
-  if (!isEnrolled) {
+  if (user.role === "student" && !isEnrolled) {
     redirect(`/course-overview/${courseId}`);
     // return (
     //   <div className="my-5 flex flex-col items-center justify-center min-h-screen text-center bg-red-50 border border-red-300 rounded-lg p-6">
@@ -124,43 +129,10 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
     //   </div>
     // );
   }
-
-  // section reviews (Add & delete)
-  const handelAddReview = async (e: FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/reviews/${courseId}`,
-        {
-          rating,
-          content,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const newReivew = res.data.review;
-      showToast("success", "تم اضافة التعليق بنجاح");
-
-      setContent("");
-      setRating(0);
-
-      setCourse((prevCourse) => {
-        if (!prevCourse) return undefined;
-        return {
-          ...prevCourse,
-          reviews: [...prevCourse.reviews, newReivew],
-        };
-      });
-
-      await getCourse(courseId);
-    } catch (error) {
-      //@ts-expect-error:fix agin
-      showToast("error", error.response.data.message);
-    }
-  };
+  if (user.role === "teacher" && !isPublichedCourse) {
+    redirect(`/dashboard-teacher/courses`);
+  }
+  //section comments
   return (
     <div className="mt-6 flex  flex-row-reverse justify-between gap-7 px-3 ">
       {/* Course Details */}
@@ -224,7 +196,7 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
             <h2 className="flex flex-col -gap-2">
               <p className="font-semibold">{course?.reviews.length}</p>
               <span className="apply-fonts-normal text-[13px] text-courseTextSection">
-                تعليق
+                تقييم
               </span>
             </h2>
           </div>
@@ -282,56 +254,63 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
           </div>
         </div>
 
-        {/* stduents reviews */}
+        {/* stduents comments */}
         <div className="mt-5">
           <h1 className="mb-8 flex items-center gap-1">
             <span className="apply-fonts-medium  xs:text-lg lg:text-2xl">
               التعليقات
             </span>
             <p className="font-bold text-courseTextSection">
-              ({course?.reviews.length})
+              ({lesson?.comments.length})
             </p>
           </h1>
 
           <div className="flex flex-col gap-5">
-            {course?.reviews ? (
-              course?.reviews.map((review) => {
+            {lesson?.comments ? (
+              lesson?.comments.map((comment) => {
+                console.log(comment)
                 return (
-                  <div key={review._id} className="border-b pb-3">
+                  <div key={comment._id} className="border-b pb-3">
+                    {/* معلومات المستخدم */}
                     <div className="flex items-center gap-2">
                       <Image
-                        src={review.user.thumbnail}
-                        alt="teacher-username"
-                        width={150}
-                        height={150}
+                        src={comment.user.thumbnail || "/imgs/logoImg.png"}
+                        alt="user-username"
+                        width={40}
+                        height={40}
                         className="rounded-full xs:w-12 xs:h-12"
                       />
-                      <div className="flex flex-col gap-1 ">
+                      <div className="flex flex-col gap-1">
                         <h1 className="font-semibold">
-                          {review.user.username}
+                          {comment.user.username}
                         </h1>
-                        <Rating
-                          className="text-courseStarColor"
-                          dir="ltr"
-                          name="half-rating-read"
-                          value={review.rating}
-                          precision={0.5}
-                          readOnly
-                          size="small"
-                        />
                       </div>
                       <h1 className="text-xl px-1">|</h1>
                       <div>
                         <h1 className="font-bold">
-                          {review.createdAt.split("T")[0]}
+                          {comment.createdAt.split("T")[0]}
                         </h1>
                       </div>
                     </div>
-                    <div dir="rtl" className=" mt-1 mx-3">
+
+                    {/* نص التعليق */}
+                    <div dir="rtl" className="mt-1 mx-3">
                       <p className="p-2 apply-fonts-normal text-[14px] text-courseTextSection">
-                        {review.content}
+                        {comment.text}
                       </p>
                     </div>
+                    {/* Add Reply to student */}
+
+                    {user.role === "student" ? (
+                      <></>
+                    ) : (
+                      <AddReply commentId={comment._id} />
+                    )}
+                    {/* عرض الردود */}
+
+                    {comment.replies && comment.replies.length > 0 && (
+                      <Reply replys={comment.replies} />
+                    )}
                   </div>
                 );
               })
@@ -339,41 +318,13 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
               <h1 className="apply-fonts-normal">لاتوجد أي تعليقات </h1>
             )}
           </div>
-          {/* add review  */}
-          <form className="flex w-full gap-3 my-5" onSubmit={handelAddReview}>
-            <button
-              type="submit"
-              className="apply-fonts-normal rounded-lg py-2 px-4 bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white "
-            >
-              نشر
-            </button>
-            <div className="flex-grow">
-              <label className="relative ">
-                <div className="absolute top-0">
-                  <ChatBubbleOutlineOutlined className=" text-courseTextSection mx-1" />
-                </div>
-                <div className="absolute top-0 left-0">
-                  <Rating
-                    dir="ltr"
-                    precision={0.5}
-                    value={rating}
-                    onChange={(e) => {
-                      //@ts-expect-error:fix agin
-                      setRating(e.target.value);
-                    }}
-                    className=" text-courseStarColor mx-1"
-                  />
-                </div>
-                <input
-                  type="text"
-                  onChange={(e) => {
-                    setContent(e.target.value);
-                  }}
-                  className="w-full text-courseTextSection rounded-xl  px-7 py-2 border-2 border-gray-400 focus:border-mainColor focus:outline-none"
-                />
-              </label>
-            </div>
-          </form>
+
+          {/* add comment  */}
+          {user.role === "teacher" || user.role === "admin" ? (
+            <></>
+          ) : (
+            <AddComment courseId={courseId} />
+          )}
         </div>
       </div>
     </div>

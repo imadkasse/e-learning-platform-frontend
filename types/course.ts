@@ -1,3 +1,19 @@
+import { User } from "./user";
+
+type Reply = {
+  _id: string;
+  user: User;
+  text: string;
+  createdAt: string;
+};
+
+type Comment = {
+  _id: string;
+  user: User;
+  text: string;
+  createdAt: string;
+  replies: Reply[];
+};
 type Videos = {
   _id: string;
   lessonTitle: string;
@@ -5,6 +21,7 @@ type Videos = {
   duration: number;
   isCompleted: boolean;
   completedBy: string[];
+  comments: Comment[];
 };
 
 export type Course = {
@@ -26,10 +43,11 @@ export type Course = {
   progress?: number;
   reviews: review[]; //edit in feature
   category: string;
+  concepts: string[];
 };
 
 type Instructor = {
-  id: string;
+  _id: string;
   username: string;
   thumbnail: string;
 };

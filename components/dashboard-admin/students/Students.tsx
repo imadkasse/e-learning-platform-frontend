@@ -43,7 +43,7 @@ const Students = () => {
   }, [token, currentPage, setUsers, setLoading]);
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-[100vh] relative ">
+    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll relative ">
       <div className="mb-5 flex items-center gap-6">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الطلاب</h1>
         <SearchUsers />

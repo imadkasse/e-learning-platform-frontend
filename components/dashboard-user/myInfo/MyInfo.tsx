@@ -4,17 +4,21 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import Cookies from "js-cookie";
+import Spinner from "@/components/spinner/Spinner";
 
 const MyInfo = () => {
   const token = Cookies.get("token");
-  const fetchUserData = useUserStore((state) => state.fetchUser);
+  const { fetchUser, loading } = useUserStore();
 
   const user = useUserStore((state) => state.user);
 
   useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
+    fetchUser();
+  }, [fetchUser]);
 
+  if (loading) {
+    return <Spinner />;
+  }
   if (!token || user.role !== "student") {
     return (
       <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">

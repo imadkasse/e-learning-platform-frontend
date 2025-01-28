@@ -24,22 +24,25 @@ const CourseCard = ({
   courseDescription,
   courseId,
 }: Props) => {
-  console.log(numberOfVideo)
   return (
     <div className="my-3 shadow-lg shadow-mainColor/60 bg-wygColor  flex flex-col max-h-[80vh]  justify-between px-3 py-4 rounded-lg">
-      <div className="relative min-w-full max-w-sm ">
-        <Image
-          src={courseImg}
-          alt="Course-imageCover"
-          layout="responsive"
-          width={705}
-          height={397}
-          className="rounded-lg object-cover " // تأكد من أن الصورة تغطي الحاوية بدون تشويه
-        />
-      </div>
+      <Link href={`/course/${courseId}`}>
+        <div className="relative min-w-full max-w-sm ">
+          <Image
+            src={courseImg}
+            alt="Course-imageCover"
+            layout="responsive"
+            width={705}
+            height={397}
+            className="rounded-lg object-cover " // تأكد من أن الصورة تغطي الحاوية بدون تشويه
+          />
+        </div>
+      </Link>
 
       <div className="mt-3">
-        <h1 className="apply-fonts-medium text-[16px] line-clamp-1">{courseName} </h1>
+        <h1 className="apply-fonts-medium text-[16px] line-clamp-1">
+          {courseName}{" "}
+        </h1>
       </div>
       <div className="">
         <h1 className="apply-fonts-normal text-[12px] line-clamp-1 text-courseTextSection">

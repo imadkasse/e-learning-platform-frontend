@@ -1,37 +1,30 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import NotificationCard from "./NotificationCard";
 import Link from "next/link";
-import { cookies } from "next/headers";
-import { User } from "@/types/user";
-import axios from "axios";
+import Cookies from "js-cookie";
+import { useUserStore } from "@/store/userStore";
+import { io } from "socket.io-client";
+import { Notifcation } from "@/types/notification";
+import Spinner from "@/components/spinner/Spinner";
 
-const Notifcations = async () => {
-  const cookiesStore = await cookies();
+const socket = io(process.env.NEXT_PUBLIC_BACK_URL);
 
-  const token = cookiesStore.get("token")?.value;
-
-  let user: User;
-
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      // console.log(res.data.user);
-      user = res.data.user;
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  await fetchUser();
-
-  //@ts-expect-error:fix in After time
+const Notifcations = () => {
+  const token = Cookies.get("token");
+  const { user, fetchUser, loading } = useUserStore();
+  const [notifcation, setNotifcation] = useState<Notifcation[]>([]);
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+  useEffect(() => {
+    socket.on("newComment", (data) => {
+      setNotifcation([...notifcation, data]);
+    });
+  }, [notifcation]);
+  if (loading) {
+    return <Spinner />;
+  }
   if (!token || user?.role !== "teacher") {
     return (
       <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
@@ -49,48 +42,42 @@ const Notifcations = async () => {
       </div>
     );
   }
+  console.log(user.notifications);
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 ">
       <div className="mb-5">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">إشعارتك</h1>
       </div>
       <div>
-        <NotificationCard
-          lessonNumber={20}
-          notifcationDate="2024/08/16"
-          notifcationImg="course1.png"
-          notifcationName="تمت اضافة درس جديد لوحدة تركيب البروتين"
-        />
-        <NotificationCard
-          lessonNumber={24}
-          notifcationDate="2024/09/118"
-          notifcationImg="course2.png"
-          notifcationName="تم الرد عليك "
-        />
-        <NotificationCard
-          lessonNumber={24}
-          notifcationDate="2024/09/118"
-          notifcationImg="course3.png"
-          notifcationName="تم الرد عليك "
-        />
-        <NotificationCard
-          lessonNumber={24}
-          notifcationDate="2024/09/118"
-          notifcationImg="course4.png"
-          notifcationName="تم الرد عليك "
-        />
-        <NotificationCard
-          lessonNumber={24}
-          notifcationDate="2024/09/118"
-          notifcationImg="course4.png"
-          notifcationName="تم الرد عليك "
-        />
-        <NotificationCard
-          lessonNumber={24}
-          notifcationDate="2024/09/118"
-          notifcationImg="course4.png"
-          notifcationName="تم الرد عليك "
-        />
+        {notifcation.length > 0 &&
+          notifcation.map((notifcation, index) => {
+            return (
+              <NotificationCard
+                key={index}
+                lessonNumber={notifcation.lessonNumber}
+                notifcationDate={notifcation.comment.createdAt}
+                notifcationImg={notifcation.courseImage}
+                notifcationName={notifcation.message}
+                courseId={notifcation.courseId}
+              />
+            );
+          })}
+        {user.notifications.length > 0 ? (
+          user.notifications.map((notifcation, index) => {
+            return (
+              <NotificationCard
+                key={index}
+                lessonNumber={notifcation.lessonNumber}
+                notifcationDate={notifcation.createdAt}
+                notifcationImg={notifcation.courseImage}
+                notifcationName={notifcation.message}
+                courseId={notifcation.courseId}
+              />
+            );
+          })
+        ) : (
+          <h1>لا توجد أي إشعارات</h1>
+        )}
       </div>
     </div>
   );

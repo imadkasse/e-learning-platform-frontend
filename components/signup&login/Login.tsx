@@ -121,7 +121,7 @@ const Login = () => {
 
         <div className="flex justify-between">
           <Link
-            href={"/reset-password"}
+            href={"/forget-password"}
             className="apply-fonts-normal text-[12px] group  "
           >
             <p className="group-hover:underline  text-gray-600 cursor-pointer">

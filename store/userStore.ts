@@ -9,6 +9,8 @@ const token = Cookies.get("token");
 export const useUserStore = create<{
   user: User;
   fetchUser: () => Promise<void>;
+  loading: boolean;
+  setLoading: (newvalue: boolean) => void;
 }>((set) => ({
   user: {
     _id: "",
@@ -21,10 +23,15 @@ export const useUserStore = create<{
     enrolledCourses: [],
     phoneNumber: "",
     publishedCourses: [],
-   
+    notifications: [],
+  },
+  loading: false,
+  setLoading: (newValue: boolean) => {
+    set(() => ({ loading: newValue }));
   },
   fetchUser: async () => {
     try {
+      set({ loading: true });
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
         {
@@ -34,9 +41,24 @@ export const useUserStore = create<{
         }
       );
       set({ user: res.data.user });
-    } catch (error) {
-      //@ts-expect-error:fix agin
-      console.log(error.response.data.message);
+    } catch {
+      set({
+        user: {
+          _id: "",
+          username: "",
+          email: "",
+          role: null,
+          active: false,
+          progress: [],
+          thumbnail: "",
+          enrolledCourses: [],
+          phoneNumber: "",
+          publishedCourses: [],
+          notifications: [],
+        },
+      });
+    } finally {
+      set({ loading: false });
     }
   },
 }));
