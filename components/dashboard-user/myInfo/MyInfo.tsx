@@ -2,22 +2,22 @@
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React from "react";
 import Cookies from "js-cookie";
 import Spinner from "@/components/spinner/Spinner";
 
 const MyInfo = () => {
   const token = Cookies.get("token");
-  const { fetchUser, loading } = useUserStore();
+  const { loading } = useUserStore();
 
   const user = useUserStore((state) => state.user);
 
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
-
   if (loading) {
-    return <Spinner />;
+    return (
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+        <Spinner />
+      </div>
+    );
   }
   if (!token || user.role !== "student") {
     return (
@@ -43,7 +43,7 @@ const MyInfo = () => {
         <h1 className="apply-fonts-normal text-2xl font-semibold ">معلوماتي</h1>
       </div>
       <div className="hover:cursor-pointer">
-        <div className="mt-5 flex items-center  justify-between bg-wygColor shadow-lg shadow-mainColor py-2 px-4 rounded-lg ">
+        <div className="mt-5 flex items-center  justify-between bg-wygColor shadow shadow-gray-400 py-2 px-4 rounded-lg ">
           <div className="">
             <Image
               src={user.thumbnail ? user.thumbnail : "/imgs/personImg.png"}

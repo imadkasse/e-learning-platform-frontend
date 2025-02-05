@@ -1,7 +1,7 @@
 "use client";
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useState } from "react";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,11 +17,8 @@ const Settings = () => {
 
   const [loadingUpdate, setLoadingUpdate] = useState<boolean>(false);
 
-  const { fetchUser, loading } = useUserStore();
+  const { loading } = useUserStore();
 
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
   const user = useUserStore((state) => state.user);
 
   const [name, setName] = useState(user.username);
@@ -30,7 +27,11 @@ const Settings = () => {
   const [image, setImage] = useState<File>();
 
   if (loading) {
-    return <Spinner />;
+    return (
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+        <Spinner />
+      </div>
+    );
   }
 
   if (!token || user.role !== "student") {

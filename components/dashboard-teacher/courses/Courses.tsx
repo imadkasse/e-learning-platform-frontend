@@ -1,43 +1,54 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import CourseCard from "./CourseCard";
-import axios from "axios";
-import { cookies } from "next/headers";
-import { Course } from "@/types/course";
-import { User } from "@/types/user";
+
 import Link from "next/link";
 import SearchCourseTeacher from "./SearchCourseTeacher";
+import Cookies from "js-cookie";
+import { useUserStore } from "@/store/userStore";
+import { useCoursesStore } from "@/store/coursesStore";
+import Spinner from "@/components/spinner/Spinner";
 
-const Courses = async () => {
-  const cookiesStore = await cookies();
+const Courses = () => {
+  const token = Cookies.get("token");
 
-  const token = cookiesStore.get("token")?.value;
+  const { user, loading } = useUserStore();
+  const { courses, setCourses, setLoading } = useCoursesStore();
+  const loadingCourses = useCoursesStore((state) => state.loading);
 
-  let user: User;
+  useEffect(() => {
+    const getMyCourses = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await res.json();
+        setCourses(data.user.publishedCourses);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getMyCourses();
+  }, [setCourses, token, setLoading]);
 
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      // console.log(res.data.user);
-      user = res.data.user;
-    } catch (err) {
-      //@ts-expect-error:fix agin
-      console.log(err.response.data.message);
-    }
-  };
-
-  await fetchUser();
-
-  //@ts-expect-error:fix in After time
-  if (!token || user?.role !== "teacher") {
+  if (loading) {
     return (
       <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+        <Spinner />
+      </div>
+    );
+  }
+  if (!token || user?.role !== "teacher") {
+    return (
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] relative">
         <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor ">
           أنت غير مسجل أو لا تملك الصلاحية للوصول الى هذه الصفحة
         </h1>
@@ -52,8 +63,6 @@ const Courses = async () => {
       </div>
     );
   }
-
-  const myCourses: Course[] = user.publishedCourses;
 
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll relative">
@@ -72,28 +81,34 @@ const Courses = async () => {
         </section>
       </div>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-7">
-        {myCourses.length ? (
-          myCourses.map((course) => {
-            console.log(course.videos);
-            return (
-              <div key={course._id}>
-                <CourseCard
-                  courseId={course._id}
-                  courseDescription={course.description}
-                  courseImg={course.imageCover}
-                  courseName={course.title}
-                  coursePrice={course.price}
-                  courseRating={course.avgRatings}
-                  students={course.studentsCount}
-                  numberOfVideo={course.videos.length}
-                />
-              </div>
-            );
-          })
+        {loadingCourses ? (
+          <div className="lg:col-span-3 md:col-span-2">
+            <Spinner />
+          </div>
         ) : (
-          <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor h-[100vh]">
-            ليس لديك أي دورات يمكنك إضافة دوراتك
-          </h1>
+          <>
+            {courses?.length > 0 ? (
+              courses.map((course) => (
+                <div key={course._id}>
+                  <CourseCard
+                    courseId={course._id}
+                    courseDescription={course.description}
+                    courseImg={course.imageCover}
+                    courseName={course.title}
+                    coursePrice={course.price}
+                    courseRating={course.avgRatings}
+                    students={course.studentsCount}
+                    numberOfVideo={course.videos.length}
+                  />
+                </div>
+              ))
+            ) : (
+              // ✅ **إظهار رسالة عند عدم وجود دورات**
+              <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor h-[100vh]">
+                لا توجد دورات
+              </h1>
+            )}
+          </>
         )}
       </div>
     </div>

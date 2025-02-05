@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
@@ -27,11 +27,7 @@ const Details: React.FC = () => {
   // add protected
   const token = Cookies.get("token");
   const loadingUser = useUserStore((state) => state.loading);
-  const fetchUser = useUserStore((state) => state.fetchUser);
 
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
   const user = useUserStore((state) => state.user);
 
   const [formData, setFormData] = useState<CourseDetails>({

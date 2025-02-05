@@ -127,7 +127,7 @@ const SideBar = () => {
               href={`/dashboard-admin/support`}
               className={` flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 ${
                 pathName === "/dashboard-admin/support" ? "bg-mainColor/50" : ""
-              }my-2`}
+              } my-2`}
             >
               <ContactSupportOutlined />
               <p>الدعم</p>

@@ -1,11 +1,11 @@
 "use client";
-import { useSearchCourse } from "@/store/searchCourse";
+import { useCoursesStore } from "@/store/coursesStore";
 import showToast from "@/utils/showToast";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 
 const SearchCourse = () => {
   const [searchData, setsearchData] = useState<string>("");
-  const { setCourses, setLoading } = useSearchCourse();
+  const { setCourses, setLoading } = useCoursesStore();
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setsearchData(e.target.value);
   };

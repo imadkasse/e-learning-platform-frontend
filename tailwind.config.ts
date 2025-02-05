@@ -25,6 +25,7 @@ const config: Config = {
         courseTextSection: "#6E7485",
         courseStarColor: "#FD8E1F",
         courseConseptColor: "#E1F7E366",
+        progressBarCourseColor: "#0DC7B1",
       },
       screens: {
         xs: "330px",

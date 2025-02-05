@@ -50,12 +50,8 @@ const EditCourse = ({ id }: Props) => {
   // add protected
   const token = Cookies.get("token");
 
-  const fetchUser = useUserStore((state) => state.fetchUser);
   const loadingUser = useUserStore((state) => state.loading);
 
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
   const user = useUserStore((state) => state.user);
 
   const [course, setCourse] = useState<Course>();

@@ -20,7 +20,7 @@ const CardCourse = ({
   progresBar,
 }: Props) => {
   return (
-    <div className="my-3 shadow-lg shadow-mainColor/60 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg">
+    <div className="my-3 shadow shadow-gray-400 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg">
       <div className="w-full flex ">
         <Image
           src={courseImg}
@@ -59,20 +59,18 @@ const CardCourse = ({
       <div className="w-full">
         <div className="w-full bg-gray-200 rounded-full h-6 mb-4 dark:bg-gray-700">
           <div
-            className="bg-mainColor h-6 rounded-full "
+            className="bg-progressBarCourseColor h-6 rounded-full "
             style={{ width: `${progresBar}%` }}
           ></div>
         </div>
       </div>
 
-      <div className="apply-fonts-normal mt-2">
-        <Link
-          href={courseUrl}
-          className="bg-mainColor hoverEle hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white"
-        >
-          تصفح الدوراة
-        </Link>
-      </div>
+      <Link
+        href={courseUrl}
+        className="apply-fonts-normal mt-2 bg-mainColor hoverEle hover:bg-mainColorHoverLight w-full  text-lg text-center py-2 px-4 rounded-lg text-white"
+      >
+        متابعة
+      </Link>
     </div>
   );
 };

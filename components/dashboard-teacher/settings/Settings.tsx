@@ -2,7 +2,7 @@
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import Link from "next/link";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 
@@ -17,12 +17,8 @@ const Settings = () => {
   const token = Cookies.get("token");
   const [loading, setloading] = useState<boolean>(false);
 
-  const fetchUser = useUserStore((state) => state.fetchUser);
   const loadingUser = useUserStore((state) => state.loading);
 
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
   const user = useUserStore((state) => state.user);
 
   const [name, setName] = useState(user.username);
@@ -32,7 +28,11 @@ const Settings = () => {
   const [imageUrl, setImageUrl] = useState<string>("");
 
   if (loadingUser) {
-    return <Spinner />;
+    return (
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+        <Spinner />
+      </div>
+    );
   }
 
   if (!token || user?.role !== "teacher") {
@@ -59,7 +59,7 @@ const Settings = () => {
     if (image) {
       formData.append("thumbnail", image);
     }
-    formData.append("usernam", name);
+    formData.append("username", name);
     formData.append("email", email);
     formData.append("phoneNumber", numPhone);
     setloading(true);
@@ -142,8 +142,7 @@ const Settings = () => {
               type="text"
               name="name"
               id="name"
-              placeholder={user.username}
-              value={name}
+              value={user.username}
               onChange={(e) => setName(e.target.value)}
               className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
             />
@@ -156,8 +155,7 @@ const Settings = () => {
             </label>
             <input
               type="email"
-              placeholder={user.email}
-              value={email}
+              value={user.email}
               onChange={(e) => setEmail(e.target.value)}
               className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
             />
@@ -170,8 +168,7 @@ const Settings = () => {
             </label>
             <input
               type="text"
-              placeholder={user.phoneNumber}
-              value={numPhone}
+              value={user.phoneNumber}
               onChange={(e) => setNumPhone(e.target.value)}
               name="price"
               id="price"

@@ -9,6 +9,7 @@ import Cookies from "js-cookie";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import showToast from "@/utils/showToast";
+import { useUserStore } from "@/store/userStore";
 
 const Login = () => {
   const router = useRouter();
@@ -19,6 +20,7 @@ const Login = () => {
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { fetchUser } = useUserStore();
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -57,8 +59,9 @@ const Login = () => {
       Cookies.set("token", token);
       const role =
         res.data.user.role === "student" ? "user" : res.data.user.role;
+      await fetchUser();
 
-      router.push(`/dashboard-${role}`);
+      router.push(`/dashboard-${role}/courses`);
     } catch (error) {
       console.log(error);
       console.log(error);

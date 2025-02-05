@@ -11,6 +11,7 @@ export const useUserStore = create<{
   fetchUser: () => Promise<void>;
   loading: boolean;
   setLoading: (newvalue: boolean) => void;
+  setUser: (newUser: User) => void;
 }>((set) => ({
   user: {
     _id: "",
@@ -60,5 +61,8 @@ export const useUserStore = create<{
     } finally {
       set({ loading: false });
     }
+  },
+  setUser: (newUser: User) => {
+    set(() => ({ user: newUser }));
   },
 }));

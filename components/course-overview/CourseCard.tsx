@@ -35,6 +35,7 @@ const CourseCard = ({
   id,
 }: Props) => {
   const token = Cookies.get("token");
+  const link = `${process.env.NEXT_PUBLIC_BASE_URL}course-overview/6777ee1d99c93c1c1b7dc42d`;
   const { user, fetchUser } = useUserStore();
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const handelOpenAndColsed = () => {
@@ -88,7 +89,7 @@ const CourseCard = ({
       <div
         className={`transition-all duration-300 ease-in-out ${
           isOpen ? "xs:hidden lg:flex" : "w-[400px]"
-        } border shadow-sm h-[80vh] lg:sticky lg:top-24 xs:fixed z-10 xs:bg-wygColor  w-[400px] py-3 px-4 flex flex-col gap-6`}
+        } border shadow-sm h-[606px] lg:sticky lg:top-24 xs:fixed z-10 xs:bg-wygColor  w-[400px]  py-3 px-4 flex flex-col gap-6`}
       >
         {/* price */}
         <div className="w-full text-lg text-center">
@@ -166,13 +167,16 @@ const CourseCard = ({
           <p className="apply-fonts-medium mb-3 ">شارك هذه الدورة :</p>
           <div className="flex gap-4 justify-center">
             <Link
-              href={`/${courseLink}`}
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                link
+              )}`}
+              target="_blank"
               className=" px-4 py-2 rounded-lg hover:border-gray-400 hoverEle bg-gray-100"
             >
               <Facebook className="text-courseTextSection" />
             </Link>
             <Link
-              href={`/${courseLink}`}
+              href={`https://twitter.com/intent/tweet?url=${link}`}
               className="bg-gray-100 px-4 py-2 rounded-lg hover:border-gray-400 hoverEle"
             >
               <Twitter className="text-courseTextSection" />
@@ -183,15 +187,18 @@ const CourseCard = ({
             >
               <Instagram className="text-courseTextSection" />
             </Link>
-            <Link
-              href={`/${courseLink}`}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(link);
+                showToast("success", "تم نسخ الرابط الى الحافظة");
+              }}
               className="bg-gray-100 px-3 py-2 rounded-lg hover:border-gray-400 hoverEle flex items-center gap-1"
             >
               <h1 className="apply-fonts-normal text-[11px] text-gray-700">
                 نسخ الرابط
               </h1>
               <ContentCopyOutlined className="text-courseTextSection" />
-            </Link>
+            </button>
           </div>
         </div>
       </div>

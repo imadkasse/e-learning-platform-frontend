@@ -12,18 +12,20 @@ const socket = io(process.env.NEXT_PUBLIC_BACK_URL);
 
 const Notifcations = () => {
   const token = Cookies.get("token");
-  const { user, fetchUser, loading } = useUserStore();
+  const { user, loading } = useUserStore();
   const [notifcation, setNotifcation] = useState<Notifcation[]>([]);
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+
   useEffect(() => {
     socket.on("newComment", (data) => {
       setNotifcation([...notifcation, data]);
     });
   }, [notifcation]);
   if (loading) {
-    return <Spinner />;
+    return (
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+        <Spinner />
+      </div>
+    );
   }
   if (!token || user?.role !== "teacher") {
     return (
@@ -44,7 +46,7 @@ const Notifcations = () => {
   }
   console.log(user.notifications);
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 ">
+    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll">
       <div className="mb-5">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">إشعارتك</h1>
       </div>

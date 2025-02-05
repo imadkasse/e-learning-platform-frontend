@@ -94,7 +94,7 @@ export const CoursePage = ({ id }: Props) => {
           <h1 className="apply-fonts-medium text-lg ">
             المفاهيم التي سنتطرق إليها
           </h1>
-          <div className="mt-2 py-2 flex flex-col gap-2">
+          <div className="mt-2 py-2 grid grid-cols-2  gap-2">
             {course.concepts?.map((concept, index) => (
               <div key={index} className="flex items-center gap-2">
                 <CheckCircle fontSize="small" className="text-green-500" />

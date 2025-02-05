@@ -24,7 +24,7 @@ const CourseCard = ({
   courseId,
 }: Props) => {
   return (
-    <div className="my-3 shadow-lg shadow-mainColor/60 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg ">
+    <div className="my-3 shadow shadow-gray-400 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg ">
       <div className="w-full flex ">
         <Image
           src={courseImg}

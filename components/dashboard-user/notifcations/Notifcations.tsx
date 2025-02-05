@@ -7,6 +7,7 @@ import { Comment } from "@/types/lesson";
 import { useUserStore } from "@/store/userStore";
 import Cookies from "js-cookie";
 import Link from "next/link";
+import Spinner from "@/components/spinner/Spinner";
 // import { useUserStore } from "@/store/userStore";
 // import Link from "next/link";
 
@@ -22,10 +23,7 @@ type Notifcation = {
 };
 const Notifcations = () => {
   const token = Cookies.get("token");
-  const { user, fetchUser } = useUserStore();
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+  const { user, loading } = useUserStore();
 
   console.log(user);
   const [notifcation, setNotifcation] = useState<Notifcation[]>([]);
@@ -36,6 +34,14 @@ const Notifcations = () => {
       console.log(data);
     });
   }, [notifcation]);
+
+  if (loading) {
+    return (
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+        <Spinner />
+      </div>
+    );
+  }
 
   if (!token || user?.role !== "student") {
     return (

@@ -1,39 +1,44 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
 import CourseCard from "./CourseCard";
 import axios from "axios";
-import { Course } from "@/types/course";
 import SearchCourse from "./SearchCourse";
 import Link from "next/link";
-import { User } from "@/types/user";
-import { cookies } from "next/headers";
+import Cookies from "js-cookie";
+import { useUserStore } from "@/store/userStore";
+import { useCoursesStore } from "@/store/coursesStore";
+import Spinner from "@/components/spinner/Spinner";
 
-const Courses = async () => {
-  const cookiesStore = await cookies();
+const Courses = () => {
+  const token = Cookies.get("token");
+  const { user, loading } = useUserStore();
 
-  const token = cookiesStore.get("token")?.value;
+  const { courses, setCourses, setLoading } = useCoursesStore();
+  const loadingCourses = useCoursesStore((state) => state.loading);
+  useEffect(() => {
+    const fetchCourse = async () => {
+      setLoading(true);
+      try {
+        const data = axios.get(
+          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`
+        );
+        setCourses((await data).data.courses);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourse();
+  }, [setCourses, setLoading]);
 
-  let user: User;
-
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      // console.log(res.data.user);
-      user = res.data.user;
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  await fetchUser();
-
-  //@ts-expect-error:fix
+  if (loading) {
+    return (
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+        <Spinner />
+      </div>
+    );
+  }
   if (!token || user.role !== "student") {
     return (
       <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
@@ -52,10 +57,6 @@ const Courses = async () => {
     );
   }
 
-  const data = await axios.get(`${process.env.BACK_URL}/api/courses`);
-
-  const allCourses: Course[] = data.data.courses;
-
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll relative">
       <div className="mb-5 flex items-center gap-6">
@@ -63,27 +64,37 @@ const Courses = async () => {
         <SearchCourse />
       </div>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-7">
-        {allCourses.length ? (
-          allCourses.map((course) => {
-            return (
-              <div key={course._id}>
-                <CourseCard
-                  courseId={course._id}
-                  courseDescription={course.description}
-                  courseImg={course.imageCover}
-                  courseName={course.title}
-                  coursePrice={course.price}
-                  courseRating={course.avgRatings}
-                  students={course.studentsCount}
-                  numberOfVideo={course.videos.length}
-                />
-              </div>
-            );
-          })
+        {loadingCourses ? (
+          // Spinner أثناء التحميل
+          <div className="lg:col-span-3 md:col-span-2">
+            <Spinner />
+          </div>
         ) : (
-          <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor h-[100vh]">
-            لا توجد دورات متاحة حاليا
-          </h1>
+          <>
+            {courses?.length > 0 ? (
+              courses.map((course) => {
+                return (
+                  <div key={course._id}>
+                    <CourseCard
+                      courseId={course._id}
+                      courseDescription={course.description}
+                      courseImg={course.imageCover}
+                      courseName={course.title}
+                      coursePrice={course.price}
+                      courseRating={course.avgRatings}
+                      students={course.studentsCount}
+                      numberOfVideo={course.videos.length}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              // رسالة عند عدم وجود دورات
+              <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor h-[100vh]">
+                لا توجد دورات
+              </h1>
+            )}
+          </>
         )}
       </div>
     </div>
