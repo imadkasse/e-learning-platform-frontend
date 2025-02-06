@@ -63,7 +63,7 @@ const Settings = () => {
     formData.append("phoneNumber", numPhone);
     setLoadingUpdate(true);
     try {
-      const res = await axios.patch(
+      await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/updateMe`,
         formData,
         {
@@ -72,7 +72,6 @@ const Settings = () => {
           },
         }
       );
-      console.log(res);
       showToast("success", "تم تحديث البيانات بنجاح ");
 
       router.refresh();

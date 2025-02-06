@@ -22,7 +22,6 @@ const SideBar = () => {
     setToggleSidebar(!toggleSidebar);
   };
   const pathName = usePathname();
-  console.log(pathName);
   return (
     <>
       {/* in the small screen */}

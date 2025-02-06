@@ -1,6 +1,5 @@
 "use client";
 import { useLesson } from "@/store/lessonStore";
-import { useUserStore } from "@/store/userStore";
 import showToast from "@/utils/showToast";
 import { ChatBubbleOutlineOutlined } from "@mui/icons-material";
 import axios from "axios";
@@ -14,8 +13,6 @@ interface Props {
 const AddComment = ({ courseId }: Props) => {
   const token = Cookies.get("token");
   const { lesson, setLesson } = useLesson();
-  const { user } = useUserStore();
-  console.log(user);
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 

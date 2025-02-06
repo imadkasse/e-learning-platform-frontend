@@ -15,10 +15,12 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import Cookies from "js-cookie";
+import { useUserStore } from "@/store/userStore";
 
 const SideBar = () => {
   const router = useRouter();
   const [toggleSidebar, setToggleSidebar] = useState<boolean>(false);
+  const { setUser } = useUserStore();
   const handleToggle = () => {
     setToggleSidebar(!toggleSidebar);
   };
@@ -26,6 +28,19 @@ const SideBar = () => {
 
   const handleLogout = () => {
     Cookies.remove("token");
+    setUser({
+      _id: "",
+      username: "",
+      email: "",
+      role: null,
+      active: false,
+      progress: [],
+      thumbnail: "",
+      enrolledCourses: [],
+      phoneNumber: "",
+      publishedCourses: [],
+      notifications: [],
+    });
     router.push("/");
   };
 

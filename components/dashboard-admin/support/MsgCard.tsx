@@ -35,7 +35,6 @@ const MsgCard = ({ username, subject, ticketId, date, description }: Props) => {
       );
       showToast("success", "تم الرد بنجاح");
     } catch (error) {
-      console.log(error);
       //@ts-expect-error:fix
       showToast("error", error.response.data.message);
     }

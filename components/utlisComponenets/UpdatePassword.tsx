@@ -33,7 +33,6 @@ const UpdatePassword = () => {
 
       showToast("success", "تم تغيير كلمة المرور بنجاح");
     } catch (error) {
-      console.log(error);
       // @ts-expect-error: fix error agin
       showToast("error", error.response.data.message);
     } finally {

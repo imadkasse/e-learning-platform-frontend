@@ -268,7 +268,6 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
           <div className="flex flex-col gap-5">
             {lesson?.comments ? (
               lesson?.comments.map((comment) => {
-                console.log(comment)
                 return (
                   <div key={comment._id} className="border-b pb-3">
                     {/* معلومات المستخدم */}

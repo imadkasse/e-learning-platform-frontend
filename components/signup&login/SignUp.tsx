@@ -56,7 +56,6 @@ const SignUp = () => {
     formData.append("password", password);
     formData.append("passwordConfirm", passwordConfirm);
 
-    console.log(formData);
 
     setLoading(true);
     try {
@@ -69,7 +68,6 @@ const SignUp = () => {
       Cookies.set(`token`, token, { expires: 7 });
       router.push(`/dashboard-${role}`);
     } catch (error) {
-      console.log(error);
       // @ts-expect-error: fix after time
       showToast("error", error.response.data.message);
     } finally {
@@ -178,7 +176,6 @@ const SignUp = () => {
               setPasswordConfirm(e.target.value);
               setIsPasswordValid(e.target.value.length >= 6);
               setPasswordIsMatch(password === e.target.value);
-              console.log(password, passwordConfirm);
             }}
             placeholder="تأكيد كلمة المرور "
             className={` w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 

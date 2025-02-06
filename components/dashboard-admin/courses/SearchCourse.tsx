@@ -27,7 +27,6 @@ const SearchCourse = () => {
         setCourses(data.courses);
       }
     } catch (error) {
-      console.log(error);
       //@ts-expect-error:fix...
       showToast("error", error.response.data.message);
     } finally {

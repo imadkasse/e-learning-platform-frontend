@@ -16,7 +16,6 @@ interface Replay {
 
 export const Reply = ({ replys }: { replys: Replay[] }) => {
   const [showComments, setShowComments] = useState<boolean>(false);
-  console.log(replys);
   return (
     <>
       <button

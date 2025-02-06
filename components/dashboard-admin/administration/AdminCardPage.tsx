@@ -57,7 +57,6 @@ const AdminCardPage = ({
       showToast("success", "تم حذف هذا المستخدم بنجاح");
       // update the list of users
     } catch (error) {
-      console.log(error);
       //@ts-expect-error:fix
       showToast("error", error.response.data.message);
     } finally {
@@ -89,7 +88,6 @@ const AdminCardPage = ({
       showToast("success", "تم تغيير حالة الحساب بنجاح");
       setShowEditModal(false);
     } catch (error) {
-      console.log(error);
       //@ts-expect-error:fix
       showToast("error", error.response.data.message);
     } finally {

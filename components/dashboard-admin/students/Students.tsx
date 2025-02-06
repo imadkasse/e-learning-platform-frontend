@@ -103,7 +103,6 @@ const Students = () => {
                 onClick={() => {
                   if (currentPage <= totalPage && currentPage != 1) {
                     setCurrentPage(currentPage - 1);
-                    console.log("first");
                   }
                 }}
                 className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-white bg-mainColor border border-mainColor hover:bg-mainColorHoverLight hover:text-white rounded-s-lg"

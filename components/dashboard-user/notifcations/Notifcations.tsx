@@ -25,13 +25,11 @@ const Notifcations = () => {
   const token = Cookies.get("token");
   const { user, loading } = useUserStore();
 
-  console.log(user);
   const [notifcation, setNotifcation] = useState<Notifcation[]>([]);
 
   useEffect(() => {
     socket.on("newReply", (data) => {
       setNotifcation([...notifcation, data]);
-      console.log(data);
     });
   }, [notifcation]);
 
@@ -94,7 +92,7 @@ const Notifcations = () => {
             );
           })
         ) : (
-          <h1>لا توجد أي إشعارات</h1>
+          <h1 className="text-mainColor text-xl text-center font-semibold">لا توجد أي إشعارات</h1>
         )}
       </div>
     </div>

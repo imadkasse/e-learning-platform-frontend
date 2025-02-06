@@ -63,8 +63,6 @@ const Login = () => {
 
       router.push(`/dashboard-${role}/courses`);
     } catch (error) {
-      console.log(error);
-      console.log(error);
       // @ts-expect-error: fix after time
       showToast("error", error.response.data.error);
     } finally {

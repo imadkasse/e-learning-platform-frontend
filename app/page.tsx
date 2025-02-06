@@ -1,3 +1,4 @@
+import Footer from "@/components/footer/Footer";
 import CourseSection from "@/components/homeComponents/course-section/CourseSection";
 import HeaderHome from "@/components/homeComponents/HeaderHome";
 import NavBarHome from "@/components/homeComponents/NavBarHome";
@@ -8,15 +9,19 @@ import { ToastContainer } from "react-toastify";
 
 export default function Home() {
   return (
-    <div className="container mx-auto">
-      <ToastContainer />
-      <NavBarHome />
-      <HeaderHome />
-      <TestimonialsHome />
-      <WhyUs />
-      <WhatYouGet />
-      <CourseSection />
-      
-    </div>
+    <>
+      <div className="container mx-auto">
+        <ToastContainer />
+        <NavBarHome />
+        <HeaderHome />
+        <TestimonialsHome />
+        <WhyUs />
+        <WhatYouGet />
+        <CourseSection />
+      </div>
+      <div>
+        <Footer />
+      </div>
+    </>
   );
 }

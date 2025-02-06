@@ -47,7 +47,6 @@ const HomePage = async () => {
           },
         }
       );
-      // console.log(res.data.user);
       user = res.data.user;
     } catch (err) {
       console.log(err);

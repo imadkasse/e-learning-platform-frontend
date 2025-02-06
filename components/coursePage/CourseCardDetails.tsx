@@ -92,7 +92,6 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
     } catch (error) {
       //@ts-expect-error:fix agin
       showToast("error", error.response.data.message);
-      console.log(error);
     } finally {
       setLoadingVideoId(null);
     }

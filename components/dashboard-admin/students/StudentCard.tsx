@@ -49,7 +49,6 @@ const StudentCard = ({
       showToast("success", "تم تغيير حالة الحساب بنجاح");
       setShowEdit(false);
     } catch (error) {
-      console.log(error);
       //@ts-expect-error:fix
       showToast("error", error.response.data.message);
     } finally {
@@ -79,7 +78,6 @@ const StudentCard = ({
       showToast("success", "تم حذف الحساب بنجاح");
       setShowDelete(false);
     } catch (error) {
-      console.log(error);
       // @ts-expect-error:fix
       showToast("error", error.response.data.message);
     } finally {

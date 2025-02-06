@@ -66,7 +66,7 @@ const CourseCard = ({
       <div className="flex items-center justify-between  my-2">
         <div className="py-1">
           <p className="font-medium " dir="ltr">
-            {coursePrice}DA
+            {coursePrice === 0 ? "مجانا" : `${coursePrice}DA`}
           </p>
         </div>
 
@@ -83,7 +83,7 @@ const CourseCard = ({
       <div className="flex items-center justify-center mt-4">
         <Link
           href={`/course-overview/${courseId}`}
-          className="apply-fonts-normal bg-mainColor hoverEle hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white"
+          className="w-full text-center apply-fonts-normal bg-mainColor hoverEle hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white"
         >
           تفاصيل الدوراة
         </Link>

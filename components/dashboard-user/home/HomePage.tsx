@@ -21,7 +21,6 @@ const HomePage = async () => {
         },
       });
       const data = await res.json();
-      // console.log(res.data.user);
       user = data.user;
     } catch (err) {
       console.log(err);
@@ -76,7 +75,16 @@ const HomePage = async () => {
             );
           })
         ) : (
-          <h1>لاتوجد أي كورسات</h1>
+          <h1 className="apply-fonts-normal text-center  col-span-3">
+            <p>
+              <span className="text-mainColor text-xl ">
+                لاتوجد أي كورسات ،
+              </span>
+              <span className="mr-2 text-mainColor text-xl hover:text-mainColorHoverLight hoverEle">
+                <Link href={"/dashboard-user/courses"}>تصفح الكورسات</Link>
+              </span>
+            </p>
+          </h1>
         )}
       </div>
       {/* Other Courses */}

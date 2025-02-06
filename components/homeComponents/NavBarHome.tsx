@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import {
   CloseOutlined,
   LogoutOutlined,
@@ -27,15 +27,10 @@ const NavBarHome = () => {
   const handleOpenToggle = () => {
     setMenuToggle(true);
   };
-  const fetchUserData = useUserStore((state) => state.fetchUser);
   const loading = useUserStore((state) => state.loading);
 
   const user = useUserStore((state) => state.user);
   const role = user.role === "student" ? "user" : user.role;
-
-  useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
 
   // const router = useRouter();
 
@@ -53,6 +48,7 @@ const NavBarHome = () => {
     setUserMenuToggle(false);
     window.location.reload();
   };
+  console.log(user)
 
   return (
     <div className="h-[80px] flex items-center justify-around  ">

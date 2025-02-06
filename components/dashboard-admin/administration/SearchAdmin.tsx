@@ -1,6 +1,6 @@
 "use client";
 import { useSearchUser } from "@/store/searchUser";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useState } from "react";
 import Cookies from "js-cookie";
 import { User } from "@/types/user";
 
@@ -12,7 +12,6 @@ const SearchAdmin = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      console.log(searchData);
       if (searchData !== "") {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/searchUsers?query=${searchData}`,
@@ -50,9 +49,7 @@ const SearchAdmin = () => {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    console.log(searchData);
-  }, [searchData]);
+  
 
   return (
     <form className="flex items-center flex-grow" onSubmit={handleSearch}>

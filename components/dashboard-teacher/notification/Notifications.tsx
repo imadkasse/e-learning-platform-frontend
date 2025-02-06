@@ -44,7 +44,6 @@ const Notifcations = () => {
       </div>
     );
   }
-  console.log(user.notifications);
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll">
       <div className="mb-5">

@@ -58,46 +58,50 @@ const Courses = () => {
   }
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll relative">
-      <div className="mb-5 flex items-center gap-6">
-        <h1 className="apply-fonts-normal text-2xl font-semibold ">الدورات</h1>
-        <SearchCourse />
+    <>
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll relative">
+        <div className="mb-5 flex items-center gap-6">
+          <h1 className="apply-fonts-normal text-2xl font-semibold ">
+            الدورات
+          </h1>
+          <SearchCourse />
+        </div>
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-7">
+          {loadingCourses ? (
+            // Spinner أثناء التحميل
+            <div className="lg:col-span-3 md:col-span-2">
+              <Spinner />
+            </div>
+          ) : (
+            <>
+              {courses?.length > 0 ? (
+                courses.map((course) => {
+                  return (
+                    <div key={course._id}>
+                      <CourseCard
+                        courseId={course._id}
+                        courseDescription={course.description}
+                        courseImg={course.imageCover}
+                        courseName={course.title}
+                        coursePrice={course.price}
+                        courseRating={course.avgRatings}
+                        students={course.studentsCount}
+                        numberOfVideo={course.videos.length}
+                      />
+                    </div>
+                  );
+                })
+              ) : (
+                // رسالة عند عدم وجود دورات
+                <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor h-[100vh]">
+                  لا توجد دورات
+                </h1>
+              )}
+            </>
+          )}
+        </div>
       </div>
-      <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-7">
-        {loadingCourses ? (
-          // Spinner أثناء التحميل
-          <div className="lg:col-span-3 md:col-span-2">
-            <Spinner />
-          </div>
-        ) : (
-          <>
-            {courses?.length > 0 ? (
-              courses.map((course) => {
-                return (
-                  <div key={course._id}>
-                    <CourseCard
-                      courseId={course._id}
-                      courseDescription={course.description}
-                      courseImg={course.imageCover}
-                      courseName={course.title}
-                      coursePrice={course.price}
-                      courseRating={course.avgRatings}
-                      students={course.studentsCount}
-                      numberOfVideo={course.videos.length}
-                    />
-                  </div>
-                );
-              })
-            ) : (
-              // رسالة عند عدم وجود دورات
-              <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor h-[100vh]">
-                لا توجد دورات
-              </h1>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+    </>
   );
 };
 

@@ -145,7 +145,7 @@ const Details: React.FC = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`,
         courseData,
         {
@@ -155,7 +155,6 @@ const Details: React.FC = () => {
           },
         }
       );
-      console.log(res);
       showToast("success", "تم نشر الدورة بنجاح");
 
       setFormData({
