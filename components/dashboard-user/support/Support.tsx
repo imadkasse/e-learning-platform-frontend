@@ -7,12 +7,16 @@ import showToast from "@/utils/showToast";
 import { CloseOutlined } from "@mui/icons-material";
 import MsgCard from "./MsgCard";
 import { useFaq } from "@/store/faqStore";
+import Link from "next/link";
+import Spinner from "@/components/spinner/Spinner";
+import { useUserStore } from "@/store/userStore";
 
 // إنشاء اتصال مع الخادم
 const socket = io("https://e-leraning-backend.onrender.com"); // تأكد من استبدال الرابط برابط الخادم الخاص بك
 
 const Support = () => {
   const token = Cookies.get("token");
+  const { loading, user } = useUserStore();
   const [subject, setSubject] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [showAddFaq, setShowAddFaq] = useState<boolean>(false);
@@ -87,6 +91,32 @@ const Support = () => {
       socket.off("ticketReply");
     };
   }, [token, setFaqs, faqs]);
+
+  if (loading) {
+    return (
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (!token || user.role !== "student") {
+    return (
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+        <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor ">
+          أنت غير مسجل أو لا تملك الصلاحية للوصول الى هذه الصفحة
+        </h1>
+        <div className="mt-5 flex justify-center ">
+          <Link
+            href={"/login"}
+            className="apply-fonts-normal py-2 px-4  bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white rounded-lg"
+          >
+            سجل الدخول من هنا
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-screen relative">

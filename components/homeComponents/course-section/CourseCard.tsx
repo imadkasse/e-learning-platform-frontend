@@ -19,7 +19,7 @@ const CourseCard = ({
   courseImg,
 }: Props) => {
   return (
-    <div className="my-3 shadow-lg shadow-mainColor bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg">
+    <div className="my-3 shadow shadow-gray-400 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg">
       <div className="w-full flex ">
         <Image
           src={courseImg}
@@ -57,7 +57,7 @@ const CourseCard = ({
       <div className="apply-fonts-normal mt-2">
         <Link
           href={`/course-overview/${courseUrl}`}
-          className="bg-mainColor hoverEle hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white"
+          className="bg-mainColor hoverEle text-center hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white"
         >
           تصفح الدوراة
         </Link>

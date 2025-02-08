@@ -1,0 +1,15 @@
+/* تخصيص الزر التالي */
+.swiper-button-next {
+  @apply text-mainColor  p-8 bg-white rounded-xl;
+}
+
+/* تخصيص الزر السابق */
+.swiper-button-prev {
+  @apply text-mainColor p-8 bg-white rounded-xl;
+}
+
+/* التأثير عند التمرير فوق الأزرار */
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  @apply text-mainColorHoverLight  p-8 bg-white/70 rounded-xl hoverEle;
+}

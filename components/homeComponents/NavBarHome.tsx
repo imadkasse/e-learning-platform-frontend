@@ -48,7 +48,6 @@ const NavBarHome = () => {
     setUserMenuToggle(false);
     window.location.reload();
   };
-  console.log(user)
 
   return (
     <div className="h-[80px] flex items-center justify-around  ">
@@ -184,7 +183,7 @@ const NavBarHome = () => {
               اراء التلاميذ
             </Link>
             <Link
-              href={"/"}
+              href={"/courses"}
               className="hover:custom-before-nav relative text-lg"
             >
               الدورات

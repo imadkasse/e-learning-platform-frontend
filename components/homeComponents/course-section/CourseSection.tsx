@@ -30,7 +30,7 @@ const CourseSection = async () => {
 
       <div className="apply-fonts-normal flex justify-center w-full mt-12">
         <Link
-          href={`/`}
+          href={`/courses`}
           className="bg-mainColor hoverEle hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white"
         >
           تصفح الدورات
