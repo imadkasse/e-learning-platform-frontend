@@ -29,7 +29,7 @@ const NavBarCourse = () => {
         </h1>
       </Link>
 
-      {token && (
+      {token ? (
         <div className="flex sm:gap-5 xs:gap-1 ">
           <Link
             href={"/dashboard-user"}
@@ -41,19 +41,39 @@ const NavBarCourse = () => {
             <p className="apply-fonts-normal">الرئيسية</p>
           </Link>
           <Link
-            href={"/"}
+            href={"/dashboard-user/courses"}
             className="flex items-center gap-2  hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md "
           >
             <BookOutlined />
             <p className="apply-fonts-normal">الدورات</p>
           </Link>
           <Link
-            href={"/"}
+            href={"/dashboard-user/notification"}
             className="flex items-center gap-2 hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md "
           >
             <NotificationsNoneOutlined />
             <p className="apply-fonts-normal">الاشعارات</p>
           </Link>
+        </div>
+      ) : (
+        <div className="flex sm:gap-5 xs:gap-1 ">
+          <Link
+            href={"/"}
+            className={`flex items-center gap-2 hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md ${
+              pathName === "/course-overview/asd" ? "bg-mainColor/50" : ""
+            } `}
+          >
+            <HomeOutlined />
+            <p className="apply-fonts-normal">الرئيسية</p>
+          </Link>
+          <Link
+            href={"/courses"}
+            className="flex items-center gap-2  hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md "
+          >
+            <BookOutlined />
+            <p className="apply-fonts-normal">الدورات</p>
+          </Link>
+          
         </div>
       )}
     </div>
