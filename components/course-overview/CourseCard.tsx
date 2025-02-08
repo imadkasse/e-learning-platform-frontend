@@ -35,7 +35,7 @@ const CourseCard = ({
   id,
 }: Props) => {
   const token = Cookies.get("token");
-  const link = `${process.env.NEXT_PUBLIC_BASE_URL}course-overview/6777ee1d99c93c1c1b7dc42d`;
+  const link = `${process.env.NEXT_PUBLIC_BASE_URL}course-overview/${id}`;
   const { user, fetchUser } = useUserStore();
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const handelOpenAndColsed = () => {
