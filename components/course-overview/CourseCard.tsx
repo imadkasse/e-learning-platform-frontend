@@ -89,7 +89,7 @@ const CourseCard = ({
       <div
         className={`transition-all duration-300 ease-in-out ${
           isOpen ? "xs:hidden lg:flex" : "w-[400px]"
-        } border shadow-sm h-[606px] lg:sticky lg:top-24 xs:fixed z-10 xs:bg-wygColor  w-[400px]  py-3 px-4 flex flex-col gap-6`}
+        } border shadow-sm max-h-[80vh] lg:sticky lg:top-24 xs:fixed z-10 xs:bg-wygColor  w-[400px]  py-3 px-4 flex flex-col gap-6`}
       >
         {/* price */}
         <div className="w-full text-lg text-center">

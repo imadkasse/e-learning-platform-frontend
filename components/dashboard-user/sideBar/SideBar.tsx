@@ -50,7 +50,7 @@ const SideBar = () => {
       <div
         className={`bg-sideBarBgColo text-white py-4   mb-2 px-3 rounded-xl h-screen transition-all duration-300 ease-in-out ${
           toggleSidebar ? `w-[300px] ` : `w-[0px]`
-        }  lg:hidden sm:sticky xs:fixed top-2 xs:right-0  xs:flex flex-col justify-between`}
+        }  lg:hidden sm:sticky xs:fixed top-2 xs:right-0 z-10  xs:flex flex-col justify-between`}
       >
         <button
           onClick={handleToggle}

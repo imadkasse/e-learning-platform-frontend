@@ -7,9 +7,8 @@ const CourseSection = async () => {
   const res = await fetch(
     `${process.env.BACK_URL}/api/courses?page=1&limit=4`,
     {
-      cache: "force-cache",
       next: {
-        revalidate: 10,
+        revalidate: 3600,
       },
     }
   );

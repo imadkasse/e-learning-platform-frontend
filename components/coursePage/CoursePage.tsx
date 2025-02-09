@@ -15,8 +15,10 @@ import { redirect } from "next/navigation";
 import { Reply } from "./comments and replies/Reply";
 import AddComment from "./comments and replies/AddComment";
 import AddReply from "./comments and replies/AddReply";
-
-const CoursePage = ({ courseId }: { courseId: string }) => {
+type Props = {
+  course: Course;
+};
+const CoursePage = ({ course }: Props) => {
   const { lesson, setLesson } = useLesson();
 
   const [isEnrolled, setIsEnrolled] = useState<boolean | undefined>(undefined);
@@ -31,27 +33,7 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
     return course?.enrolledStudents.some((s) => s === userId);
   };
 
-  const [course, setCourse] = useState<Course>();
-  const { user, fetchUser } = useUserStore();
-
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
-
-  const getCourse = async (courseId: string) => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`,
-      {
-        cache: "no-store",
-      }
-    );
-    const data = await res.json();
-    setCourse(data.course);
-  };
-
-  useEffect(() => {
-    getCourse(courseId);
-  }, [courseId]);
+  const { user } = useUserStore();
 
   //set first lesson
   useEffect(() => {
@@ -111,30 +93,14 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
   }
   //check is user buying course
   if (user.role === "student" && !isEnrolled) {
-    redirect(`/course-overview/${courseId}`);
-    // return (
-    //   <div className="my-5 flex flex-col items-center justify-center min-h-screen text-center bg-red-50 border border-red-300 rounded-lg p-6">
-    //     <h2 className="apply-fonts-medium text-xl text-red-600">
-    //       لم يتم تسجيلك في هذه الدورة!
-    //     </h2>
-    //     <p className="apply-fonts-normal text-gray-700 mt-2">
-    //       يرجى شراء الدورة للوصول إلى محتواها.
-    //     </p>
-    //     <Link
-    //       href={`/course-overview/${courseId}`}
-    //       className="mt-4 bg-mainColor hover:bg-mainColorHoverLight text-white font-medium px-6 py-2 rounded-lg shadow-md transition duration-300"
-    //     >
-    //       شراء الدورة الآن
-    //     </Link>
-    //   </div>
-    // );
+    redirect(`/course-overview/${course._id}`);
   }
   if (user.role === "teacher" && !isPublichedCourse) {
     redirect(`/dashboard-teacher/courses`);
   }
   //section comments
   return (
-    <div className="mt-6 flex  flex-row-reverse justify-between gap-7 px-3 ">
+    <div className=" flex  flex-row-reverse justify-between gap-7 px-3 ">
       {/* Course Details */}
 
       <CourseCardDetails
@@ -322,7 +288,7 @@ const CoursePage = ({ courseId }: { courseId: string }) => {
           {user.role === "teacher" || user.role === "admin" ? (
             <></>
           ) : (
-            <AddComment courseId={courseId} />
+            <AddComment courseId={course._id} />
           )}
         </div>
       </div>

@@ -7,9 +7,9 @@ import Link from "next/link";
 
 const HeaderHome = () => {
   return (
-    <div className=" my-24 flex items-center justify-between xs:flex-col md:flex-row ">
+    <div className=" my-24 flex items-center justify-between xs:flex-col md:flex-row overflow-hidden">
       <motion.div
-        initial={{ x: 100, opacity: 0 }}
+        initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 1 }}
       >

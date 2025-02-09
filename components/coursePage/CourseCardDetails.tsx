@@ -123,12 +123,12 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
       <div
         className={`transition-all duration-300 ease-in-out ${
           isOpen ? "xs:hidden lg:flex" : "lg:w-[400px] xs:w-[300px]"
-        } border shadow-sm max-h-[80vh]  lg:sticky lg:top-24 xs:fixed z-10 xs:bg-wygColor  w-[400px] py-3 px-4 flex flex-col justify-between gap-6`}
-      >
+        } border shadow-sm max-h-[85vh]  lg:sticky lg:top-[96px] lg:bottom-5   xs:fixed z-10 xs:bg-wygColor  w-[400px] py-3 px-4 flex flex-col gap-5  `}
+      >   
         {/* Title & course Details (Videos and progress) */}
         <section className="flex flex-col gap-3">
           <div className="w-full text-lg  ">
-            <h1 className="border-b py-3 border-courseTextSection apply-fonts-normal ">
+            <h1 className="border-b pt-1 pb-2 border-courseTextSection apply-fonts-normal ">
               محتوى الدورة
             </h1>
           </div>
@@ -164,7 +164,7 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
 
             {/* محتوى Accordion */}
             {isOpenAccordion && ( // عرض المحتوى فقط إذا كان الـ Accordion مفتوحًا
-              <div className="py-2 px-2 overflow-y-scroll max-h-72">
+              <div className="py-2 px-2 overflow-y-scroll max-h-72 ">
                 {courseVideos?.length ? (
                   courseVideos.map((l) => (
                     <div

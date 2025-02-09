@@ -1,4 +1,6 @@
 import "@/app/globals.css";
+import { fetchUserServer } from "@/lib/fetchUserServer";
+import UserProvider from "@/providers/UserProvider";
 
 interface Props {
   params: Promise<{ courseId: string }>;
@@ -14,14 +16,17 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await fetchUserServer();
   return (
     <>
-      <div>{children}</div>
+      <div>
+        <UserProvider user={user}>{children}</UserProvider>
+      </div>
     </>
   );
 }

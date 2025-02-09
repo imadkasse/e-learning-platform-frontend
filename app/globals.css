@@ -89,7 +89,7 @@
 #video-container.blurred {
   filter: blur(6px); /* قيمة التعتيم عند اكتشاف التفاعل */
 }
-html,
+/* html,
 body {
   overflow: auto !important;
-}
+} */

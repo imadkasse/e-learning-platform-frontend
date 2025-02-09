@@ -1,4 +1,4 @@
-"use client";
+import { fetchUserServer } from "@/lib/fetchUserServer";
 import {
   BookOutlined,
   HomeOutlined,
@@ -6,11 +6,16 @@ import {
 } from "@mui/icons-material";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import React from "react";
 
-const NavBarCourse = () => {
-  const pathName = usePathname();
+const NavBarCourse = async () => {
+  const user = await fetchUserServer();
+  const role =
+    user.role === "student"
+      ? "user"
+      : user.role === "teacher"
+      ? "teacher"
+      : "admin";
   return (
     <div className="sticky top-3 z-20 bg-sideBarBgColo text-white  rounded-3xl flex items-center flex-row-reverse justify-between px-5 py-1">
       <Link href={`/`} className="flex items-center flex-row-reverse  md:gap-3">
@@ -28,23 +33,21 @@ const NavBarCourse = () => {
 
       <div className="flex sm:gap-5 xs:gap-1 ">
         <Link
-          href={"/dashboard-user"}
-          className={`flex items-center gap-2 hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md ${
-            pathName === "/course/asd" ? "bg-mainColor/50" : ""
-          } `}
+          href={`/dashboard-${role}`}
+          className={`flex items-center gap-2 hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md  `}
         >
           <HomeOutlined />
           <p className="apply-fonts-normal">الرئيسية</p>
         </Link>
         <Link
-          href={"/"}
+          href={`/dashboard-${role}/courses`}
           className="flex items-center gap-2  hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md "
         >
           <BookOutlined />
           <p className="apply-fonts-normal">الدورات</p>
         </Link>
         <Link
-          href={"/"}
+          href={`/dashboard-${role}/notification`}
           className="flex items-center gap-2 hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md "
         >
           <NotificationsNoneOutlined />
