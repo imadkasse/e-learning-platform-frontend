@@ -1,82 +1,81 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+const fadeLeft = {
+  hidden: { opacity: 0, x: -50 },
+  visible: { opacity: 1, x: 0, transition: { duration: 1 } },
+};
+
+const fadeRight = {
+  hidden: { opacity: 0, x: 50 },
+  visible: { opacity: 1, x: 0, transition: { duration: 1 } },
+};
 
 const WhyUs = () => {
-  AOS.init({
-    disable: false,
-    startEvent: "DOMContentLoaded",
-    animatedClassName: "aos-animate",
-    initClassName: "aos-init",
-    useClassNames: true,
-    debounceDelay: 50,
-    throttleDelay: 99,
-    disableMutationObserver: false,
+  const { ref: refTitle, inView: inViewTitle } = useInView({
+    triggerOnce: true,
   });
-
+  const { ref: refImage, inView: inViewImage } = useInView({
+    triggerOnce: true,
+  });
   return (
     <div className=" my-24 flex items-center justify-between xs:flex-col  md:flex-row ">
-      <section
-        data-aos="fade-left"
-        data-aos-offset="200"
-        data-aos-delay="50"
-        data-aos-duration="1000"
-        data-aos-easing="ease-in-out"
-        data-aos-mirror="true"
-        data-aos-once="false"
-        data-aos-anchor-placement="center"
-      >
-        <div className="lg:w-[600px] lg:h-[200px] ">
-          <h1 className="lg:text-[74px] sm:text-[40px] xs:text-[40px] apply-fonts-medium">
-            منصتنا تفاعلية وذكية
-          </h1>
-        </div>
+      <section>
+        <motion.h1
+          ref={refTitle}
+          initial="hidden"
+          animate={inViewTitle ? "visible" : "hidden"}
+          variants={fadeLeft}
+          className="lg:text-[74px] sm:text-[40px] xs:text-[40px] apply-fonts-medium"
+        >
+          منصتنا تفاعلية وذكية
+        </motion.h1>
 
-        <div className="my-4 apply-fonts-normal">
+        <motion.div
+          initial="hidden"
+          animate={inViewTitle ? "visible" : "hidden"}
+          variants={fadeLeft}
+          className="my-4 apply-fonts-normal"
+        >
           <h2 className="text-xl font-light">
             منصتنا تفاعلية وذكية، تتيح لك التعلم بطريقة مخصصة وفريدة تناسب
             احتياجاتك الفردية.
           </h2>
-        </div>
+        </motion.div>
 
-        <div className="flex   apply-fonts-normal">
-          <Link href={'/courses'} className="bg-mainColor hoverEle hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white">
+        <motion.div
+          initial="hidden"
+          animate={inViewTitle ? "visible" : "hidden"}
+          variants={fadeLeft}
+          className="flex apply-fonts-normal"
+        >
+          <Link
+            href={"/courses"}
+            className="bg-mainColor hoverEle hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white"
+          >
             تصفح الدورات
           </Link>
-        </div>
+        </motion.div>
       </section>
       <section className=" w-full  flex md:justify-end sm:justify-center ">
-        <div
-          data-aos="fade-right"
-          data-aos-offset="200"
-          data-aos-delay="50"
-          data-aos-duration="1000"
-          data-aos-easing="ease-in-out"
-          data-aos-mirror="true"
-          data-aos-once="false"
-          data-aos-anchor-placement="center"
-          className="xl:w-[500px] xl:h-[500px] lg:w-[410px] lg:h-[410px] md:w-[350px] md:h-[350px]  xs:w-[300px] xs:h-[300px] "
-          // animate={{
-          //   y: [0, 25],
-          // }}
-          // transition={{
-          //   duration: 1, // مدة الحركة (2 ثانية)
-          //   ease: "easeInOut",
-          //   repeat: Infinity, // اجعل الحركة تتكرر باستمرار
-          //   repeatType: "reverse", // حركة ذهاب وعودة
-          // }}
+        <motion.div
+          ref={refImage}
+          initial="hidden"
+          animate={inViewImage ? "visible" : "hidden"}
+          variants={fadeRight}
+          className="xl:w-[500px] xl:h-[500px] lg:w-[410px] lg:h-[410px] md:w-[350px] md:h-[350px] xs:w-[300px] xs:h-[300px]"
         >
           <Image
-            src={"/imgs/pcImg.png"}
+            src="/imgs/pcImg.png"
             width={500}
             height={500}
             alt="pcImg"
             className="w-full h-full"
           />
-        </div>
+        </motion.div>
       </section>
     </div>
   );

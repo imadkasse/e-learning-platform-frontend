@@ -4,7 +4,15 @@ import Link from "next/link";
 import { Course } from "@/types/course";
 
 const CourseSection = async () => {
-  const res = await fetch(`${process.env.BACK_URL}/api/courses?page=1&limit=4`);
+  const res = await fetch(
+    `${process.env.BACK_URL}/api/courses?page=1&limit=4`,
+    {
+      cache: "force-cache",
+      next: {
+        revalidate: 10,
+      },
+    }
+  );
   const data = await res.json();
   const courses: Course[] = data.courses;
 

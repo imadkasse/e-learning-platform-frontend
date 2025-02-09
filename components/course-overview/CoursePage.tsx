@@ -11,46 +11,22 @@ import Image from "next/image";
 import CourseCard from "./CourseCard";
 import DynamicVideoPlyr from "./DynamicVideoPlyr";
 import AddReview from "./Reviews/AddReview";
-import { useEffect, useState } from "react";
-import { useCourse } from "@/store/courseStore";
-import Spinner from "../spinner/Spinner";
 import { useUserStore } from "@/store/userStore";
+import { Course } from "@/types/course";
 
 type Props = {
-  id: string;
+  course: Course;
 };
-export const CoursePage = ({ id }: Props) => {
-  const { course, setCourse } = useCourse();
+export const CoursePage = ({ course }: Props) => {
   const { user } = useUserStore();
-  const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    const getCourse = async (courseId: string) => {
-      try {
-        setLoading(true);
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`,
-          {
-            cache: "no-store",
-          }
-        );
-        const data = await res.json();
-        setCourse(data.course);
-      } catch (error) {
-        console.error("Failed to fetch course:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getCourse(id);
-  }, [id, setCourse]);
   const instructor = course.instructor;
 
   return (
     <div className="mt-6 flex  flex-row-reverse justify-between gap-7 px-3 ">
       {/* Course Card */}
       <CourseCard
-        id={id}
+        id={course._id}
         price={course.price}
         duration={course.duration}
         studentNumber={course.enrolledStudents.length}
@@ -180,11 +156,7 @@ export const CoursePage = ({ id }: Props) => {
           </h1>
 
           <div className="flex flex-col gap-5">
-            {loading ? (
-              <div className="flex justify-center items-center min-h-[200px]">
-                <Spinner />
-              </div>
-            ) : course.reviews.length > 0 ? (
+            {course.reviews.length > 0 ? (
               course.reviews.map((review) => {
                 return (
                   <div key={review._id} className="border-b pb-3">
@@ -233,7 +205,7 @@ export const CoursePage = ({ id }: Props) => {
 
         {/* add review */}
 
-        {user.role === "teacher" ? <></> : <AddReview courseId={id} />}
+        {user.role === "teacher" ? <></> : <AddReview courseId={course._id} />}
       </div>
     </div>
   );

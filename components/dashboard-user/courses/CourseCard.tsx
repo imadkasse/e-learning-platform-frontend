@@ -24,7 +24,7 @@ const CourseCard = ({
   courseId,
 }: Props) => {
   return (
-    <div className="my-3 shadow shadow-gray-400 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg ">
+    <div className="my-1 shadow shadow-gray-400 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg  ">
       <div className="w-full flex ">
         <Image
           src={courseImg}
@@ -35,8 +35,10 @@ const CourseCard = ({
         />
       </div>
 
-      <div className="mt-3">
-        <h1 className="apply-fonts-medium text-base">{courseName} </h1>
+      <div className="mt-1 py-2">
+        <h1 className="apply-fonts-medium lg:text-md xs:text-sm line-clamp-1">
+          {courseName}
+        </h1>
       </div>
       <div className="my-1">
         <h1 className="apply-fonts-normal text-[12px] h-10  line-clamp-2 text-courseTextSection">
@@ -44,7 +46,7 @@ const CourseCard = ({
         </h1>
       </div>
 
-      <div className="flex items-center justify-between gap-5 my-3 ">
+      <div className="flex items-center justify-between gap-5 my-1 ">
         <div className="flex gap-1 items-center">
           <div className="text-mainColor">
             <PlayLesson />
@@ -63,7 +65,7 @@ const CourseCard = ({
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between  my-2">
+      <div className="flex items-center justify-between  my-1">
         <div className="py-1">
           <p className="font-medium " dir="ltr">
             {coursePrice === 0 ? "مجانا" : `${coursePrice}DA`}
@@ -80,7 +82,7 @@ const CourseCard = ({
           />
         </div>
       </div>
-      <div className="flex items-center justify-center mt-4">
+      <div className="flex items-center justify-center mt-2">
         <Link
           href={`/course-overview/${courseId}`}
           className="w-full text-center apply-fonts-normal bg-mainColor hoverEle hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white"

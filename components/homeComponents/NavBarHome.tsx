@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import {
   CloseOutlined,
   LogoutOutlined,
@@ -30,9 +30,8 @@ const NavBarHome = () => {
   const loading = useUserStore((state) => state.loading);
 
   const user = useUserStore((state) => state.user);
-  const role = user.role === "student" ? "user" : user.role;
 
-  // const router = useRouter();
+  const role = user.role === "student" ? "user" : user.role;
 
   const handleLogout = () => {
     Cookie.remove("token");

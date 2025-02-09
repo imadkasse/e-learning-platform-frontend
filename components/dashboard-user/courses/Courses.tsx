@@ -59,14 +59,14 @@ const Courses = () => {
 
   return (
     <>
-      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll relative">
+      <div className=" bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll relative">
         <div className="mb-5 flex items-center gap-6">
           <h1 className="apply-fonts-normal text-2xl font-semibold ">
             الدورات
           </h1>
           <SearchCourse />
         </div>
-        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-7">
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-12">
           {loadingCourses ? (
             // Spinner أثناء التحميل
             <div className="lg:col-span-3 md:col-span-2">

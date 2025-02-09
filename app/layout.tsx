@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { fetchUserServer } from "@/lib/fetchUserServer";
-import UserProvider from "@/providers/UserProvider";
+
 // import Footer from "@/components/footer/Footer";
 // import Footer from "@/components/footer/Footer";
 
@@ -15,11 +14,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await fetchUserServer();
   return (
     <html lang="en" dir="rtl">
       <body className={` antialiased`}>
-        <UserProvider user={user}>{children}</UserProvider>
+        {children}
         {/* <Footer /> */}
       </body>
     </html>
