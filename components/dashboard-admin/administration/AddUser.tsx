@@ -79,7 +79,7 @@ const AddUser = () => {
         إضافة
       </button>
       {showAdd && (
-        <div className="rounded-xl absolute bg-black/40 w-full h-full top-0 left-0 z-30 flex flex-col justify-center py-6 px-10">
+        <div className=" fixed bg-black/40 w-full top-0 left-0     px-4 py-5 h-[100vh]  z-10 flex flex-col justify-center ">
           <button
             className="text-right "
             onClick={() => {

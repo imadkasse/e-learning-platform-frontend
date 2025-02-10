@@ -100,7 +100,7 @@ const CoursePage = ({ course }: Props) => {
   }
   //section comments
   return (
-    <div className=" flex  flex-row-reverse justify-between gap-7 px-3 ">
+    <div className=" flex  flex-row-reverse justify-between gap-7 sm:px-3 ">
       {/* Course Details */}
 
       <CourseCardDetails
@@ -195,7 +195,9 @@ const CoursePage = ({ course }: Props) => {
                         className="text-courseIconsSection"
                       />
                       <div>
-                        <h1 className="text-md font-medium">{file.filename}</h1>
+                        <h1 className="text-md font-medium line-clamp-2">
+                          {file.filename}
+                        </h1>
                         <p className="text-courseTextSection" dir="">
                           {(Number(file.size) / 1024 / 1024).toFixed(2)}MB
                         </p>
@@ -205,10 +207,11 @@ const CoursePage = ({ course }: Props) => {
                     <div>
                       <a
                         href={file.url}
+                        target="_blank"
                         download={true}
-                        className="apply-fonts-normal py-2 px-3 bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white "
+                        className="apply-fonts-normal py-2 px-3 bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white xs:text-sm"
                       >
-                        تحميل الملف
+                        تحميل
                       </a>
                     </div>
                   </div>

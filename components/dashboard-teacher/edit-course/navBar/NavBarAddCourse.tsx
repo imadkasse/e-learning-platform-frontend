@@ -37,14 +37,14 @@ const NavBarAddCourse = () => {
           <p className="apply-fonts-normal">الرئيسية</p>
         </Link>
         <Link
-          href={"/"}
+          href={"/dashboard-teacher/courses"}
           className="flex items-center gap-2  hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md "
         >
           <BookOutlined />
           <p className="apply-fonts-normal">الدورات</p>
         </Link>
         <Link
-          href={"/"}
+          href={"/dashboard-teacher/notification"}
           className="flex items-center gap-2 hover:bg-mainColor/50 hoverEle sm:py-2 sm:px-3 xs:p-1 xs:text-[12px] sm:text-base rounded-md "
         >
           <NotificationsNoneOutlined />

@@ -97,8 +97,8 @@ export const CoursePage = ({ course }: Props) => {
                 <AccessTimeOutlined className="text-courseIconsSection" />
                 <h1 className="flex  items-center">
                   {/* added after time */}
-                  {(course.duration / 3600).toFixed(5)}
-                  <span className="apply-fonts-normal text-[13px]">ساعة</span>
+                  {(course.duration / 3600).toFixed(2)}
+                  <span className="mr-1 apply-fonts-normal text-[13px]">ساعة</span>
                 </h1>
               </div>
             </div>

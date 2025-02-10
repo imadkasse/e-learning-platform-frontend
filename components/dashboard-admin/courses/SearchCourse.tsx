@@ -1,14 +1,12 @@
 "use client";
 import { useCoursesStore } from "@/store/coursesStore";
 import showToast from "@/utils/showToast";
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React, {  FormEvent, useState } from "react";
 
 const SearchCourse = () => {
   const [searchData, setsearchData] = useState<string>("");
   const { setCourses, setLoading } = useCoursesStore();
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setsearchData(e.target.value);
-  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -59,7 +57,9 @@ const SearchCourse = () => {
             type="text"
             id="simple-search"
             value={searchData}
-            onChange={handleSearchChange}
+            onChange={(e) => {
+              setsearchData(e.target.value);
+            }}
             className="apply-fonts-normal  block w-full ps-10 p-2.5  rounded-3xl   focus:border-red-400 "
             placeholder="البحث..."
           />

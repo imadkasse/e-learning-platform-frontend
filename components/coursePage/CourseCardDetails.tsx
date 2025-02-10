@@ -220,7 +220,7 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
                           <p>
                             {
                               //@ts-expect-error:fix
-                              formatDuration(l.duration.toFixed(0))
+                              formatDuration(l.duration.toFixed())
                             }
                           </p>
                         </div>

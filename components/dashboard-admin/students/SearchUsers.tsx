@@ -70,7 +70,7 @@ const SearchUsers = () => {
             type="text"
             id="simple-search"
             className="apply-fonts-normal  block w-full ps-10 p-2.5  rounded-3xl   focus:border-red-400 "
-            placeholder="البحث..."
+            placeholder="إبحث بإستخدام الإسم..."
             value={searchData}
             onChange={(e) => setsearchData(e.target.value)}
           />

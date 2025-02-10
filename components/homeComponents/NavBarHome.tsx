@@ -175,21 +175,21 @@ const NavBarHome = () => {
             exit={{ y: -20, opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Link
-              href={"/"}
-              className="hover:custom-before-nav relative text-lg"
+            <ScrollLink
+              to={"testimonials"}
+              className="hover:custom-before-nav relative text-lg cursor-pointer"
             >
               اراء التلاميذ
-            </Link>
-            <Link
-              href={"/courses"}
-              className="hover:custom-before-nav relative text-lg"
+            </ScrollLink>
+            <ScrollLink
+              to={"courses"}
+              className="hover:custom-before-nav relative text-lg cursor-pointer"
             >
               الدورات
-            </Link>
+            </ScrollLink>
             <Link
               href={"/"}
-              className="hover:custom-before-nav relative text-lg"
+              className="hover:custom-before-nav relative text-lg cursor-pointer"
             >
               تواصل معنا
             </Link>

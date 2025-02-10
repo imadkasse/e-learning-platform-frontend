@@ -17,7 +17,7 @@ const Courses = async () => {
   const courses: ShowCourse[] = coursesData.courses;
 
   return (
-    <div>
+    <div className="px-6">
       <SlidesCourses courses={courses} />
     </div>
   );

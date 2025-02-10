@@ -140,7 +140,8 @@ const Settings = () => {
               type="text"
               name="name"
               id="name"
-              value={user.username}
+              value={name}
+              placeholder={user.username}
               onChange={(e) => setName(e.target.value)}
               className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
             />
@@ -153,7 +154,8 @@ const Settings = () => {
             </label>
             <input
               type="email"
-              value={user.email}
+              value={email}
+              placeholder={user.email}
               onChange={(e) => setEmail(e.target.value)}
               className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
             />
@@ -166,7 +168,8 @@ const Settings = () => {
             </label>
             <input
               type="text"
-              value={user.phoneNumber}
+              value={numPhone}
+              placeholder={user.phoneNumber}
               onChange={(e) => setNumPhone(e.target.value)}
               name="price"
               id="price"
