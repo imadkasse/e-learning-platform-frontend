@@ -10,7 +10,7 @@ import { ToastContainer } from "react-toastify";
 export default function Home() {
   return (
     <>
-      <div className="lg:px-10  container mx-auto">
+      <div className="lg:px-10  ">
         <ToastContainer />
         <NavBarHome />
         <HeaderHome />
