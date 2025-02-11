@@ -4,9 +4,9 @@
 // import { useUserStore } from "@/store/userStore";
 // import { User } from "@/types/user";
 
-import { User } from "@/types/user";
-import axios from "axios";
-import { cookies } from "next/headers";
+// import { User } from "@/types/user";
+// import axios from "axios";
+// import { cookies } from "next/headers";
 
 const HomePage = async () => {
   //with cilent componenet
@@ -32,28 +32,28 @@ const HomePage = async () => {
   //   );
   // }
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  // const cookieStore = await cookies();
+  // const token = cookieStore.get("token")?.value;
 
-  let user: User;
+  // let user: User;
 
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      user = res.data.user;
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // const fetchUser = async () => {
+  //   try {
+  //     const res = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     user = res.data.user;
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
-  await fetchUser();
+  // await fetchUser();
 
 
 
