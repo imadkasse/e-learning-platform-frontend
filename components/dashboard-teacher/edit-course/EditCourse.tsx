@@ -52,7 +52,6 @@ const EditCourse = ({ id }: Props) => {
 
   const loadingUser = useUserStore((state) => state.loading);
 
-  const user = useUserStore((state) => state.user);
 
   const [course, setCourse] = useState<Course>();
 
@@ -119,24 +118,7 @@ const EditCourse = ({ id }: Props) => {
     return <Spinner />;
   }
 
-  //return this if the user is Not authenticated
-  if (!token || user?.role !== "teacher") {
-    return (
-      <div className="bg-wygColor flex flex-col justify-center rounded-xl px-4 py-5 h-[100vh] ">
-        <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor ">
-          أنت غير مسجل أو لا تملك الصلاحية للوصول الى هذه الصفحة
-        </h1>
-        <div className="mt-5 flex justify-center ">
-          <Link
-            href={"/login"}
-            className="apply-fonts-normal py-2 px-4  bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white rounded-lg"
-          >
-            سجل الدخول من هنا
-          </Link>
-        </div>
-      </div>
-    );
-  }
+
 
   const handleImageCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;

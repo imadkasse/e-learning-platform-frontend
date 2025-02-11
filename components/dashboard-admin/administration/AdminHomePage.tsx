@@ -41,7 +41,7 @@ const AdminHomePage = () => {
   }, [token, setLoading, setUsers]);
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll ">
+    <div className="lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll  ">
       <div className="mb-5 flex items-center lg:gap-6 ">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الإدارة </h1>
 

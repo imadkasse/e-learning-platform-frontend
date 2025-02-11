@@ -55,17 +55,10 @@ const HomePage = async () => {
 
   await fetchUser();
 
-  //@ts-expect-error: fix afte time in user
-  if (!token || user?.role !== "teacher") {
-    return (
-      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-screen ">
-        You are not logged in.
-      </div>
-    );
-  }
+
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-screen ">
+    <div className="bg-wygColor lg:custom-width h-[94vh] rounded-xl px-4 py-5 overflow-y-scroll">
       HomePage Teacher
     </div>
   );

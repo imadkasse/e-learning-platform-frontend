@@ -44,7 +44,7 @@ const Support = () => {
   }, [token, faqs, setFaqs]);
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll relative">
+    <div className=" lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll relative">
       <h1 className="apply-fonts-normal text-2xl font-semibold ">الرسائل</h1>
       <div className=" grid grid-cols-1 mt-7">
         {faqs?.length === 0 ? (

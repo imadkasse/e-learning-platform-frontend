@@ -43,53 +43,49 @@ const Students = () => {
   }, [token, currentPage, setUsers, setLoading]);
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll relative ">
+    <div className=" lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll relative ">
       <div className="mb-5 flex items-center gap-6">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الطلاب</h1>
         <SearchUsers />
       </div>
       <div className="">
-        <div className="w-full rounded-lg  py-4 px-8 mb-4">
-          <table className="table-auto w-full">
-            <thead className="bg-mainColor text-white ">
+        <div className="overflow-x-auto w-full">
+          <table className="min-w-full border border-gray-300 rounded-lg">
+            <thead className="bg-mainColor text-white">
               <tr className="text-center">
-                <th className="apply-fonts-normal py-2 ">التلميذ</th>
-                <th className="apply-fonts-normal py-2">تاريخ</th>
-                <th className="apply-fonts-normal py-2">العمليات</th>
+                <th className="py-2 px-4 apply-fonts-normal">التلميذ</th>
+                <th className="py-2 px-4 apply-fonts-normal">تاريخ</th>
+                <th className="py-2 px-4 apply-fonts-normal">العمليات</th>
               </tr>
             </thead>
-            <tbody className="">
+            <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-4">
+                  <td colSpan={3} className="text-center py-4">
                     <Spinner />
                   </td>
                 </tr>
+              ) : users?.length > 0 ? (
+                users.map((user) => (
+                  <tr key={user._id} className="border-b">
+                    <td colSpan={3} className="px-4 py-2">
+                      <StudentCard
+                        studentImg={user.thumbnail || "/imgs/logoImg.png"}
+                        studentName={user.username}
+                        studentEmail={user.email}
+                        studentJoinDate={user.createdAt?.split("T")[0]}
+                        studentId={user._id}
+                        studentStatus={user.active}
+                      />
+                    </td>
+                  </tr>
+                ))
               ) : (
-                <>
-                  {users?.length > 0 ? (
-                    users.map((user) => (
-                      <tr key={user._id} className="">
-                        <td colSpan={4} className="">
-                          <StudentCard
-                            studentImg={user.thumbnail || "/imgs/logoImg.png"}
-                            studentName={user.username}
-                            studentEmail={user.email}
-                            studentJoinDate={user.createdAt?.split("T")[0]}
-                            studentId={user._id}
-                            studentStatus={user.active}
-                          />
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={3} className="text-center py-4">
-                        لا يوجد أي مستخدمين
-                      </td>
-                    </tr>
-                  )}
-                </>
+                <tr>
+                  <td colSpan={3} className="text-center py-4">
+                    لا يوجد أي مستخدمين
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

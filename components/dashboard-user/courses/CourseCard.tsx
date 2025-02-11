@@ -24,7 +24,7 @@ const CourseCard = ({
   courseId,
 }: Props) => {
   return (
-    <div className="my-1 shadow shadow-gray-400 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg  ">
+    <div className="my-1 drop-shadow-md border  w-full  border-gray-200   flex flex-col justify-between px-3 py-4   ">
       <div className="w-full flex ">
         <Image
           src={courseImg}
@@ -46,28 +46,28 @@ const CourseCard = ({
         </h1>
       </div>
 
-      <div className="flex items-center justify-between gap-5 my-1 ">
+      <div className="flex flex-wrap items-center justify-between gap-5 my-1 ">
         <div className="flex gap-1 items-center">
-          <div className="text-mainColor">
-            <PlayLesson />
+          <div className="text-mainColor text-lg">
+            <PlayLesson fontSize="inherit"/>
           </div>
-          <div className="flex items-center">
-            <span className="apply-fonts-normal">دروس</span>
+          <div className="flex items-center lg:text-sm text-[13px]">
+            <span className="apply-fonts-normal ">دروس</span>
             <p>:{numberOfVideo}</p>
           </div>
         </div>
-        <div className="flex gap-1 items-center">
-          <div className="text-mainColor">
+        <div className="flex gap-1 ">
+          <div className="text-mainColor flex items-center gap-1">
             <PeopleOutlineOutlined />
+            <span className="lg:text-sm text-black text-[15px]">{students}</span>
           </div>
           <div className="flex items-center">
-            <span className="">{students}</span>
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between  my-1">
+      <div className="flex flex-wrap items-center justify-between  my-1">
         <div className="py-1">
-          <p className="font-medium " dir="ltr">
+          <p className="font-medium lg:text-sm  text-[14px]" dir="ltr">
             {coursePrice === 0 ? "مجانا" : `${coursePrice}DA`}
           </p>
         </div>
@@ -78,14 +78,14 @@ const CourseCard = ({
             value={courseRating}
             precision={0.5}
             dir="ltr"
-            className="text-courseIconsSection"
+            className="text-courseIconsSection lg:text-lg text-[15px]"
           />
         </div>
       </div>
       <div className="flex items-center justify-center mt-2">
         <Link
           href={`/course-overview/${courseId}`}
-          className="w-full text-center apply-fonts-normal bg-mainColor hoverEle hover:bg-mainColorHoverLight text-lg py-2 px-4 rounded-lg text-white"
+          className="w-full text-center apply-fonts-normal bg-mainColor hoverEle hover:bg-mainColorHoverLight lg:text-sm text-[14px] py-2 px-2 lg:px-4 rounded-lg text-white"
         >
           تفاصيل الدوراة
         </Link>

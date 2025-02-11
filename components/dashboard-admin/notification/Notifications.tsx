@@ -3,7 +3,7 @@ import NotificationCard from "./NotificationCard";
 
 const Notifcations = () => {
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 ">
+    <div className="h-[94vh] lg:custom-width rounded-xl px-4 py-5 ">
       <div className="mb-5">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">إشعارتك</h1>
       </div>

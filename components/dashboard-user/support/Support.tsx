@@ -7,7 +7,6 @@ import showToast from "@/utils/showToast";
 import { CloseOutlined } from "@mui/icons-material";
 import MsgCard from "./MsgCard";
 import { useFaq } from "@/store/faqStore";
-import Link from "next/link";
 import Spinner from "@/components/spinner/Spinner";
 import { useUserStore } from "@/store/userStore";
 
@@ -16,7 +15,7 @@ const socket = io("https://e-leraning-backend.onrender.com"); // تأكد من �
 
 const Support = () => {
   const token = Cookies.get("token");
-  const { loading, user } = useUserStore();
+  const { loading } = useUserStore();
   const [subject, setSubject] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [showAddFaq, setShowAddFaq] = useState<boolean>(false);
@@ -100,27 +99,9 @@ const Support = () => {
     );
   }
 
-  if (!token || user.role !== "student") {
-    return (
-      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
-        <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor ">
-          أنت غير مسجل أو لا تملك الصلاحية للوصول الى هذه الصفحة
-        </h1>
-        <div className="mt-5 flex justify-center ">
-          <Link
-            href={"/login"}
-            className="apply-fonts-normal py-2 px-4  bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white rounded-lg"
-          >
-            سجل الدخول من هنا
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 min-h-screen relative">
-      <div className="w-full border-b-2 pb-3 flex items-center justify-between sticky top-0 bg-wygColor">
+    <div className=" lg:custom-width rounded-xl px-4  h-[93vh] relative overflow-y-scroll">
+      <div className="w-full border-b-2 pb-3 mt-2 flex items-center justify-between sticky top-0 bg-white ">
         <h1 className="apply-fonts-normal text-xl">الردود</h1>
         <button
           onClick={() => {

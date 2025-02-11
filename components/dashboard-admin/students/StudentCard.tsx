@@ -87,8 +87,8 @@ const StudentCard = ({
 
   return (
     <>
-      <div className="xs:flex-col xs:gap-3 sm:flex-row py-4 px-8 rounded-lg shadow-sm shadow-mainColor flex items-center justify-between my-2">
-        <div className="flex  items-center gap-4 justify-center w-full">
+      <div className="xs:flex-col xs:flex-wrap md:flex-nowrap xs:gap-3 sm:flex-row py-4 px-8 rounded-lg shadow-sm shadow-mainColor flex items-center justify-between my-2">
+        <div className="flex flex-wrap  items-center gap-4 justify-center w-full">
           <div>
             <Image
               src={studentImg}
@@ -98,7 +98,7 @@ const StudentCard = ({
               className="w-14 h-14 rounded-full"
             />
           </div>
-          <div>
+          <div className="">
             <h1 className="apply-fonts-normal text-lg">{studentName}</h1>
             <h1 className="text-gray-500">{studentEmail}</h1>
           </div>
@@ -108,7 +108,7 @@ const StudentCard = ({
           <p className="text-xl">{studentJoinDate}</p>
         </div>
 
-        <div className="flex gap-2 w-full justify-center">
+        <div className="flex  gap-2 w-full justify-center">
           <button
             onClick={() => {
               setShowDelete(!showDelete);

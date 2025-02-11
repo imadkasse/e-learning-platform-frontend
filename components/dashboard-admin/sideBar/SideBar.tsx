@@ -1,4 +1,5 @@
 "use client";
+import { useUserStore } from "@/store/userStore";
 import {
   ArrowBackIos,
   ArrowForwardIos,
@@ -11,9 +12,10 @@ import {
   SettingsOutlined,
   SupervisorAccountOutlined,
 } from "@mui/icons-material";
+import Cookies from "js-cookie";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const SideBar = () => {
@@ -22,13 +24,33 @@ const SideBar = () => {
     setToggleSidebar(!toggleSidebar);
   };
   const pathName = usePathname();
+  const router = useRouter();
+  const { setUser } = useUserStore();
+
+  const handleLogout = () => {
+    Cookies.remove("token");
+    setUser({
+      _id: "",
+      username: "",
+      email: "",
+      role: null,
+      active: false,
+      progress: [],
+      thumbnail: "",
+      enrolledCourses: [],
+      phoneNumber: "",
+      publishedCourses: [],
+      notifications: [],
+    });
+    router.push("/");
+  };
   return (
     <>
       {/* in the small screen */}
       <div
-        className={`bg-sideBarBgColo text-white py-4   mb-2 px-3 rounded-xl h-screen transition-all duration-300 ease-in-out ${
+        className={`bg-sideBarBgColo text-white py-4 h-[94vh] mb-2 px-3 rounded-xl  transition-all duration-300 ease-in-out ${
           toggleSidebar ? `w-[300px] ` : `w-[0px]`
-        }  lg:hidden sm:sticky xs:fixed xs:z-50 top-2 xs:right-0  xs:flex flex-col justify-between`}
+        }  lg:hidden sm:sticky xs:fixed xs:z-50 top-2 xs:right-3  xs:flex flex-col justify-between `}
       >
         <button
           onClick={handleToggle}
@@ -59,10 +81,10 @@ const SideBar = () => {
             </Link>
           </div>
           <nav className="apply-fonts-normal w-full  flex justify-center">
-            <div className="list-none text-base w-[200px]">
+            <div className="list-none text-[14px] w-[200px]">
               <Link
                 href={`/dashboard-admin`}
-                className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                   pathName === "/dashboard-admin" ? "bg-mainColor/50" : ""
                 }  my-2`}
               >
@@ -71,7 +93,7 @@ const SideBar = () => {
               </Link>
               <Link
                 href={`/dashboard-admin/courses`}
-                className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                   pathName === "/dashboard-admin/courses"
                     ? "bg-mainColor/50"
                     : ""
@@ -82,7 +104,7 @@ const SideBar = () => {
               </Link>
               <Link
                 href={`/dashboard-admin/students`}
-                className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                   pathName === "/dashboard-admin/students"
                     ? "bg-mainColor/50"
                     : ""
@@ -93,7 +115,7 @@ const SideBar = () => {
               </Link>
               <Link
                 href={`/dashboard-admin/administration`}
-                className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                   pathName === "/dashboard-admin/administration"
                     ? "bg-mainColor/50"
                     : ""
@@ -104,7 +126,7 @@ const SideBar = () => {
               </Link>
               <Link
                 href={`/dashboard-admin/notification`}
-                className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                   pathName === "/dashboard-admin/notification"
                     ? "bg-mainColor/50"
                     : ""
@@ -124,7 +146,7 @@ const SideBar = () => {
           <ul className="list-none text-base w-[200px]">
             <Link
               href={`/dashboard-admin/support`}
-              className={` flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 ${
+              className={` flex items-center gap-5 py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 ${
                 pathName === "/dashboard-admin/support" ? "bg-mainColor/50" : ""
               } my-2`}
             >
@@ -133,23 +155,23 @@ const SideBar = () => {
             </Link>
             <Link
               href={`/`}
-              className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2"
+              className=" flex items-center gap-5 py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2"
             >
               <SettingsOutlined />
               <p>الإعدادات</p>
             </Link>
-            <Link
-              href={`/`}
-              className=" flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
+            <button
+              onClick={handleLogout}
+              className=" flex items-center gap-5 py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
             >
               <LogoutOutlined className="text-red-700" />
               <p>تسجيل الخروج</p>
-            </Link>
+            </button>
           </ul>
         </nav>
       </div>
       {/* in the large screen */}
-      <div className="bg-sideBarBgColo text-white py-2  px-3 rounded-xl h-screen lg:w-[300px]  xs:hidden lg:sticky lg:top-2  lg:flex flex-col justify-between">
+      <div className="bg-sideBarBgColo text-white py-2  px-3 rounded-xl min-h-[94vh] lg:w-[300px]  xs:hidden lg:sticky lg:top-2  lg:flex flex-col justify-between">
         <div>
           <div className="w-full flex justify-center mb-1">
             <Link
@@ -163,16 +185,16 @@ const SideBar = () => {
                 width={150}
                 height={150}
               />
-              <h1 className="md:text-xl xs:text-base font-semibold xs:hidden lg:block">
+              <h1 className="lg:text-[15px] font-semibold xs:hidden lg:block">
                 Sience Academie
               </h1>
             </Link>
           </div>
           <nav className="apply-fonts-normal w-full  flex justify-center">
-            <div className="list-none text-base w-[200px]">
+            <div className="list-none text-[14px] w-[200px]">
               <Link
                 href={`/dashboard-admin`}
-                className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                   pathName === "/dashboard-admin" ? "bg-mainColor/50" : ""
                 }  my-2`}
               >
@@ -181,7 +203,7 @@ const SideBar = () => {
               </Link>
               <Link
                 href={`/dashboard-admin/courses`}
-                className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                   pathName === "/dashboard-admin/courses"
                     ? "bg-mainColor/50"
                     : ""
@@ -192,7 +214,7 @@ const SideBar = () => {
               </Link>
               <Link
                 href={`/dashboard-admin/students`}
-                className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                   pathName === "/dashboard-admin/students"
                     ? "bg-mainColor/50"
                     : ""
@@ -203,7 +225,7 @@ const SideBar = () => {
               </Link>
               <Link
                 href={`/dashboard-admin/administration`}
-                className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                   pathName === "/dashboard-admin/administration"
                     ? "bg-mainColor/50"
                     : ""
@@ -214,7 +236,7 @@ const SideBar = () => {
               </Link>
               <Link
                 href={`/dashboard-admin/notification`}
-                className={`flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                className={`flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                   pathName === "/dashboard-admin/notification"
                     ? "bg-mainColor/50"
                     : ""
@@ -230,7 +252,7 @@ const SideBar = () => {
           <div className="list-none text-base w-[200px] ">
             <Link
               href={`/dashboard-admin/support`}
-              className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+              className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                 pathName === "/dashboard-admin/support" ? "bg-mainColor/50" : ""
               } my-2`}
             >
@@ -239,7 +261,7 @@ const SideBar = () => {
             </Link>
             <Link
               href={`/dashboard-admin/settings`}
-              className={` flex items-center justify-between py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+              className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                 pathName === "/dashboard-admin/settings"
                   ? "bg-mainColor/50"
                   : ""
@@ -248,13 +270,13 @@ const SideBar = () => {
               <SettingsOutlined />
               <p>الإعدادات</p>
             </Link>
-            <Link
-              href={`/`}
-              className="group flex items-center justify-between py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
+            <button
+              onClick={handleLogout}
+              className="group flex items-center gap-4 py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
             >
               <LogoutOutlined className="text-red-700 hoverEle group-hover:text-white" />
               <p>تسجيل الخروج</p>
-            </Link>
+            </button>
           </div>
         </nav>
       </div>

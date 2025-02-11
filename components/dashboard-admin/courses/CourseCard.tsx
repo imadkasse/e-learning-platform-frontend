@@ -57,7 +57,7 @@ const CourseCard = ({
 
   return (
     <>
-      <div className="my-3 shadow shadow-gray-400 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg">
+      <div className="my-3 drop-shadow-md border   flex flex-col justify-between px-3 py-4 rounded-lg">
         <div className="w-full flex ">
           <Image
             src={courseImg}
@@ -68,11 +68,11 @@ const CourseCard = ({
           />
         </div>
 
-        <div className="mt-3">
+        <div className="mt-1">
           <h1 className="apply-fonts-medium text-base">{courseName} </h1>
         </div>
 
-        <div className="flex items-center justify-between gap-5 my-3 ">
+        <div className="flex flex-wrap items-center justify-between  my-3 ">
           <div className="flex gap-1 items-center">
             <div className="text-mainColor">
               <PlayLesson />
@@ -93,22 +93,22 @@ const CourseCard = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex flex-wrap  items-center justify-between mt-4">
           <button
             onClick={() => {
               setOpenModal(true);
             }}
-            className={`apply-fonts-normal  text-lg py-2 px-4 rounded-lg text-white  bg-redColor hoverEle hover:bg-redColorHoverLight`}
+            className={`apply-fonts-normal  text-sm py-2 px-4 rounded-lg text-white  bg-redColor hoverEle hover:bg-redColorHoverLight`}
           >
-            حذف الدورة
+            حذف
           </button>
           <p className="text-xl uppercase font-light" dir="ltr">
-            {coursePrice}.00 da
+            {coursePrice === 0 ? "مجانا" : coursePrice + "Da"}
           </p>
         </div>
       </div>
       {openModal && (
-        <div className="fixed top-0 left-0 w-full h-full  bg-black/50 ">
+        <div className="fixed top-0 left-0 z-30 w-full h-full  bg-black/50 ">
           <div className="flex flex-col justify-center items-center w-full h-full">
             <div className="bg-white p-5 rounded-lg shadow-lg ">
               <h1 className="apply-fonts-normal text-lg font-semibold mb-4">

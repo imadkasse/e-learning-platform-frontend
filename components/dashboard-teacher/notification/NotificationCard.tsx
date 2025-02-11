@@ -19,7 +19,7 @@ const NotificationCard = ({
   courseId,
 }: Props) => {
   return (
-    <div className="w-full my-3 shadow shadow-gray-400 bg-wygColor  flex gap-4 items-center  px-3 py-4 rounded-lg">
+    <div className="w-full my-3 drop-shadow-md border    flex gap-4 items-center  px-3 py-4 rounded-lg">
       <Link href={`/course/${courseId}`}>
         <Image
           src={notifcationImg}

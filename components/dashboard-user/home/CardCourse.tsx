@@ -20,7 +20,7 @@ const CardCourse = ({
   progresBar,
 }: Props) => {
   return (
-    <div className="my-3 shadow shadow-gray-400 bg-wygColor  flex flex-col justify-between px-3 py-4 rounded-lg">
+    <div className="my-1 drop-shadow-md border  w-full h-full  border-gray-200   flex flex-col justify-between   px-3 py-4   ">
       <div className="w-full flex ">
         <Image
           src={courseImg}
@@ -30,12 +30,11 @@ const CardCourse = ({
           className="rounded-lg w-full h-full"
         />
       </div>
-
       <div className="mt-1">
         <h1 className="apply-fonts-medium text-base">{courseName} </h1>
       </div>
 
-      <div className="flex items-center gap-5 my-3 ">
+      <div className="flex flex-wrap items-center justify-between gap-5 my-3 ">
         <div className="flex gap-1 items-center">
           <div className="text-mainColor">
             <PlayLesson />
@@ -63,14 +62,14 @@ const CardCourse = ({
             style={{ width: `${progresBar}%` }}
           ></div>
         </div>
-      </div>
 
-      <Link
-        href={courseUrl}
-        className="apply-fonts-normal mt-2 bg-mainColor hoverEle hover:bg-mainColorHoverLight w-full  text-lg text-center py-2 px-4 rounded-lg text-white"
-      >
-        متابعة
-      </Link>
+        <Link
+          href={courseUrl}
+          className="w-full block border apply-fonts-normal mt-2 bg-mainColor hoverEle hover:bg-mainColorHoverLight  text-lg text-center py-2 px-4 rounded-full text-white"
+        >
+          متابعة
+        </Link>
+      </div>
     </div>
   );
 };

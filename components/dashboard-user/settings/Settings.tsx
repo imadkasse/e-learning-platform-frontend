@@ -3,7 +3,6 @@ import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import React, { FormEvent, useState } from "react";
 import Cookies from "js-cookie";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
@@ -28,29 +27,13 @@ const Settings = () => {
 
   if (loading) {
     return (
-      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[93vh] ">
         <Spinner />
       </div>
     );
   }
 
-  if (!token || user.role !== "student") {
-    return (
-      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
-        <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor ">
-          أنت غير مسجل أو لا تملك الصلاحية للوصول الى هذه الصفحة
-        </h1>
-        <div className="mt-5 flex justify-center ">
-          <Link
-            href={"/login"}
-            className="apply-fonts-normal py-2 px-4  bg-mainColor hover:bg-mainColorHoverLight hoverEle text-white rounded-lg"
-          >
-            سجل الدخول من هنا
-          </Link>
-        </div>
-      </div>
-    );
-  }
+
 
   const handelupdate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -85,7 +68,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] overflow-y-scroll">
+    <div className=" lg:custom-width rounded-xl px-4 py-5 h-[93vh]  overflow-y-scroll">
       <div className="mb-5">
         <h1 className="apply-fonts-normal text-2xl font-semibold">
           إعدادات الحساب

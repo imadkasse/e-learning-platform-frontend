@@ -3,7 +3,7 @@ import React from "react";
 
 const page = () => {
   return (
-    <div className="py-3 container mx-auto ">
+    <div className="px-3 h-full container mx-auto ">
       <HomePage />
     </div>
   );

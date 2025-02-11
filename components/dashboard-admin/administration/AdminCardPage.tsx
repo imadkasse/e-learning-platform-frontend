@@ -96,19 +96,19 @@ const AdminCardPage = ({
   };
   return (
     <>
-      <div className="xs:flex-col xs:items-center xs:gap-3 sm:flex-row py-4 px-8 rounded-lg my-2 shadow-sm  shadow-mainColor flex items-center justify-between">
+      <div className="xs:flex-col  xs:items-center xs:gap-3 sm:flex-row py-4 px-8 rounded-lg my-2 shadow-sm  shadow-mainColor flex items-center justify-between">
         <div className="w-full text-center ">
           <h1 className="apply-fonts-normal text-lg">{userRole}</h1>
         </div>
 
-        <div className="flex  items-center gap-3 w-full ">
+        <div className="flex xs:flex-col md:flex-row  items-center gap-3 w-full ">
           <div>
             <Image
               src={userImg}
               width={100}
               height={100}
               alt="userImg"
-              className=" w-12 h-12   rounded-full"
+              className=" w-12 h-12    rounded-full"
             />
           </div>
           <div className="">

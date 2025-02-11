@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useCoursesStore } from "@/store/coursesStore";
-import { Close, PeopleOutlineOutlined, PlayLesson } from "@mui/icons-material";
+import { PeopleOutlineOutlined, PlayLesson } from "@mui/icons-material";
 import { Rating } from "@mui/material";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -64,7 +64,7 @@ const CourseCard = ({
 
   return (
     <>
-      <div className="my-3 shadow shadow-gray-400 bg-wygColor  flex flex-col max-h-[80vh]  justify-between px-3 py-4 rounded-lg">
+      <div className="my-3 drop-shadow-md border   flex flex-col max-h-[80vh]  justify-between px-3 py-4 rounded-lg">
         <Link href={`/course/${courseId}`}>
           <div className="relative min-w-full max-w-sm ">
             <Image
@@ -89,7 +89,7 @@ const CourseCard = ({
           </h1>
         </div>
 
-        <div className="flex items-center justify-between  ">
+        <div className="flex flex-wrap items-center justify-between  ">
           <div className="flex gap-1 items-center">
             <div className="text-mainColor">
               <PlayLesson />
@@ -108,10 +108,10 @@ const CourseCard = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-between  my-2">
+        <div className="flex flex-wrap items-center justify-between  my-2">
           <div className="py-1">
             <p className="font-medium " dir="ltr">
-              {coursePrice}DA
+              {coursePrice === 0 ? "مجانا" : coursePrice + "DA"}
             </p>
           </div>
 
@@ -126,38 +126,26 @@ const CourseCard = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex flex-wrap items-center justify-between mt-4 gap-3">
           <button
             onClick={() => {
               setisOpen(!isOpen);
             }}
-            className="xs:text-[12px] xl:text-lg apply-fonts-normal bg-redColor hoverEle hover:bg-redColorHoverLight py-2 px-4 rounded-lg text-white"
+            className="xs:text-[12px] flex-1 xl:text-lg apply-fonts-normal bg-redColor hoverEle hover:bg-redColorHoverLight py-2 px-4 rounded-lg text-white"
           >
-            حذف الدوراة
+            حذف
           </button>
           <Link
             href={`/edit-course/${courseId}`}
-            className="xs:text-[12px] xl:text-lg apply-fonts-normal bg-mainColor hoverEle hover:bg-mainColorHoverLigh py-2 px-2 rounded-lg text-white"
+            className="text-center xs:text-[12px] flex-1 xl:text-lg apply-fonts-normal bg-mainColor hoverEle hover:bg-mainColorHoverLight py-2 px-4 rounded-lg text-white"
           >
-            تعديل الدوراة
+            تعديل
           </Link>
         </div>
       </div>
       {isOpen && (
-        <div className="fixed top-0 left-0 lg:custom-width rounded-xl h-[100vh] px-4 my-3  z-10 bg-black/50 flex items-center justify-center">
-          <div className=" apply-fonts-normal bg-white w-80 z-10 rounded-lg">
-            <button
-              onClick={() => {
-                setisOpen(false);
-              }}
-              className=""
-            >
-              <Close
-                fontSize="medium"
-                className="text-redColor hoverEle hover:text-redColorHoverLight"
-              />
-            </button>
-
+        <div className="fixed top-0 left-0 w-full rounded-xl h-[100vh] px-4 my-3  z-10 bg-black/50 flex items-center justify-center">
+          <div className=" py-2 apply-fonts-normal bg-white w-80 z-10 rounded-lg">
             <p className="text-center">هل أنت متأكد من حذف هذه الدورة</p>
             <div className="flex justify-center gap-4 mt-4 mb-2">
               <button

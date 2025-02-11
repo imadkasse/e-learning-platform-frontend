@@ -1,16 +1,15 @@
 "use client";
 import { useCoursesStore } from "@/store/coursesStore";
 import showToast from "@/utils/showToast";
-import React, {  FormEvent, useState } from "react";
+import React, { FormEvent, useState } from "react";
 
 const SearchCourse = () => {
   const [searchData, setsearchData] = useState<string>("");
-  const { setCourses, setLoading } = useCoursesStore();
+  const { setCourses } = useCoursesStore();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      setLoading(true);
       if (searchData !== "") {
         const data = await fetch(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCourses?query=${searchData}`
@@ -27,8 +26,6 @@ const SearchCourse = () => {
     } catch (error) {
       //@ts-expect-error:fix...
       showToast("error", error.response.data.message);
-    } finally {
-      setLoading(false);
     }
   };
   return (
@@ -56,11 +53,10 @@ const SearchCourse = () => {
           <input
             type="text"
             id="simple-search"
-            value={searchData}
             onChange={(e) => {
               setsearchData(e.target.value);
             }}
-            className="apply-fonts-normal  block w-full ps-10 p-2.5  rounded-3xl   focus:border-red-400 "
+            className="apply-fonts-normal bg-wygColor block w-full ps-10 p-2.5  rounded-3xl   focus:border-red-400 "
             placeholder="البحث..."
           />
         </div>

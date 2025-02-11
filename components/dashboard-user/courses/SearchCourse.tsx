@@ -33,9 +33,9 @@ const SearchCourse = () => {
   };
   return (
     <>
-      <form className="flex items-center flex-grow" onSubmit={handelSearch}>
+      <form className="flex items-center flex-grow " onSubmit={handelSearch} >
         <label className="sr-only">Search</label>
-        <div className="relative w-full">
+        <div className="relative w-full ">
           <div className="absolute  inset-y-0 start-0 flex items-center ps-3 pointer-events-none  ">
             <svg
               className="w-4 h-4 text-gray-400"
@@ -56,7 +56,7 @@ const SearchCourse = () => {
           <input
             type="text"
             id="simple-search"
-            className="apply-fonts-normal  block w-full ps-10 p-2.5  rounded-3xl   focus:border-red-400 "
+            className="apply-fonts-normal bg-wygColor  block w-full ps-10 p-2.5  rounded-3xl   focus:border-red-400 "
             onChange={(e) => {
               setQuery(e.target.value);
             }}

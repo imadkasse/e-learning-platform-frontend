@@ -49,7 +49,7 @@ const SearchCourseTeacher = () => {
         <div className="relative ">
           <input
             type="text"
-            className="w-full py-2.5 px-3 rounded-xl border-courseTextSection"
+            className="w-full py-2.5 px-3 rounded-xl border-courseTextSection bg-wygColor "
             onChange={(e) => {
               setQuery(e.target.value);
             }}
