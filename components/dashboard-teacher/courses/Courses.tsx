@@ -49,7 +49,7 @@ const Courses = () => {
   }
 
   return (
-    <div className=" lg:custom-width rounded-xl px-4 py-5 h-[93vh] overflow-y-scroll relative">
+    <div className=" lg:custom-width rounded-xl px-4 py-5  overflow-y-scroll relative h-[93vh]">
       <div className="mb-5 flex items-center gap-6 ">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الدورات</h1>
         <section className="flex items-center flex-grow ">

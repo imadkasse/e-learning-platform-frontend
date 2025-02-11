@@ -49,7 +49,7 @@ const NavBarHome = () => {
   };
 
   return (
-    <div className="h-[80px] flex items-center justify-around  ">
+    <div className="h-[80px] flex items-center justify-around  sticky top-0 z-50 bg-white w-full">
       <Link href={`/`} className="flex items-center flex-row-reverse  md:gap-3">
         <Image
           src="/imgs/logoImg.png"

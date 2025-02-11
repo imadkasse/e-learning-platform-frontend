@@ -96,12 +96,12 @@ const AdminCardPage = ({
   };
   return (
     <>
-      <div className="xs:flex-col  xs:items-center xs:gap-3 sm:flex-row py-4 px-8 rounded-lg my-2 shadow-sm  shadow-mainColor flex items-center justify-between">
+      <div className="xs:flex-col xs:flex-wrap lg:flex-nowrap  xs:items-center xs:gap-3 sm:flex-row py-4 px-8 rounded-lg my-2 shadow-sm  shadow-mainColor flex items-center justify-between">
         <div className="w-full text-center ">
           <h1 className="apply-fonts-normal text-lg">{userRole}</h1>
         </div>
 
-        <div className="flex xs:flex-col md:flex-row  items-center gap-3 w-full ">
+        <div className="flex xs:flex-col md:flex-row justify-center items-center gap-3 w-full ">
           <div>
             <Image
               src={userImg}
@@ -112,14 +112,14 @@ const AdminCardPage = ({
             />
           </div>
           <div className="">
-            <h1 className="apply-fonts-normal lg:text-lg">{userName}</h1>
+            <h1 className="apply-fonts-normal lg:text-lg text-center">{userName}</h1>
             <h1 className="text-gray-500 xs:block sm:hidden xl:block">
               {userEmail}
             </h1>
           </div>
         </div>
 
-        <div className="w-full ">
+        <div className="w-full text-center ">
           <p className="md:text-xl ">{userJoinDate}</p>
         </div>
 

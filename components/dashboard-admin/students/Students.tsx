@@ -50,7 +50,7 @@ const Students = () => {
       </div>
       <div className="">
         <div className="overflow-x-auto w-full">
-          <table className="min-w-full border border-gray-300 rounded-lg">
+          <table className="min-w-full   rounded-lg">
             <thead className="bg-mainColor text-white">
               <tr className="text-center">
                 <th className="py-2 px-4 apply-fonts-normal">التلميذ</th>
@@ -67,7 +67,7 @@ const Students = () => {
                 </tr>
               ) : users?.length > 0 ? (
                 users.map((user) => (
-                  <tr key={user._id} className="border-b">
+                  <tr key={user._id} className="">
                     <td colSpan={3} className="px-4 py-2">
                       <StudentCard
                         studentImg={user.thumbnail || "/imgs/logoImg.png"}

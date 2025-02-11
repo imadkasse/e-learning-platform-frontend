@@ -25,7 +25,7 @@ export default async function RootLayout({
   }
   return (
     <>
-      <div className="flex gap-3 p-[20px] h-screen">
+      <div className="flex gap-3 p-[20px] h-screen  ">
         <SideBar />
         <ToastContainer />
         <main className="flex-1">

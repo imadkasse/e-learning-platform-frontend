@@ -16,7 +16,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" dir="rtl">
-      <body className={` antialiased`}>
+      <body className={` antialiased `}>
         {children}
         {/* <Footer /> */}
       </body>

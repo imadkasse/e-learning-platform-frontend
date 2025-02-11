@@ -87,7 +87,7 @@ const StudentCard = ({
 
   return (
     <>
-      <div className="xs:flex-col xs:flex-wrap md:flex-nowrap xs:gap-3 sm:flex-row py-4 px-8 rounded-lg shadow-sm shadow-mainColor flex items-center justify-between my-2">
+      <div className="xs:flex-col xs:flex-wrap lg:flex-nowrap xs:gap-3 sm:flex-row py-4 px-8 rounded-lg shadow-sm shadow-mainColor flex items-center justify-between my-2">
         <div className="flex flex-wrap  items-center gap-4 justify-center w-full">
           <div>
             <Image
