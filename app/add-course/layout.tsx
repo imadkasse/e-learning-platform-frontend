@@ -20,8 +20,8 @@ export default async function AddCourseLayout({
   }
   return (
     <div className="p-4 flex flex-col gap-4">
-      <NavBarAddCourse />
       <ToastContainer />
+      <NavBarAddCourse />
       <div>
         <UserProvider user={user}>{children}</UserProvider>
       </div>

@@ -26,7 +26,9 @@ type Props = {
   courseVideos: Lesson[] | undefined;
 };
 
+
 const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
+  
   const token = Cookies.get("token");
   const pathname = usePathname();
 
@@ -96,6 +98,7 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
       setLoadingVideoId(null);
     }
   };
+  //! changed this (add sections)
   return (
     <>
       <button

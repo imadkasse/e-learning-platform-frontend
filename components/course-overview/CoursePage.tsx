@@ -106,6 +106,7 @@ export const CoursePage = ({ course }: Props) => {
           <div className="">
             <table className="table-auto w-full  ">
               <tbody>
+                {/* //! changed this (add sections) */}
                 {course.videos.map((video) => (
                   <tr
                     key={video._id}

@@ -1,455 +1,668 @@
 "use client";
-import Image from "next/image";
-import React, { useState, ChangeEvent, FormEvent } from "react";
-import Cookies from "js-cookie";
 import axios from "axios";
-import "react-toastify/dist/ReactToastify.css";
-import showToast from "@/utils/showToast";
-import { useUserStore } from "@/store/userStore";
-import Spinner from "@/components/spinner/Spinner";
+import Cookies from "js-cookie";
+import { X } from "lucide-react";
+import Image from "next/image";
+// components/CourseUploader.tsx
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 
-interface CourseDetails {
-  imageCover: File | null;
-  lessonName: string;
-  lessonVideo: File | null;
-  pdfFiles: File[];
-  courseTitle: string;
-  coursePrice: number;
-  courseDescription: string;
-  category: string;
-  lessonVideoName: string;
-  pdfFilesNames: string[];
-  concepts: string[];
+type AddSection = {
+  title: string;
+};
+type Section = {
+  _id: string;
+  title: string;
+};
+interface UploadedFile {
+  id: string;
+  title: string;
+  url: string;
+  size: number; // بالبايت
 }
 
-const Details: React.FC = () => {
-  // add protected
-  const token = Cookies.get("token");
-  const loadingUser = useUserStore((state) => state.loading);
+interface StepFilesProps {
+  courseId: string;
+}
+const baseUrl = process.env.NEXT_PUBLIC_BACK_URL;
+const token = Cookies.get("token");
+export default function CourseUploader() {
+  const [step, setStep] = useState(1);
+  const [newconcept, setNewConcept] = useState<string>("");
+  const [concepts, setConcepts] = useState<string[]>([]);
+  const [currentCourse, setCurrentCourse] = useState();
 
-
-  const [formData, setFormData] = useState<CourseDetails>({
-    imageCover: null,
-    lessonName: "",
-    lessonVideo: null,
-    pdfFiles: [],
-    lessonVideoName: "",
-    pdfFilesNames: [],
-    courseTitle: "",
-    coursePrice: 0,
-    courseDescription: "",
-    category: "",
-    concepts: [],
-  });
-  // دالة لإضافة مفهوم جديد
-  const handleAddConcept = (concept: string) => {
+  // concepts
+  const addConcept = (concept: string) => {
     if (concept.trim() === "") return;
-    setFormData((prevState) => ({
-      ...prevState,
-      concepts: [...prevState.concepts, concept],
-    }));
+    setConcepts((prev) => [...prev, concept]);
+  };
+  const removeConcept = (index: number) => {
+    setConcepts(
+      concepts.filter((concept: string, i: number) => {
+        return i !== index;
+      })
+    );
   };
 
-  // دالة لحذف مفهوم
-  const handleRemoveConcept = (index: number) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      concepts: prevState.concepts.filter((_, i) => i !== index),
-    }));
-  };
+  //sections
+  const [sections, setSections] = useState<AddSection[]>([]);
+  const [title, setTitle] = useState("");
 
-  // تخزين قيمة الإدخال الحالي للمفهوم
-  const [conceptInput, setConceptInput] = useState("");
+  const nextStep = () => setStep((prev) => Math.min(prev + 1, 4));
+  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
+  return (
+    <div className="bg-wygColor rounded-lg p-6 mt-1 ">
+      <section>
+        {/* Stepper */}
+        <div className="flex justify-between mb-8">
+          {["تفاصيل عامة", "الأقسام", "الفيديوهات", "الملفات"].map(
+            (label, index) => (
+              <div
+                key={index}
+                className={`flex-1 text-center apply-fonts-normal py-2 border-b-4 ${
+                  step === index + 1
+                    ? "border-[#3D45EE] text-[#3D45EE] font-bold"
+                    : "border-gray-200 text-gray-500"
+                }`}
+              >
+                {label}
+              </div>
+            )
+          )}
+        </div>
+        {/* Step Content */}
+        {step === 1 && (
+          <StepGeneralDetails
+            concepts={concepts}
+            setNewConcept={setNewConcept}
+            newconcept={newconcept}
+            addConcept={addConcept}
+            removeConcept={removeConcept}
+          />
+        )}
+        {step === 2 && (
+          <StepSections
+            sections={sections}
+            setSections={setSections}
+            title={title}
+            setTitle={setTitle}
+          />
+        )}
+        {step === 3 && <StepVideos sections={sections} />}
+        {step === 4 && <StepFiles courseId="//! change to currntCourse._id" />}
+      </section>
+
+      {/* Navigation */}
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={prevStep}
+          disabled={step === 1}
+          className="apply-fonts-normal px-4 py-2 bg-gray-200 rounded cursor-pointer hover:bg-gray-300 disabled:opacity-50"
+        >
+          رجوع
+        </button>
+        {step !== 4 ? (
+          <button
+            onClick={nextStep}
+            disabled={step === 4}
+            className="apply-fonts-normal px-4 py-2 bg-[#3D45EE] text-white rounded cursor-pointer hover:bg-[#2E36C0]"
+          >
+            التالي
+          </button>
+        ) : (
+          <button
+            onClick={nextStep}
+            disabled={step === 4}
+            className="apply-fonts-normal px-4 py-2 bg-[#3D45EE] text-white rounded cursor-pointer hover:bg-[#2E36C0]"
+          >
+            نشر
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Step 1 ---------------- */
+interface StepGeneralDetailsProps {
+  concepts: string[];
+  newconcept: string;
+  setNewConcept: Dispatch<SetStateAction<string>>;
+  addConcept: (concept: string) => void;
+  removeConcept: (index: number) => void;
+}
+function StepGeneralDetails({
+  concepts,
+  newconcept,
+  setNewConcept,
+  addConcept,
+  removeConcept,
+}: StepGeneralDetailsProps) {
   const [imageCoverPreview, setImageCoverPreview] = useState<string | null>(
     null
   );
-  const [loading, setLoading] = useState<boolean>(false);
-
-  if (loadingUser) {
-    return <Spinner />;
-  }
-
   const handleImageCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      setFormData((prev) => ({ ...prev, imageCover: file }));
       setImageCoverPreview(URL.createObjectURL(file));
     }
   };
-
-  const handleLessonVideoChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setFormData((prev) => ({
-      ...prev,
-      lessonVideo: file,
-      // @ts-expect-error:fix that agin
-      lessonVideoName: file.name, // تحديث اسم الفيديو
-    }));
-  };
-
-  const handlePdfFilesChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setFormData((prev) => ({
-      ...prev,
-      pdfFiles: files,
-      pdfFilesNames: files.map((file) => file.name), // تحديث أسماء ملفات PDF
-    }));
-  };
-
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    const courseData = new FormData();
-
-    if (formData.imageCover)
-      courseData.append("imageCover", formData.imageCover);
-    courseData.append("lessonTitle", formData.lessonName);
-    if (formData.lessonVideo) courseData.append("videos", formData.lessonVideo);
-    formData.pdfFiles.forEach((file) => courseData.append("files", file));
-    courseData.append("title", formData.courseTitle);
-    courseData.append("price", formData.coursePrice.toString());
-    courseData.append("description", formData.courseDescription);
-    courseData.append("category", formData.category);
-    formData.concepts.forEach((concept, index) => {
-      courseData.append(`concepts[${index}]`, concept);
-    });
-
-    setLoading(true);
+  const handleCreateCourse = async () => {
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`,
-        courseData,
+      const res = await axios.post(
+        `${baseUrl}/api/courses`,
+        {
+          //! info
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
           },
         }
       );
-      showToast("success", "تم نشر الدورة بنجاح");
-
-      setFormData({
-        imageCover: null,
-        lessonName: "",
-        lessonVideo: null,
-        pdfFiles: [],
-        lessonVideoName: "",
-        pdfFilesNames: [],
-        courseTitle: "",
-        coursePrice: 0,
-        courseDescription: "",
-        category: "",
-        concepts: [],
-      });
     } catch (error) {
-      //@ts-expect-error:fix
-      showToast("error", error.response.data.message);
+      console.log(error);
+    }
+  };
+  return (
+    <div className="space-y-4">
+      <input
+        type="text"
+        placeholder="عنوان الكورس"
+        className="apply-fonts-normal w-full border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
+      />
+      <input
+        type="number"
+        placeholder="السعر"
+        className="w-full border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
+      />
+      <textarea
+        placeholder="الوصف"
+        className="apply-fonts-normal w-full border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
+      />
+      <div className="apply-fonts-normal flex items-center space-x-4">
+        <div className="w-full">
+          <label
+            htmlFor="imageCover"
+            className="block font-medium mb-2 text-gray-700"
+          >
+            صورة الغلاف
+          </label>
+          <div className="relative">
+            <input
+              type="file"
+              id="imageCover"
+              accept="image/*"
+              onChange={handleImageCoverChange}
+              className="hidden"
+            />
+            <label
+              htmlFor="imageCover"
+              className="apply-fonts-normal cursor-pointer bg-mainColor text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-mainColorHoverLight transition-colors duration-300"
+            >
+              اختر صورة
+            </label>
+          </div>
+          {imageCoverPreview && (
+            <div className="mt-4 apply-fonts-normal">
+              <p className="text-gray-600 text-sm mb-2 apply-fonts-normal">
+                معاينة الصورة:
+              </p>
+              <Image
+                src={imageCoverPreview}
+                alt="صورة الغلاف"
+                className="w-[500px] h-[322px]   rounded border"
+                width={250}
+                height={250}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="apply-fonts-normal">
+        <div className="flex  gap-4">
+          <input
+            type="text"
+            value={newconcept}
+            onChange={(e) => setNewConcept(e.target.value)}
+            placeholder="المفاهيم"
+            className="w-full border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              if (newconcept.length > 0) {
+                addConcept(newconcept);
+                setNewConcept("");
+              }
+            }}
+            className="px-4 py-2 bg-[#3D45EE] text-white rounded hover:bg-[#2E36C0]"
+          >
+            أضف
+          </button>
+        </div>
+        <div>
+          <div className="flex gap-4 mt-4 ">
+            {concepts.map((concept: string, index: number) => {
+              return (
+                <div
+                  key={index}
+                  className="p-1 bg-violet-200 flex rounded-md gap-2  "
+                >
+                  <h1>{concept}</h1>
+                  <button
+                    type="button"
+                    onClick={() => removeConcept(index)}
+                    className="text-red-500"
+                  >
+                    <X size={17} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Step 2 ---------------- */
+interface StepSectionsProps {
+  sections: AddSection[];
+  setSections: Dispatch<SetStateAction<AddSection[]>>;
+  title: string;
+  setTitle: Dispatch<SetStateAction<string>>;
+}
+
+function StepSections({
+  sections,
+  setSections,
+  title,
+  setTitle,
+}: StepSectionsProps) {
+  const addSection = () => {
+    if (title.trim()) {
+      setSections([
+        ...sections,
+        {
+          title,
+        },
+      ]);
+      setTitle("");
+    }
+  };
+  const removeSection = (index: number) => {
+    setSections(
+      sections.filter((_: AddSection, i: number) => {
+        return i !== index;
+      })
+    );
+    setTitle("");
+  };
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-4">
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="عنوان القسم"
+          className="apply-fonts-normal flex-1 border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
+        />
+        <button
+          onClick={addSection}
+          className="apply-fonts-normal px-4 py-2 bg-[#3D45EE] text-white rounded hover:bg-[#2E36C0] hoverEle"
+        >
+          حفظ
+        </button>
+      </div>
+      <ul className="list-disc ">
+        {sections.map((sec: AddSection, idx) => (
+          <li key={idx} className="flex gap-2 mb-4">
+            <input
+              value={sec.title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled
+              placeholder="عنوان القسم"
+              className="apply-fonts-normal flex-1 border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
+            />
+            <button
+              onClick={() => removeSection(idx)}
+              className="apply-fonts-normal px-4 py-2 bg-redColor text-white rounded hover:bg-redColorHoverLight hoverEle"
+            >
+              حذف
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/* ---------------- Step 3 ---------------- */
+interface StepVideosProps {
+  sections: AddSection[];
+}
+function StepVideos({ sections }: StepVideosProps) {
+  const [videos, setVideos] = useState<{
+    [key: number]: { title: string; file?: File }[];
+  }>({}); // before upload video
+
+  const [uploadedLessons, setUploadedLessons] = useState<{
+    [key: number]: { title: string }[];
+  }>({}); // after upload video
+
+  const handleVideoChange = (
+    sectionIndex: number,
+    videoIndex: number,
+    field: "title" | "file",
+    value: string | File
+  ) => {
+    setVideos((prev) => {
+      const sectionVideos = prev[sectionIndex] || [];
+      const updatedVideos = [...sectionVideos];
+      if (!updatedVideos[videoIndex]) updatedVideos[videoIndex] = { title: "" };
+      updatedVideos[videoIndex] = {
+        ...updatedVideos[videoIndex],
+        [field]: value,
+      };
+      return { ...prev, [sectionIndex]: updatedVideos };
+    });
+  };
+
+  const addVideoField = (sectionIndex: number) => {
+    setVideos((prev) => {
+      const sectionVideos = prev[sectionIndex] || [];
+      return { ...prev, [sectionIndex]: [...sectionVideos, { title: "" }] };
+    });
+  };
+
+  const removeVideoField = (sectionIndex: number, videoIndex: number) => {
+    setVideos((prev) => {
+      const sectionVideos = prev[sectionIndex] || [];
+      const updatedVideos = sectionVideos.filter((_, i) => i !== videoIndex);
+      return { ...prev, [sectionIndex]: updatedVideos };
+    });
+  };
+
+  // using  {{URL}}/api/courses/sections/:sectionId here
+  const uploadVideo = (
+    sectionIndex: number,
+    video: { title: string; file?: File }
+  ) => {
+    if (!video.file) {
+      alert("الرجاء اختيار ملف قبل الرفع");
+      return;
+    }
+    console.log("رفع الفيديو:", video.title, video.file);
+    alert(`تم رفع الفيديو: ${video.title}`);
+
+    setUploadedLessons((prev) => {
+      const sectionLessons = prev[sectionIndex] || [];
+      return {
+        ...prev,
+        [sectionIndex]: [...sectionLessons, { title: video.title }],
+      };
+    });
+  };
+  // using  Delete lesson from backend
+  const removeUploadedLesson = (sectionIndex: number, lessonIndex: number) => {
+    setUploadedLessons((prev) => {
+      const sectionLessons = prev[sectionIndex] || [];
+      const updatedLessons = sectionLessons.filter((_, i) => i !== lessonIndex);
+      return { ...prev, [sectionIndex]: updatedLessons };
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      {sections.map((section, sectionIndex) => (
+        <div key={sectionIndex} className="border p-4 rounded-lg bg-gray-50">
+          <h2 className="apply-fonts-normal font-bold text-lg mb-4">
+            {section.title}
+          </h2>
+
+          {(videos[sectionIndex] || []).map((video, videoIndex) => (
+            <div key={videoIndex} className="space-y-3 mb-4 border-b pb-4">
+              <input
+                type="text"
+                placeholder="عنوان الفيديو"
+                value={video.title}
+                onChange={(e) =>
+                  handleVideoChange(
+                    sectionIndex,
+                    videoIndex,
+                    "title",
+                    e.target.value
+                  )
+                }
+                className="apply-fonts-normal w-full border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
+              />
+
+              <input
+                type="file"
+                accept="video/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    handleVideoChange(
+                      sectionIndex,
+                      videoIndex,
+                      "file",
+                      e.target.files[0]
+                    );
+                  }
+                }}
+                className=" w-full border p-3 rounded bg-gray-50"
+              />
+
+              <div className="apply-fonts-normal flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => uploadVideo(sectionIndex, video)}
+                  className="bg-[#3D45EE] text-white px-4 py-2 rounded hover:bg-[#2E36C0] transition"
+                >
+                  رفع الفيديو
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => removeVideoField(sectionIndex, videoIndex)}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                >
+                  حذف الفيديو
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {/* عرض الدروس المرفوعة */}
+          {uploadedLessons[sectionIndex] &&
+            uploadedLessons[sectionIndex].length > 0 && (
+              <div className="mt-4">
+                <h3 className="apply-fonts-normal font-semibold mb-2">
+                  📚 الدروس المرفوعة:
+                </h3>
+                <ul className="space-y-2">
+                  {uploadedLessons[sectionIndex].map((lesson, lessonIndex) => (
+                    <li
+                      key={lessonIndex}
+                      className="flex justify-between items-center border p-2 rounded bg-white"
+                    >
+                      <span className="apply-fonts-normal">{lesson.title}</span>
+                      <button
+                        onClick={() =>
+                          removeUploadedLesson(sectionIndex, lessonIndex)
+                        }
+                        className="apply-fonts-normal text-red-500 hover:text-red-700"
+                      >
+                        ❌ حذف
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+          <button
+            type="button"
+            onClick={() => addVideoField(sectionIndex)}
+            className="apply-fonts-normal mt-4 bg-[#3D45EE] text-white px-4 py-2 rounded hover:bg-[#2E36C0] transition"
+          >
+            + إضافة فيديو
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------- Step 4 ---------------- */
+function StepFiles({ courseId }: StepFilesProps) {
+  const [title, setTitle] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([
+    {
+      title: "Python",
+      url: "/asdd",
+      id: "1231",
+      size: 12331,
+    },
+  ]);
+  const [loading, setLoading] = useState(false);
+
+  const uploadFile = async () => {
+    if (!title || !file) {
+      alert("الرجاء إدخال عنوان الملف واختيار الملف");
+      return;
+    }
+
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("file", file);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}/files`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!res.ok) throw new Error("فشل رفع الملف");
+
+      const data = await res.json();
+
+      setUploadedFiles((prev) => [
+        ...prev,
+        {
+          id: data.id,
+          title: data.title,
+          url: data.url,
+          size: file.size,
+        },
+      ]);
+
+      setTitle("");
+      setFile(null);
+    } catch (err) {
+      console.error(err);
+      alert("حدث خطأ أثناء رفع الملف");
     } finally {
       setLoading(false);
     }
   };
 
+  const deleteFile = async (fileId: string) => {
+    if (!confirm("هل تريد حذف هذا الملف؟")) return;
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}/files/${fileId}`,
+        { method: "DELETE" }
+      );
+
+      if (!res.ok) throw new Error("فشل حذف الملف");
+
+      setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
+    } catch (err) {
+      console.error(err);
+      alert("حدث خطأ أثناء حذف الملف");
+    }
+  };
+
   return (
-    <div className="p-6 bg-wygColor shadow-xl rounded-xl shadow-mainColorHoverLight min-h-screen">
-      <h1 className="text-2xl font-bold mb-4 apply-fonts-normal">
-        إضافة تفاصيل الدورة
-      </h1>
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6 bg-white p-6 rounded shadow"
-      >
-        {/* صورة الغلاف */}
-        <div className="flex items-center space-x-4">
-          <div className="w-full">
-            <label
-              htmlFor="imageCover"
-              className="block font-medium mb-2 text-gray-700"
-            >
-              صورة الغلاف
-            </label>
-            <div className="relative">
-              <input
-                type="file"
-                id="imageCover"
-                accept="image/*"
-                onChange={handleImageCoverChange}
-                className="hidden"
-              />
-              <label
-                htmlFor="imageCover"
-                className="apply-fonts-normal cursor-pointer bg-mainColor text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-mainColorHoverLight transition-colors duration-300"
-              >
-                اختر صورة
-              </label>
-            </div>
-            {imageCoverPreview && (
-              <div className="mt-4">
-                <p className="text-gray-600 text-sm mb-2 apply-fonts-normal">
-                  معاينة الصورة:
-                </p>
-                <Image
-                  src={imageCoverPreview}
-                  alt="صورة الغلاف"
-                  className="w-[500px] h-[322px]   rounded border"
-                  width={250}
-                  height={250}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* اسم الدرس */}
-        <div>
-          <label
-            htmlFor="lessonName"
-            className="apply-fonts-normal block font-medium mb-2"
-          >
-            اسم الدرس
-          </label>
-          <input
-            type="text"
-            id="lessonName"
-            name="lessonName"
-            value={formData.lessonName}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        {/* فيديو الدرس */}
-        <div className="flex items-center space-x-4">
-          <div className="w-full">
-            <label
-              htmlFor="lessonVideo"
-              className="block font-medium mb-2 text-gray-700"
-            >
-              فيديو الدرس
-            </label>
-            <div className="relative">
-              <input
-                type="file"
-                id="lessonVideo"
-                accept="video/*"
-                onChange={handleLessonVideoChange}
-                className="hidden"
-              />
-              <label
-                htmlFor="lessonVideo"
-                className="cursor-pointer bg-green-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors duration-300"
-              >
-                اختر فيديو
-              </label>
-            </div>
-            {formData.lessonVideoName && (
-              <p className="mt-5 text-sm text-gray-500">
-                الفيديو المرفوع: {formData.lessonVideoName}
-              </p>
-            )}
-            <p className="mt-3 apply-fonts-normal text-sm text-blue-600">
-              * يرجى رفع الفيديو الأول فقط الآن، ويمكنك تعديل الدورة لاحقًا
-              لإضافة باقي الفيديوهات.
-            </p>
-          </div>
-        </div>
-
-        {/* ملفات PDF */}
-        <div className="flex items-center space-x-4">
-          <div className="w-full">
-            <label
-              htmlFor="pdfFiles"
-              className="block font-medium mb-2 text-gray-700"
-            >
-              ملفات PDF
-            </label>
-            <div className="relative">
-              <input
-                type="file"
-                id="pdfFiles"
-                accept=".pdf"
-                multiple
-                onChange={handlePdfFilesChange}
-                className="hidden"
-              />
-              <label
-                htmlFor="pdfFiles"
-                className="cursor-pointer bg-purple-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-purple-700 transition-colors duration-300"
-              >
-                اختر ملفات PDF
-              </label>
-            </div>
-            {formData.pdfFilesNames.length > 0 && (
-              <ul className="mt-5 text-sm text-gray-500">
-                {formData.pdfFilesNames.map((fileName, index) => (
-                  <li key={index}>- {fileName}</li>
-                ))}
-              </ul>
-            )}
-            <p className="mt-3 apply-fonts-normal text-sm text-blue-600">
-              * يمكن إضافة ملفات PDF إضافية عند تعديل الدورة لاحقًا.
-            </p>
-          </div>
-        </div>
-
-        {/* عنوان الدورة */}
-        <div>
-          <label htmlFor="courseTitle" className="block font-medium mb-2">
-            عنوان الدورة
-          </label>
-          <input
-            type="text"
-            id="courseTitle"
-            name="courseTitle"
-            value={formData.courseTitle}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        {/* سعر الدورة */}
-        <div>
-          <label htmlFor="coursePrice" className="block font-medium mb-2">
-            سعر الدورة
-          </label>
-          <input
-            type="number"
-            id="coursePrice"
-            name="coursePrice"
-            value={formData.coursePrice}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        {/* وصف الدورة */}
-        <div>
-          <label htmlFor="courseDescription" className="block font-medium mb-2">
-            وصف الدورة
-          </label>
-          <textarea
-            id="courseDescription"
-            name="courseDescription"
-            value={formData.courseDescription}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-            rows={4}
-          ></textarea>
-        </div>
-        {/* مفاهيم الدورة */}
-        <div>
-          <label
-            htmlFor="conceptInput"
-            className="apply-fonts-normal block font-medium mb-2"
-          >
-            مفاهيم الدورة
-          </label>
-          <div className="flex items-center space-x-2 gap-2">
-            <input
-              type="text"
-              id="conceptInput"
-              value={conceptInput}
-              onChange={(e) => setConceptInput(e.target.value)}
-              className="w-full p-2 border rounded"
-              placeholder="أدخل مفهومًا"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                handleAddConcept(conceptInput);
-                setConceptInput("");
-              }}
-              className="apply-fonts-normal p-2 bg-mainColor text-white rounded"
-            >
-              أضف
-            </button>
-          </div>
-        </div>
-
-        {/* عرض المفاهيم المضافة */}
-        <div>
-          <h3 className="apply-fonts-normal font-medium mb-2">
-            المفاهيم المضافة:
-          </h3>
-          {formData.concepts.length > 0 ? (
-            <ul className="space-y-2">
-              {formData.concepts.map((concept, index) => (
-                <li
-                  key={index}
-                  className="apply-fonts-normal flex justify-between items-center bg-gray-100 p-2 rounded shadow"
-                >
-                  <span>{concept}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveConcept(index)}
-                    className="apply-fonts-normal text-redColor"
-                  >
-                    حذف
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 apply-fonts-normal">
-              لم تتم إضافة أي مفاهيم بعد.
-            </p>
-          )}
-        </div>
-        {/* الفئات */}
-        <div>
-          <label htmlFor="category" className="block font-medium mb-2">
-            الفئة
-          </label>
-          <select
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleInputChange}
-            className="apply-fonts-normal block w-full border rounded p-2"
-            required
-          >
-            <option className="apply-fonts-normal" value="">
-              اختر الفئة
-            </option>
-            <option className="apply-fonts-normal" value="development">
-              علوم
-            </option>
-            <option className="apply-fonts-normal" value="design">
-              فيزياء
-            </option>
-            <option className="apply-fonts-normal" value="marketing">
-              رياضيات
-            </option>
-            <option className="apply-fonts-normal" value="business">
-              أدب عربي
-            </option>
-            <option className="apply-fonts-normal" value="other">
-              فلسفة
-            </option>
-          </select>
-        </div>
-
-        {/* زر الإرسال */}
+    <div className="space-y-6">
+      {/* إدخال ملف جديد */}
+      <div className="space-y-3 border p-4 rounded-lg bg-gray-50">
+        <input
+          type="text"
+          placeholder="عنوان الملف"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="apply-fonts-normal w-full border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
+        />
+        <input
+          type="file"
+          onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+          className="w-full border p-3 rounded bg-white"
+        />
         <button
-          type="submit"
-          className={`w-full p-2  text-white font-medium rounded  ${
-            loading
-              ? "bg-mainColorHoverLight cursor-not-allowed"
-              : "bg-mainColor hover:bg-mainColorHoverLight"
-          } hoverEle`}
+          type="button"
+          onClick={uploadFile}
+          disabled={loading}
+          className="apply-fonts-normal bg-[#3D45EE] text-white px-4 py-2 rounded hover:bg-[#2E36C0] transition disabled:opacity-50"
         >
-          {loading ? "جاري النشر" : "نشر"}
+          {loading ? "جارٍ الرفع..." : "رفع الملف"}
         </button>
-      </form>
+      </div>
+
+      {/* عرض الملفات المرفوعة */}
+      {uploadedFiles.length > 0 && (
+        <div>
+          <h3 className="apply-fonts-normal font-semibold mb-3">
+            📂 الملفات المرفوعة
+          </h3>
+          <ul className="space-y-2">
+            {uploadedFiles.map((f) => (
+              <li
+                key={f.id}
+                className="flex justify-between items-center border p-3 rounded bg-white"
+              >
+                <div className="flex flex-col">
+                  <span className="apply-fonts-normal font-medium">
+                    {f.title}
+                  </span>
+                  <a
+                    href={f.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="apply-fonts-normal text-blue-600 hover:underline text-sm"
+                  >
+                    رابط التحميل
+                  </a>
+                  <span className="apply-fonts-normal text-gray-500 text-sm">
+                    حجم الملف:{" "}
+                    <span className="font-sans">
+                      {(f.size / 1024).toFixed(2)}
+                    </span>{" "}
+                    ك.ب
+                  </span>
+                </div>
+                <button
+                  onClick={() => deleteFile(f.id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  ❌
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
-};
-
-export default Details;
+}
