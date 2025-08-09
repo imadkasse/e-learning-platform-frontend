@@ -95,6 +95,7 @@ const CoursePage = ({ course }: Props) => {
   if (user.role === "student" && !isEnrolled) {
     redirect(`/course-overview/${course._id}`);
   }
+  // check is the course uploaded by teacher
   if (user.role === "teacher" && !isPublichedCourse) {
     redirect(`/dashboard-teacher/courses`);
   }
@@ -104,14 +105,14 @@ const CoursePage = ({ course }: Props) => {
       {/* Course Details */}
 
       <CourseCardDetails
-        courseVideos={course?.videos}
+        courseVideos={course?.videos} //! changed this
         courseId={course?._id}
         userId={user._id}
       />
       {/* Show Course */}
       <div className="lg:custom-width-Course ">
         {/* Welcome video */}
-        <DynamicVideoPlyr videoSrc={lesson?.url || ""} />
+        <DynamicVideoPlyr videoSrc={lesson?.url || ""} /> {/*//! changed this*/}
         {/* Video Title */}
         <div className="my-4">
           <h1 className="apply-fonts-medium  xs:text-lg lg:text-2xl mb-2">
@@ -222,7 +223,6 @@ const CoursePage = ({ course }: Props) => {
             )}
           </div>
         </div>
-
         {/* stduents comments */}
         <div className="mt-5">
           <h1 className="mb-8 flex items-center gap-1">
