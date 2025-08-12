@@ -13,13 +13,19 @@ import DynamicVideoPlyr from "./DynamicVideoPlyr";
 import AddReview from "./Reviews/AddReview";
 import { useUserStore } from "@/store/userStore";
 import { Course } from "@/types/course";
+import { ChevronDown, ChevronUp, Folder } from "lucide-react";
+import React, { useState } from "react";
 
 type Props = {
   course: Course;
 };
 export const CoursePage = ({ course }: Props) => {
   const { user } = useUserStore();
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
+  const toggleSection = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
   const instructor = course.instructor;
 
   return (
@@ -56,7 +62,15 @@ export const CoursePage = ({ course }: Props) => {
         </div>
         {/* Welcome video */}
 
-        <DynamicVideoPlyr videoSrc={course.videos[0]?.url} />
+        <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+          <iframe
+            src={`https://iframe.mediadelivery.net/embed/476506/${course.sections[0].videos[0].url}?autoplay=false&loop=false&muted=false&preload=false&responsive=false`}
+            loading="lazy"
+            className="absolute top-0 left-0 w-full h-full border-0 rounded-lg shadow-md"
+            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </div>
 
         {/* description Course */}
         <div className="my-4">
@@ -89,7 +103,7 @@ export const CoursePage = ({ course }: Props) => {
               <div className="flex  items-center gap-1">
                 <PlayCircleOutlined className="text-mainColor" />
                 <h1 className="flex  items-center">
-                  {course.videos.length}
+                  {course.sections.length}
                   <span className="apply-fonts-normal text-[13px]">درس</span>
                 </h1>
               </div>
@@ -98,37 +112,64 @@ export const CoursePage = ({ course }: Props) => {
                 <h1 className="flex  items-center">
                   {/* added after time */}
                   {(course.duration / 3600).toFixed(2)}
-                  <span className="mr-1 apply-fonts-normal text-[13px]">ساعة</span>
+                  <span className="mr-1 apply-fonts-normal text-[13px]">
+                    ساعة
+                  </span>
                 </h1>
               </div>
             </div>
           </div>
           <div className="">
-            <table className="table-auto w-full  ">
+            <table className="table-auto w-full border-collapse">
               <tbody>
-                {/* //! changed this (add sections) */}
-                {course.videos.map((video) => (
-                  <tr
-                    key={video._id}
-                    className="bg-white hover:bg-gray-50 transition"
-                  >
-                    {/* زر التشغيل */}
-                    <td className="px-4 py-2 text-right">
-                      <button className="text-mainColor hover:text-mainColorHover transition">
-                        <PlayArrow />
-                      </button>
-                    </td>
+                {course.sections?.map((section, index) => (
+                  <React.Fragment key={section._id}>
+                    {/* عنوان القسم */}
+                    <tr className="bg-gray-100 border">
+                      <td colSpan={3} className="p-0">
+                        <button
+                          onClick={() => toggleSection(index)}
+                          className="flex items-center justify-between w-full py-3 px-4 text-right text-lg font-semibold "
+                        >
+                          <div className="flex items-center gap-2">
+                            <Folder className="text-blue-500" size={20} />
+                            {section.title}
+                          </div>
+                          {openIndex === index ? (
+                            <ChevronUp className="text-gray-500" size={20} />
+                          ) : (
+                            <ChevronDown className="text-gray-500" size={20} />
+                          )}
+                        </button>
+                      </td>
+                    </tr>
 
-                    {/* اسم الدرس */}
-                    <td className="px-4 py-2 text-right apply-fonts-normal">
-                      {video.lessonTitle}
-                    </td>
+                    {/* فيديوهات القسم */}
+                    {openIndex === index &&
+                      section.videos.map((video) => (
+                        <tr
+                          key={video._id}
+                          className="bg-white hover:bg-gray-50 transition"
+                        >
+                          {/* زر التشغيل */}
+                          <td className="px-4 py-2 text-right w-12">
+                            <button className="text-mainColor hover:text-mainColorHover transition">
+                              <PlayArrow />
+                            </button>
+                          </td>
 
-                    {/* مدة الدرس */}
-                    <td className="px-4 py-2 text-right text-gray-600">
-                      {(Number(video.duration) / 60).toFixed(3)} دقيقة
-                    </td>
-                  </tr>
+                          {/* اسم الدرس */}
+                          <td className="px-4 py-2 text-right apply-fonts-normal">
+                            {video.lessonTitle}
+                          </td>
+
+                          {/* مدة الدرس */}
+                          <td className="px-4 py-2 text-right text-gray-600 w-32">
+                            {(Number(video.duration) / 60).toFixed(3)} دقيقة
+                          </td>
+                        </tr>
+                      ))}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

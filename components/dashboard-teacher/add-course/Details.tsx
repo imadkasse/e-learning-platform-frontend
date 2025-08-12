@@ -1,17 +1,46 @@
 "use client";
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import showToast from "@/utils/showToast";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { X } from "lucide-react";
+import { Loader, X } from "lucide-react";
 import Image from "next/image";
-// components/CourseUploader.tsx
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import "react-toastify/dist/ReactToastify.css";
 
+interface CourseDetails {
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  imageCover: File | null;
+}
+interface Course {
+  _id: string;
+  title: string;
+  description: string;
+  instructor: string;
+  sections: Section[];
+  files: string[];
+  price: number;
+  category: string;
+  studentsCount: number;
+  imageCover: string;
+  enrolledStudents: string[];
+  reviews: string[];
+  numberRatings: number;
+  avgRatings: number;
+  concepts: string[];
+  publishedDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
 type AddSection = {
   title: string;
 };
 type Section = {
   _id: string;
   title: string;
+  videos: Videos[];
 };
 interface UploadedFile {
   id: string;
@@ -19,17 +48,70 @@ interface UploadedFile {
   url: string;
   size: number; // بالبايت
 }
-
-interface StepFilesProps {
-  courseId: string;
+interface Videos {
+  _id: string;
+  lessonTitle: string;
+  url: string;
+  format: string;
+  duration: number;
+  uploadedBy: string;
+  sectionId: string;
+  isCompleted: string;
+  completedBy: string[];
+  comments: string[];
+  createdAt: string;
+  publishedDate: string;
 }
+interface VideoUpload {
+  title: string;
+  file: File;
+}
+
 const baseUrl = process.env.NEXT_PUBLIC_BACK_URL;
 const token = Cookies.get("token");
+
 export default function CourseUploader() {
-  const [step, setStep] = useState(1);
+  // stepre
+  const [step, setStep] = useState(3);
+  const nextStep = () => setStep((prev) => Math.min(prev + 1, 4));
+  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
+  // const [isCreateingCourse, setIsCreateingCourse] = useState(false);
+
+  // step one create course  details
   const [newconcept, setNewConcept] = useState<string>("");
   const [concepts, setConcepts] = useState<string[]>([]);
-  const [currentCourse, setCurrentCourse] = useState();
+  const [courseDetails, setCourseDetails] = useState<CourseDetails>({
+    imageCover: null,
+    title: "",
+    price: 0,
+    description: "",
+    category: "",
+  });
+  const [currentCourse, setCurrentCourse] = useState<Course>({
+    _id: "",
+    title: "",
+    description: "",
+    instructor: "",
+    sections: [],
+    files: [],
+    price: 0,
+    category: "",
+    studentsCount: 0,
+    imageCover: "",
+    enrolledStudents: [],
+    reviews: [],
+    numberRatings: 0,
+    avgRatings: 0,
+    concepts: [],
+    publishedDate: "",
+    createdAt: "",
+    updatedAt: "",
+  });
+  const [loadingCreatingCourse, setloadingCreatingCourse] = useState(false);
+  const [loadingAddSection, setloadingAddSection] = useState(false);
+  const [loadingAddVideoToSection, setloadingAddVideoToSection] =
+    useState(false);
+  const [loadingAddFilesToCourse, setloadingAddFilesToCourse] = useState(false);
 
   // concepts
   const addConcept = (concept: string) => {
@@ -44,13 +126,183 @@ export default function CourseUploader() {
     );
   };
 
-  //sections
-  const [sections, setSections] = useState<AddSection[]>([]);
+  const handleCreateCourse = async () => {
+    // check before send
+    if (!courseDetails.title?.trim()) {
+      showToast("error", "الرجاء إدخال عنوان الكورس");
+      return;
+    }
+    if (!courseDetails.description?.trim()) {
+      showToast("error", "الرجاء إدخال وصف الكورس");
+      return;
+    }
+    if (!courseDetails.price || isNaN(Number(courseDetails.price))) {
+      showToast("error", "الرجاء إدخال سعر صحيح");
+      return;
+    }
+    if (!courseDetails.imageCover) {
+      showToast("error", "الرجاء اختيار صورة غلاف");
+      return;
+    }
+    if (!concepts || concepts.length === 0) {
+      showToast("error", "الرجاء إضافة مفهوم واحد على الأقل");
+      return;
+    }
+
+    setloadingCreatingCourse(true);
+    const formData = new FormData();
+
+    formData.append("title", courseDetails.title);
+    formData.append("description", courseDetails.description);
+    formData.append("price", String(courseDetails.price));
+    if (courseDetails.imageCover) {
+      formData.append("imageCover", courseDetails.imageCover); // لازم يكون ملف (File)
+    }
+
+    if (concepts && concepts.length > 0) {
+      concepts.forEach((concept: string, index: number) => {
+        formData.append(`concepts[${index}]`, concept);
+      });
+    }
+
+    try {
+      const res = await axios.post(`${baseUrl}/api/courses`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      showToast("success", res.data.message);
+      // console.log(res.data.course);
+      setCurrentCourse(res.data.course);
+      nextStep();
+    } catch (error) {
+      console.error("Error creating course:", error);
+      showToast("error", "حدث خطأ أثناء إنشاء الكورس");
+    } finally {
+      setloadingCreatingCourse(false);
+    }
+  };
+
+  // step two create course  details
+  const [sections, setSections] = useState<Section[]>([]);
   const [title, setTitle] = useState("");
+  const handleAddSctions = async () => {
+    if (!title.trim()) {
+      showToast("error", "الرجاء إدخال عنوان القسم");
+      return;
+    }
+    setloadingAddSection(true);
+    try {
+      const res = await axios.post(
+        `${baseUrl}/api/courses/${currentCourse._id}`,
+        {
+          sectionTitle: title,
+        }
+      );
+      showToast("success", res.data.message);
+      console.log(res.data.section);
+      setCurrentCourse({
+        ...currentCourse,
+        sections: [...currentCourse.sections, res.data.section._id],
+      });
+      setSections([...sections, res.data.section]);
+    } catch (error) {
+      console.log(error);
+      showToast("error", "حدث خطأ أثناء إنشاء الكورس");
+    } finally {
+      setloadingAddSection(false);
+    }
+  };
+  // step three add videos to sections
+  const addVideoToSection = async (
+    sectionId: string,
+    title: string,
+    file: File
+  ) => {
+    if (!sectionId?.trim()) {
+      showToast("error", "الرجاء اختيار القسم أولا");
+      return;
+    }
+    if (!title?.trim()) {
+      showToast("error", "الرجاء إدخال عنوان الدرس");
+      return;
+    }
+    if (!file) {
+      showToast("error", "الرجاء رفع الفيديو");
+      return;
+    }
+    setloadingAddVideoToSection(true);
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("file", file);
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, 4));
-  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
+    try {
+      const res = await axios.post(
+        `${baseUrl}/api/courses/${currentCourse._id}/sections/${sectionId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      showToast("success", res.data.message);
+      setSections((prevSections) =>
+        prevSections.map((sec) =>
+          sec._id === sectionId
+            ? { ...sec, videos: [...sec.videos, res.data.video] }
+            : sec
+        )
+      );
+    } catch (error) {
+      console.error("Error creating course:", error);
+      showToast("error", "حدث خطأ أثناء الفييديو");
+    } finally {
+      setloadingAddVideoToSection(false);
+    }
+  };
+  // step four add files to course
+  const addFilesToCourse = async (fileName: string, file: File | null) => {
+    if (!fileName.trim()) {
+      showToast("error", "الرجاء إدخال إسم الملف");
+      return;
+    }
+    if (!file) {
+      showToast("error", "الرجاء إدخال الملف");
+      return;
+    }
 
+    setloadingAddFilesToCourse(true);
+    const formData = new FormData();
+    formData.append("filename", fileName);
+    if (file) {
+      formData.append("file", file);
+    }
+    try {
+      const res = await axios.post(
+        `${baseUrl}/api/courses/${currentCourse._id}/files`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      showToast("success", res.data.message);
+      setCurrentCourse({
+        ...currentCourse,
+        files: [...currentCourse.files, res.data.file],
+      });
+    } catch (error) {
+      console.error("Error creating course:", error);
+      showToast("error", "حدث خطأ أثناء الفييديو");
+    } finally {
+      setloadingAddFilesToCourse(false);
+    }
+  };
   return (
     <div className="bg-wygColor rounded-lg p-6 mt-1 ">
       <section>
@@ -74,6 +326,8 @@ export default function CourseUploader() {
         {/* Step Content */}
         {step === 1 && (
           <StepGeneralDetails
+            courseDetails={courseDetails}
+            setCourseDetails={setCourseDetails}
             concepts={concepts}
             setNewConcept={setNewConcept}
             newconcept={newconcept}
@@ -84,13 +338,27 @@ export default function CourseUploader() {
         {step === 2 && (
           <StepSections
             sections={sections}
-            setSections={setSections}
+            loadingAddSection={loadingAddSection}
+            currentCourse={currentCourse}
+            handleAddSctions={handleAddSctions}
             title={title}
             setTitle={setTitle}
           />
         )}
-        {step === 3 && <StepVideos sections={sections} />}
-        {step === 4 && <StepFiles courseId="//! change to currntCourse._id" />}
+        {step === 3 && (
+          <StepVideos
+            sections={sections}
+            addVideoToSection={addVideoToSection}
+            loadingAddVideoToSection={loadingAddVideoToSection}
+          />
+        )}
+        {step === 4 && (
+          <StepFiles
+            addFilesToCourse={addFilesToCourse}
+            currentCourse={currentCourse}
+            loadingAddFilesToCourse={loadingAddFilesToCourse}
+          />
+        )}
       </section>
 
       {/* Navigation */}
@@ -104,16 +372,31 @@ export default function CourseUploader() {
         </button>
         {step !== 4 ? (
           <button
-            onClick={nextStep}
+            type="submit"
+            onClick={async () => {
+              if (step === 1) {
+                await handleCreateCourse();
+              } else {
+                nextStep();
+              }
+            }}
             disabled={step === 4}
-            className="apply-fonts-normal px-4 py-2 bg-[#3D45EE] text-white rounded cursor-pointer hover:bg-[#2E36C0]"
+            className={`apply-fonts-normal px-4 py-2 bg-[#3D45EE] text-white rounded  hover:bg-[#2E36C0] flex items-center justify-center gap-2 ${
+              step === 4
+                ? "bg-mainColorHoverLight cursor-not-allowed"
+                : "cursor-pointer"
+            }`}
           >
-            التالي
+            {loadingCreatingCourse && <Loader className="animate-spin" />}
+            {loadingCreatingCourse ? "جارٍ الإنشاء..." : "التالي"}
           </button>
         ) : (
           <button
-            onClick={nextStep}
-            disabled={step === 4}
+            onClick={() => {
+              console.log(currentCourse);
+              
+            }}
+            
             className="apply-fonts-normal px-4 py-2 bg-[#3D45EE] text-white rounded cursor-pointer hover:bg-[#2E36C0]"
           >
             نشر
@@ -126,6 +409,8 @@ export default function CourseUploader() {
 
 /* ---------------- Step 1 ---------------- */
 interface StepGeneralDetailsProps {
+  courseDetails: CourseDetails;
+  setCourseDetails: Dispatch<SetStateAction<CourseDetails>>;
   concepts: string[];
   newconcept: string;
   setNewConcept: Dispatch<SetStateAction<string>>;
@@ -133,6 +418,8 @@ interface StepGeneralDetailsProps {
   removeConcept: (index: number) => void;
 }
 function StepGeneralDetails({
+  courseDetails,
+  setCourseDetails,
   concepts,
   newconcept,
   setNewConcept,
@@ -146,41 +433,60 @@ function StepGeneralDetails({
     const file = e.target.files?.[0] || null;
     if (file) {
       setImageCoverPreview(URL.createObjectURL(file));
+      setCourseDetails((prev) => ({ ...prev, imageCover: file }));
     }
   };
-  const handleCreateCourse = async () => {
-    try {
-      const res = await axios.post(
-        `${baseUrl}/api/courses`,
-        {
-          //! info
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    } catch (error) {
-      console.log(error);
-    }
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setCourseDetails((prev) => ({ ...prev, [name]: value }));
   };
+
   return (
     <div className="space-y-4">
       <input
         type="text"
         placeholder="عنوان الكورس"
+        value={courseDetails?.title}
+        onChange={handleInputChange}
+        name="title"
         className="apply-fonts-normal w-full border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
       />
       <input
         type="number"
         placeholder="السعر"
+        value={courseDetails?.price}
+        onChange={handleInputChange}
+        name="price"
         className="w-full border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
       />
       <textarea
         placeholder="الوصف"
+        value={courseDetails?.description}
+        onChange={handleInputChange}
+        rows={7}
+        name="description"
         className="apply-fonts-normal w-full border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
       />
+      <div>
+        <label className="apply-fonts-normal block font-medium mb-2 text-gray-700">
+          الفئة
+        </label>
+        <select
+          name="category"
+          value={courseDetails?.category}
+          onChange={handleInputChange}
+          className="apply-fonts-normal w-full border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
+        >
+          <option value="">اختر الفئة</option>
+          <option value="رياضيات">رياضيات</option>
+          <option value="فيزياء">فيزياء</option>
+          <option value="كيمياء">كيمياء</option>
+          <option value="برمجة">برمجة</option>
+          <option value="لغات">لغات</option>
+        </select>
+      </div>
       <div className="apply-fonts-normal flex items-center space-x-4">
         <div className="w-full">
           <label
@@ -270,38 +576,23 @@ function StepGeneralDetails({
 
 /* ---------------- Step 2 ---------------- */
 interface StepSectionsProps {
-  sections: AddSection[];
-  setSections: Dispatch<SetStateAction<AddSection[]>>;
+  sections: Section[];
+  loadingAddSection: boolean;
+  handleAddSctions: () => void;
+  currentCourse: Course;
   title: string;
   setTitle: Dispatch<SetStateAction<string>>;
 }
 
 function StepSections({
   sections,
-  setSections,
+  // currentCourse,
+  loadingAddSection,
+  handleAddSctions,
   title,
   setTitle,
 }: StepSectionsProps) {
-  const addSection = () => {
-    if (title.trim()) {
-      setSections([
-        ...sections,
-        {
-          title,
-        },
-      ]);
-      setTitle("");
-    }
-  };
-  const removeSection = (index: number) => {
-    setSections(
-      sections.filter((_: AddSection, i: number) => {
-        return i !== index;
-      })
-    );
-    setTitle("");
-  };
-
+  console.log(sections);
   return (
     <div>
       <div className="flex gap-2 mb-4">
@@ -312,24 +603,25 @@ function StepSections({
           className="apply-fonts-normal flex-1 border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
         />
         <button
-          onClick={addSection}
+          onClick={handleAddSctions}
+          disabled={loadingAddSection}
           className="apply-fonts-normal px-4 py-2 bg-[#3D45EE] text-white rounded hover:bg-[#2E36C0] hoverEle"
         >
-          حفظ
+          {loadingAddSection ? "جاري الحفظ..." : "حفظ"}
         </button>
       </div>
-      <ul className="list-disc ">
-        {sections.map((sec: AddSection, idx) => (
-          <li key={idx} className="flex gap-2 mb-4">
+
+      <ul className="list-disc">
+        {sections.map((sec: { _id: string; title: string }) => (
+          <li key={sec._id} className="flex gap-2 mb-4">
             <input
               value={sec.title}
-              onChange={(e) => setTitle(e.target.value)}
               disabled
-              placeholder="عنوان القسم"
+              placeholder={sec.title}
               className="apply-fonts-normal flex-1 border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
             />
             <button
-              onClick={() => removeSection(idx)}
+              // onClick={() => handleRemoveSection(sec._id)}
               className="apply-fonts-normal px-4 py-2 bg-redColor text-white rounded hover:bg-redColorHoverLight hoverEle"
             >
               حذف
@@ -343,88 +635,70 @@ function StepSections({
 
 /* ---------------- Step 3 ---------------- */
 interface StepVideosProps {
-  sections: AddSection[];
+  sections: Section[];
+  addVideoToSection: (sectionId: string, title: string, file: File) => void;
+  loadingAddVideoToSection: boolean;
 }
-function StepVideos({ sections }: StepVideosProps) {
-  const [videos, setVideos] = useState<{
-    [key: number]: { title: string; file?: File }[];
-  }>({}); // before upload video
+function StepVideos({
+  sections,
+  addVideoToSection,
+  loadingAddVideoToSection,
+}: StepVideosProps) {
+  // قبل التحميل: لكل قسم قائمة فيديوهات تحت الإنشاء
+  const [videosUpload, setVideosUpload] = useState<
+    Record<string, VideoUpload[]>
+  >({});
 
-  const [uploadedLessons, setUploadedLessons] = useState<{
-    [key: number]: { title: string }[];
-  }>({}); // after upload video
+  // بعد التحميل: لكل قسم فيديوهات مرفوعة
+  // const [videos, setVideos] = useState<Record<string, Videos[]>>({});
 
+  // تعديل بيانات فيديو قبل التحميل
   const handleVideoChange = (
-    sectionIndex: number,
+    sectionId: string,
     videoIndex: number,
     field: "title" | "file",
     value: string | File
   ) => {
-    setVideos((prev) => {
-      const sectionVideos = prev[sectionIndex] || [];
-      const updatedVideos = [...sectionVideos];
-      if (!updatedVideos[videoIndex]) updatedVideos[videoIndex] = { title: "" };
-      updatedVideos[videoIndex] = {
-        ...updatedVideos[videoIndex],
-        [field]: value,
-      };
-      return { ...prev, [sectionIndex]: updatedVideos };
+    setVideosUpload((prev) => {
+      const sectionVideos = prev[sectionId] || [];
+      const updated = [...sectionVideos];
+      updated[videoIndex] = { ...updated[videoIndex], [field]: value };
+      return { ...prev, [sectionId]: updated };
     });
   };
 
-  const addVideoField = (sectionIndex: number) => {
-    setVideos((prev) => {
-      const sectionVideos = prev[sectionIndex] || [];
-      return { ...prev, [sectionIndex]: [...sectionVideos, { title: "" }] };
-    });
-  };
-
-  const removeVideoField = (sectionIndex: number, videoIndex: number) => {
-    setVideos((prev) => {
-      const sectionVideos = prev[sectionIndex] || [];
-      const updatedVideos = sectionVideos.filter((_, i) => i !== videoIndex);
-      return { ...prev, [sectionIndex]: updatedVideos };
-    });
-  };
-
-  // using  {{URL}}/api/courses/sections/:sectionId here
-  const uploadVideo = (
-    sectionIndex: number,
-    video: { title: string; file?: File }
-  ) => {
-    if (!video.file) {
-      alert("الرجاء اختيار ملف قبل الرفع");
-      return;
-    }
-    console.log("رفع الفيديو:", video.title, video.file);
-    alert(`تم رفع الفيديو: ${video.title}`);
-
-    setUploadedLessons((prev) => {
-      const sectionLessons = prev[sectionIndex] || [];
+  // إضافة حقل فيديو قبل التحميل
+  const addVideoField = (sectionId: string) => {
+    setVideosUpload((prev) => {
+      const sectionVideos = prev[sectionId] || [];
       return {
         ...prev,
-        [sectionIndex]: [...sectionLessons, { title: video.title }],
+        [sectionId]: [...sectionVideos, { title: "", file: null as any }],
       };
     });
   };
-  // using  Delete lesson from backend
-  const removeUploadedLesson = (sectionIndex: number, lessonIndex: number) => {
-    setUploadedLessons((prev) => {
-      const sectionLessons = prev[sectionIndex] || [];
-      const updatedLessons = sectionLessons.filter((_, i) => i !== lessonIndex);
-      return { ...prev, [sectionIndex]: updatedLessons };
+
+  // حذف فيديو قبل التحميل
+  const removeVideoField = (sectionId: string, videoIndex: number) => {
+    setVideosUpload((prev) => {
+      const sectionVideos = prev[sectionId] || [];
+      return {
+        ...prev,
+        [sectionId]: sectionVideos.filter((_, i) => i !== videoIndex),
+      };
     });
   };
 
   return (
     <div className="space-y-6">
-      {sections.map((section, sectionIndex) => (
-        <div key={sectionIndex} className="border p-4 rounded-lg bg-gray-50">
+      {sections.map((section) => (
+        <div key={section._id} className="border p-4 rounded-lg bg-gray-50">
           <h2 className="apply-fonts-normal font-bold text-lg mb-4">
             {section.title}
           </h2>
 
-          {(videos[sectionIndex] || []).map((video, videoIndex) => (
+          {/* فيديوهات قبل الرفع */}
+          {(videosUpload[section._id] || []).map((video, videoIndex) => (
             <div key={videoIndex} className="space-y-3 mb-4 border-b pb-4">
               <input
                 type="text"
@@ -432,44 +706,48 @@ function StepVideos({ sections }: StepVideosProps) {
                 value={video.title}
                 onChange={(e) =>
                   handleVideoChange(
-                    sectionIndex,
+                    section._id,
                     videoIndex,
                     "title",
                     e.target.value
                   )
                 }
-                className="apply-fonts-normal w-full border p-3 rounded focus:outline-none focus:border-[#3D45EE]"
+                className="apply-fonts-normal w-full border p-3 rounded"
               />
-
               <input
                 type="file"
                 accept="video/*"
                 onChange={(e) => {
                   if (e.target.files && e.target.files[0]) {
                     handleVideoChange(
-                      sectionIndex,
+                      section._id,
                       videoIndex,
                       "file",
                       e.target.files[0]
                     );
                   }
                 }}
-                className=" w-full border p-3 rounded bg-gray-50"
+                className="w-full border p-3 rounded bg-gray-50"
               />
-
-              <div className="apply-fonts-normal flex gap-3">
+              <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => uploadVideo(sectionIndex, video)}
-                  className="bg-[#3D45EE] text-white px-4 py-2 rounded hover:bg-[#2E36C0] transition"
+                  onClick={() =>
+                    video.file &&
+                    addVideoToSection(section._id, video.title, video.file)
+                  }
+                  className="bg-[#3D45EE] text-white px-4 py-2 rounded hover:bg-[#2E36C0]"
                 >
-                  رفع الفيديو
+                  {loadingAddVideoToSection ? (
+                    <Loader className="animate-spin" />
+                  ) : (
+                    "رفع الفيديو"
+                  )}
                 </button>
-
                 <button
                   type="button"
-                  onClick={() => removeVideoField(sectionIndex, videoIndex)}
-                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                  onClick={() => removeVideoField(section._id, videoIndex)}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                 >
                   حذف الفيديو
                 </button>
@@ -477,38 +755,38 @@ function StepVideos({ sections }: StepVideosProps) {
             </div>
           ))}
 
-          {/* عرض الدروس المرفوعة */}
-          {uploadedLessons[sectionIndex] &&
-            uploadedLessons[sectionIndex].length > 0 && (
-              <div className="mt-4">
-                <h3 className="apply-fonts-normal font-semibold mb-2">
-                  📚 الدروس المرفوعة:
-                </h3>
-                <ul className="space-y-2">
-                  {uploadedLessons[sectionIndex].map((lesson, lessonIndex) => (
-                    <li
-                      key={lessonIndex}
-                      className="flex justify-between items-center border p-2 rounded bg-white"
-                    >
-                      <span className="apply-fonts-normal">{lesson.title}</span>
-                      <button
-                        onClick={() =>
-                          removeUploadedLesson(sectionIndex, lessonIndex)
-                        }
-                        className="apply-fonts-normal text-red-500 hover:text-red-700"
+          {/* عرض الفيديوهات المرفوعة */}
+          {section.videos.length > 0 && (
+            <div className="mt-4">
+              <h3 className="font-semibold mb-2">📚 الدروس المرفوعة:</h3>
+              <ul className="space-y-2">
+                {section.videos.map((lesson) => (
+                  <li
+                    key={lesson._id}
+                    className="flex justify-between items-center border p-2 rounded bg-white"
+                  >
+                    <span>{lesson.lessonTitle}</span>
+                    <div className="flex gap-3">
+                      <a
+                        href={lesson.url}
+                        className="text-blue-600 hover:underline"
                       >
+                        مشاهدة
+                      </a>
+                      <button className="text-red-500 hover:text-red-700">
                         ❌ حذف
                       </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <button
             type="button"
-            onClick={() => addVideoField(sectionIndex)}
-            className="apply-fonts-normal mt-4 bg-[#3D45EE] text-white px-4 py-2 rounded hover:bg-[#2E36C0] transition"
+            onClick={() => addVideoField(section._id)}
+            className="mt-4 bg-[#3D45EE] text-white px-4 py-2 rounded hover:bg-[#2E36C0]"
           >
             + إضافة فيديو
           </button>
@@ -519,7 +797,16 @@ function StepVideos({ sections }: StepVideosProps) {
 }
 
 /* ---------------- Step 4 ---------------- */
-function StepFiles({ courseId }: StepFilesProps) {
+interface StepFilesProps {
+  currentCourse: Course;
+  loadingAddFilesToCourse: boolean;
+  addFilesToCourse: (fileName: string, file: File) => void;
+}
+function StepFiles({
+  currentCourse,
+  loadingAddFilesToCourse,
+  addFilesToCourse,
+}: StepFilesProps) {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([
@@ -530,58 +817,13 @@ function StepFiles({ courseId }: StepFilesProps) {
       size: 12331,
     },
   ]);
-  const [loading, setLoading] = useState(false);
-
-  const uploadFile = async () => {
-    if (!title || !file) {
-      alert("الرجاء إدخال عنوان الملف واختيار الملف");
-      return;
-    }
-
-    setLoading(true);
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("file", file);
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}/files`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (!res.ok) throw new Error("فشل رفع الملف");
-
-      const data = await res.json();
-
-      setUploadedFiles((prev) => [
-        ...prev,
-        {
-          id: data.id,
-          title: data.title,
-          url: data.url,
-          size: file.size,
-        },
-      ]);
-
-      setTitle("");
-      setFile(null);
-    } catch (err) {
-      console.error(err);
-      alert("حدث خطأ أثناء رفع الملف");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const deleteFile = async (fileId: string) => {
     if (!confirm("هل تريد حذف هذا الملف؟")) return;
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}/files/${fileId}`,
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${currentCourse._id}/files/${fileId}`,
         { method: "DELETE" }
       );
 
@@ -612,24 +854,32 @@ function StepFiles({ courseId }: StepFilesProps) {
         />
         <button
           type="button"
-          onClick={uploadFile}
-          disabled={loading}
+          onClick={() => {
+            if (file) {
+              addFilesToCourse(title, file);
+            }
+          }}
+          disabled={loadingAddFilesToCourse}
           className="apply-fonts-normal bg-[#3D45EE] text-white px-4 py-2 rounded hover:bg-[#2E36C0] transition disabled:opacity-50"
         >
-          {loading ? "جارٍ الرفع..." : "رفع الملف"}
+          {loadingAddFilesToCourse ? (
+            <Loader className="animate-spin" />
+          ) : (
+            "رفع الملف"
+          )}
         </button>
       </div>
 
       {/* عرض الملفات المرفوعة */}
-      {uploadedFiles.length > 0 && (
+      {currentCourse.files.length > 0 && (
         <div>
           <h3 className="apply-fonts-normal font-semibold mb-3">
             📂 الملفات المرفوعة
           </h3>
           <ul className="space-y-2">
-            {uploadedFiles.map((f) => (
+            {currentCourse.files.map((f) => (
               <li
-                key={f.id}
+                key={f._id}
                 className="flex justify-between items-center border p-3 rounded bg-white"
               >
                 <div className="flex flex-col">
