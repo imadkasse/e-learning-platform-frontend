@@ -1,32 +1,27 @@
-"use client";
-import React, { useEffect } from "react";
+import React from "react";
 import CourseCard from "./CourseCard";
 
 import Link from "next/link";
 import SearchCourseTeacher from "./SearchCourseTeacher";
-import Cookies from "js-cookie";
 import { useUserStore } from "@/store/userStore";
 import { useCoursesStore } from "@/store/coursesStore";
 import Spinner from "@/components/spinner/Spinner";
+import { Course } from "@/types/course";
+import { cookies } from "next/headers";
 interface CoursesProps {
   searchParams: {
     filter?: string;
   };
 }
-const Courses = ({ searchParams }: CoursesProps) => {
-  const token = Cookies.get("token");
-
-  const { loading } = useUserStore();
-
-  const { courses, setCourses, setLoading } = useCoursesStore();
-  const loadingCourses = useCoursesStore((state) => state.loading);
-
-  useEffect(() => {
-    const getMyCourses = async () => {
-      try {
-        setLoading(true);
+const Courses = async ({ searchParams }: CoursesProps) => {
+  const { filter } = searchParams;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  const getMyCourses = async () => {
+    try {
+      if (filter) {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
+          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCoursesByTeacher?query=${filter}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -34,23 +29,26 @@ const Courses = ({ searchParams }: CoursesProps) => {
           }
         );
         const data = await res.json();
-        setCourses(data.user.publishedCourses);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
+        return data.courses;
       }
-    };
-    getMyCourses();
-  }, [setCourses, token, setLoading]);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
 
-  if (loading) {
-    return (
-      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
-        <Spinner />
-      </div>
-    );
-  }
+      return data.user.publishedCourses;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const courses: Course[] = await getMyCourses();
+  console.log(courses);
 
   return (
     <div className=" lg:custom-width rounded-xl px-4 py-5  overflow-y-scroll relative h-[93vh]">
@@ -70,41 +68,35 @@ const Courses = ({ searchParams }: CoursesProps) => {
       </div>
       <div className="container mx-auto px-8 py-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  gap-6">
-          {loadingCourses ? (
-            <div className="lg:col-span-3 md:col-span-2">
-              <Spinner />
-            </div>
-          ) : (
-            <>
-              {courses?.length > 0 ? (
-                courses.map((course) => {
-                  const videoNumber = course.sections.reduce((acc, section) => {
-                    return acc + (section.videos?.length || 0);
-                  }, 0);
+          <>
+            {courses?.length > 0 ? (
+              courses.map((course) => {
+                const videoNumber = course.sections.reduce((acc, section) => {
+                  return acc + (section.videos?.length || 0);
+                }, 0);
 
-                  return (
-                    <div key={course._id} className=" max-w-[272px]">
-                      <CourseCard
-                        courseId={course._id}
-                        courseDescription={course.description}
-                        courseImg={course.imageCover}
-                        courseName={course.title}
-                        coursePrice={course.price}
-                        courseRating={course.avgRatings}
-                        students={course.studentsCount}
-                        numberOfVideo={videoNumber}
-                      />
-                    </div>
-                  );
-                })
-              ) : (
-                // ✅ **إظهار رسالة عند عدم وجود دورات**
-                <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor h-[100vh]">
-                  لا توجد دورات
-                </h1>
-              )}
-            </>
-          )}
+                return (
+                  <div key={course._id} className=" max-w-[272px]">
+                    <CourseCard
+                      courseId={course._id}
+                      courseDescription={course.description}
+                      courseImg={course.imageCover}
+                      courseName={course.title}
+                      coursePrice={course.price}
+                      courseRating={course.avgRatings}
+                      students={course.studentsCount}
+                      numberOfVideo={videoNumber}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              // ✅ **إظهار رسالة عند عدم وجود دورات**
+              <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor h-[100vh]">
+                لا توجد دورات
+              </h1>
+            )}
+          </>
         </div>
       </div>
     </div>

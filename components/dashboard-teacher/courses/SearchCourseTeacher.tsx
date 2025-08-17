@@ -1,19 +1,21 @@
 "use client";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 // import CourseCard from "./CourseCard";
 import { Search } from "@mui/icons-material";
 import { useCoursesStore } from "@/store/coursesStore";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const SearchCourseTeacher = () => {
-  const [query, setQuery] = useState<string>("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const filter = searchParams.get("filter") || "";
+  const [query, setQuery] = useState<string>(filter);
 
-  const { setCourses, setLoading } = useCoursesStore();
   const token = Cookies.get("token");
-  const handelSearchCourses = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handelSearchCourses = async () => {
     try {
-      setLoading(true);
+      
       if (query !== "") {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCoursesByTeacher?query=${query}`,
@@ -24,28 +26,33 @@ const SearchCourseTeacher = () => {
           }
         );
         const data = await res.json();
-        setCourses(data.courses);
-      } else {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await res.json();
-        setCourses(data.user.publishedCourses);
+        return data.courses;
       }
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      return data.courses;
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (query) params.set("filter", query);
+
+    // حدّث الرابط بالمعلمات الجديدة
+    router.push(`?${params.toString()}`);
+  }, [query, router]);
   return (
     <>
-      <form onSubmit={handelSearchCourses}>
+      <form>
         <div className="relative ">
           <input
             type="text"
