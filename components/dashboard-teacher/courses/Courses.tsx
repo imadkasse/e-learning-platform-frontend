@@ -8,8 +8,12 @@ import Cookies from "js-cookie";
 import { useUserStore } from "@/store/userStore";
 import { useCoursesStore } from "@/store/coursesStore";
 import Spinner from "@/components/spinner/Spinner";
-
-const Courses = () => {
+interface CoursesProps {
+  searchParams: {
+    filter?: string;
+  };
+}
+const Courses = ({ searchParams }: CoursesProps) => {
   const token = Cookies.get("token");
 
   const { loading } = useUserStore();
@@ -74,15 +78,10 @@ const Courses = () => {
             <>
               {courses?.length > 0 ? (
                 courses.map((course) => {
-                  const videos = course.sections.map((section) => {
-                    return section.videos?.length || 0;
-                  });
-                  const numberOfVideos = videos.reduce(
-                    (acc, curr) => acc + curr,
-                    0
-                  );
+                  const videoNumber = course.sections.reduce((acc, section) => {
+                    return acc + (section.videos?.length || 0);
+                  }, 0);
 
-                  console.log(numberOfVideos);
                   return (
                     <div key={course._id} className=" max-w-[272px]">
                       <CourseCard
@@ -93,7 +92,7 @@ const Courses = () => {
                         coursePrice={course.price}
                         courseRating={course.avgRatings}
                         students={course.studentsCount}
-                        numberOfVideo={numberOfVideos}
+                        numberOfVideo={videoNumber}
                       />
                     </div>
                   );

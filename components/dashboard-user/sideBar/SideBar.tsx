@@ -122,7 +122,8 @@ const SideBar = () => {
           }`}
         >
           <ul className="list-none text-base w-[200px]">
-            <Link
+            {/* user info (remove in this time) */}
+            {/* <Link
               href={`/dashboard-user/my-info`}
               className={` flex items-center gap-5 py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2 ${
                 pathName === "/dashboard-user/my-info" ? "bg-mainColor/50" : ""
@@ -130,7 +131,7 @@ const SideBar = () => {
             >
               <PersonOutlineOutlined />
               <p>معلوماتي</p>
-            </Link>
+            </Link> */}
             <Link
               href={`/dashboard-user/support`}
               className={` flex items-center gap-5 py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2 ${
@@ -215,7 +216,8 @@ const SideBar = () => {
         </div>
         <nav className="apply-fonts-normal w-full  flex justify-center">
           <div className="list-none text-[14px] w-[200px]">
-            <Link
+            {/* user info (remove in this time) */}
+            {/* <Link
               href={`/dashboard-user/my-info`}
               className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
                 pathName === "/dashboard-user/my-info" ? "bg-mainColor/50" : ""
@@ -223,7 +225,7 @@ const SideBar = () => {
             >
               <PersonOutlineOutlined />
               <p>معلوماتي</p>
-            </Link>
+            </Link> */}
             <Link
               href={`/dashboard-user/support`}
               className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${

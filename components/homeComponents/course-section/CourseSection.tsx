@@ -27,10 +27,11 @@ const CourseSection = async () => {
               key={course._id}
               courseImg={course.imageCover}
               courseName={course.title}
-              numberOfVideo={course.videos.length}
+              numberOfVideo={12} // edit this 
               courseUrl={course._id}
               studentsNumber={course.enrolledStudents.length}
             />
+            
           );
         })}
       </div>
