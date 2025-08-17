@@ -9,7 +9,7 @@ import { Rating } from "@mui/material";
 import Image from "next/image";
 
 import CourseCard from "./CourseCard";
-import DynamicVideoPlyr from "./DynamicVideoPlyr";
+// import DynamicVideoPlyr from "./DynamicVideoPlyr";
 import AddReview from "./Reviews/AddReview";
 import { useUserStore } from "@/store/userStore";
 import { Course } from "@/types/course";

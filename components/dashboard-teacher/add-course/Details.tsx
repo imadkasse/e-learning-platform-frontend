@@ -72,7 +72,7 @@ const token = Cookies.get("token");
 
 export default function CourseUploader() {
   // stepre
-  const [step, setStep] = useState(3);
+  const [step, setStep] = useState(1);
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 4));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
   // const [isCreateingCourse, setIsCreateingCourse] = useState(false);
@@ -173,7 +173,6 @@ export default function CourseUploader() {
         },
       });
       showToast("success", res.data.message);
-      // console.log(res.data.course);
       setCurrentCourse(res.data.course);
       nextStep();
     } catch (error) {
@@ -201,7 +200,6 @@ export default function CourseUploader() {
         }
       );
       showToast("success", res.data.message);
-      console.log(res.data.section);
       setCurrentCourse({
         ...currentCourse,
         sections: [...currentCourse.sections, res.data.section._id],
@@ -394,9 +392,7 @@ export default function CourseUploader() {
           <button
             onClick={() => {
               console.log(currentCourse);
-              
             }}
-            
             className="apply-fonts-normal px-4 py-2 bg-[#3D45EE] text-white rounded cursor-pointer hover:bg-[#2E36C0]"
           >
             نشر
@@ -549,7 +545,7 @@ function StepGeneralDetails({
           </button>
         </div>
         <div>
-          <div className="flex gap-4 mt-4 ">
+          <div className="flex  flex-wrap gap-4 mt-4 ">
             {concepts.map((concept: string, index: number) => {
               return (
                 <div
@@ -592,7 +588,6 @@ function StepSections({
   title,
   setTitle,
 }: StepSectionsProps) {
-  console.log(sections);
   return (
     <div>
       <div className="flex gap-2 mb-4">
@@ -732,10 +727,15 @@ function StepVideos({
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={async () => {
                     video.file &&
-                    addVideoToSection(section._id, video.title, video.file)
-                  }
+                      (await addVideoToSection(
+                        section._id,
+                        video.title,
+                        video.file
+                      ));
+                    removeVideoField(section._id, videoIndex);
+                  }}
                   className="bg-[#3D45EE] text-white px-4 py-2 rounded hover:bg-[#2E36C0]"
                 >
                   {loadingAddVideoToSection ? (

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AccessTimeOutlined,
   ArrowBackIos,
@@ -19,16 +19,21 @@ import showToast from "@/utils/showToast";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useUserStore } from "@/store/userStore";
+import { Section } from "@/types/course";
 
 type Props = {
   courseId: string | undefined;
   userId: string | undefined;
   courseVideos: Lesson[] | undefined;
+  sections: Section[];
 };
 
-
-const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
-  
+const CourseCardDetails = ({
+  courseVideos,
+  courseId,
+  userId,
+  sections,
+}: Props) => {
   const token = Cookies.get("token");
   const pathname = usePathname();
 
@@ -55,11 +60,29 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
 
   const { lesson, setLesson } = useLesson();
 
-  const [isOpenAccordion, setIsOpenAccordion] = useState<boolean>(true);
+  const [isOpenAccordion, setIsOpenAccordion] = useState<
+    {
+      i: number;
+      value: boolean;
+    }[]
+  >(
+    sections.map((_, index) => {
+      return { i: index, value: false };
+    })
+  );
   const [loadingVideoId, setLoadingVideoId] = useState<string | null>(null);
   //TODO: can you remove and replace with better logic
   const [completedVideos, setCompletedVideos] = useState<string[]>([]); // fix the error in mark as completed
-  const toggleAccordion = () => setIsOpenAccordion((prev) => !prev);
+  const toggleAccordion = (i: number) => {
+    setIsOpenAccordion((prev) =>
+      prev.map((item) =>
+        item.i === i
+          ? { ...item, value: !item.value }
+          : { ...item, value: false }
+      )
+    );
+  };
+
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const handelOpenAndColsed = () => {
     setIsOpen(!isOpen);
@@ -98,6 +121,7 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
       setLoadingVideoId(null);
     }
   };
+
   //! changed this (add sections)
   return (
     <>
@@ -127,7 +151,7 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
         className={`transition-all duration-300 ease-in-out ${
           isOpen ? "xs:hidden lg:flex" : "lg:w-[400px] xs:w-[300px]"
         } border shadow-sm max-h-[85vh]  lg:sticky lg:top-[96px] lg:bottom-5   xs:fixed z-10 xs:bg-wygColor  w-[400px] py-3 px-4 flex flex-col gap-5  `}
-      >   
+      >
         {/* Title & course Details (Videos and progress) */}
         <section className="flex flex-col gap-3">
           <div className="w-full text-lg  ">
@@ -137,105 +161,122 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
           </div>
 
           {/* course Details (Videos and progress)*/}
-          <div className="border border-gray-300">
-            {/* عنوان Accordion */}
-            <div className="flex items-center justify-between bg-gray-300 py-2 px-1 cursor-pointer">
-              <button onClick={toggleAccordion}>
-                {isOpenAccordion ? (
-                  <ExpandMore className="text-gray-600 transition-transform duration-300" />
-                ) : (
-                  <ExpandMore className="text-gray-600 transition-transform duration-300 rotate-180" />
-                )}
-              </button>
-              <div className="flex gap-6 px-2">
-                <div className="flex items-center gap-1">
-                  <PlayCircleOutlined className="text-mainColor" />
-                  <h1 className="flex items-center">
-                    {courseVideos?.length}
-                    <span className="apply-fonts-normal text-[13px] mr-1">
-                      محاضرة
-                    </span>
-                  </h1>
-                </div>
-              </div>
-              <div>
-                <h1 className="font-semibold text-green-400">
-                  {numberOfCompletedVideo}/{courseVideos?.length}
-                </h1>
-              </div>
-            </div>
-
-            {/* محتوى Accordion */}
-            {isOpenAccordion && ( // عرض المحتوى فقط إذا كان الـ Accordion مفتوحًا
-              <div className="py-2 px-2 overflow-y-scroll max-h-72 ">
-                {courseVideos?.length ? (
-                  courseVideos.map((l) => (
-                    <div
-                      key={l._id}
-                      className={`my-2 py-1 px-2 ${
-                        l === lesson
-                          ? "bg-mainColorHoverLight/60"
-                          : " hover:bg-mainColorHoverLight"
-                      } group hoverEle`}
-                      onClick={() => {
-                        setLesson(l);
-                      }}
-                    >
-                      <div
-                        className={`flex items-center justify-between ${
-                          l === lesson ? "text-white" : "group-hover:text-white"
-                        }`}
+          {sections.length > 0 && (
+            <>
+              {sections.map((section, index: number) => {
+                return (
+                  <div key={section._id} className="border border-gray-300">
+                    {/* عنوان Accordion */}
+                    <div className="flex items-center justify-between bg-gray-300 py-2 px-1 cursor-pointer">
+                      <button
+                        onClick={() => {
+                          toggleAccordion(index);
+                        }}
                       >
-                        <div className="flex items-center gap-2">
-                          {loadingVideoId === l._id ? (
-                            // Spinner أثناء التحميل
-                            <div className="w-4 h-4 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                          ) : user.role === "teacher" ||
-                            user.role === "admin" ? (
-                            <></>
-                          ) : (
-                            <input
-                              type="checkbox"
-                              className="w-4 h-4 cursor-pointer"
-                              checked={
-                                l.completedBy.includes(userId || "no") ||
-                                completedVideos.includes(l._id)
-                              }
-                              onChange={() => {
-                                handleCompleteVideo(l._id);
-                              }}
-                            />
-                          )}
-                          <h1 className="font-semibold text-base">
-                            {l.lessonTitle}
+                        {isOpenAccordion[index]?.value ? (
+                          <ExpandMore className="text-gray-600 transition-transform duration-300" />
+                        ) : (
+                          <ExpandMore className="text-gray-600 transition-transform duration-300 rotate-180" />
+                        )}
+                      </button>
+                      <div className="flex gap-6 px-2">
+                        <div className="flex items-center gap-1">
+                          <PlayCircleOutlined className="text-mainColor" />
+                          <h1 className="flex items-center">
+                            {/* {++index} */}
+                            <span className="apply-fonts-normal text-[13px] mr-1">
+                              {section.title}
+                            </span>
                           </h1>
                         </div>
-
-                        <div
-                          className={`flex items-center gap-1 ${
-                            l === lesson
-                              ? "text-white"
-                              : "group-hover:text-white"
-                          }`}
-                        >
-                          <AccessTimeOutlined />
-
-                          <p>
-                            {
-                              //@ts-expect-error:fix
-                              formatDuration(l.duration.toFixed())
-                            }
-                          </p>
-                        </div>
+                      </div>
+                      <div>
+                        <h1 className="font-semibold text-green-400">
+                          {numberOfCompletedVideo}/{courseVideos?.length}
+                        </h1>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <h1 className="apply-fonts-normal">لا توجد أي دروس حاليا</h1>
-                )}
-              </div>
-            )}
-          </div>
+
+                    {/* محتوى Accordion */}
+                    {isOpenAccordion[index]?.value && ( // عرض المحتوى فقط إذا كان الـ Accordion مفتوحًا
+                      <div className="py-2 px-2 overflow-y-scroll max-h-72 ">
+                        {section.videos?.length ? (
+                          section.videos.map((l) => (
+                            <div
+                              key={l._id}
+                              className={`my-2 py-1 px-2 ${
+                                l === lesson
+                                  ? "bg-mainColorHoverLight/60"
+                                  : " hover:bg-mainColorHoverLight"
+                              } group hoverEle`}
+                              onClick={() => {
+                                setLesson(l);
+                              }}
+                            >
+                              <div
+                                className={`flex items-center justify-between ${
+                                  l === lesson
+                                    ? "text-white"
+                                    : "group-hover:text-white"
+                                }`}
+                              >
+                                <div className="flex items-center gap-2">
+                                  {loadingVideoId === l._id ? (
+                                    // Spinner أثناء التحميل
+                                    <div className="w-4 h-4 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                                  ) : user.role === "teacher" ||
+                                    user.role === "admin" ? (
+                                    <></>
+                                  ) : (
+                                    <input
+                                      type="checkbox"
+                                      className="w-4 h-4 cursor-pointer"
+                                      checked={
+                                        l.completedBy.includes(
+                                          userId || "no"
+                                        ) || completedVideos.includes(l._id)
+                                      }
+                                      onChange={() => {
+                                        handleCompleteVideo(l._id);
+                                      }}
+                                    />
+                                  )}
+                                  <h1 className="font-semibold text-base">
+                                    {l.lessonTitle}
+                                  </h1>
+                                </div>
+
+                                <div
+                                  className={`flex items-center gap-1 ${
+                                    l === lesson
+                                      ? "text-white"
+                                      : "group-hover:text-white"
+                                  }`}
+                                >
+                                  <AccessTimeOutlined />
+
+                                  <p>
+                                    {
+                                      //@ts-expect-error:fix
+                                      formatDuration(l.duration.toFixed())
+                                    }
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <h1 className="apply-fonts-normal">
+                            لا توجد أي دروس حاليا
+                          </h1>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </>
+          )}
         </section>
         {/* Share Course Links */}
         <div className="">
