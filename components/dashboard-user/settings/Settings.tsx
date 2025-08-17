@@ -77,7 +77,7 @@ const Settings = () => {
       {user && (
         <form onSubmit={handelupdate}>
           {/* Image */}
-          <div className="flex flex-col  justify-center gap-3 ">
+          <div className="flex flex-col   justify-center gap-3 ">
             <label className="apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
               الصورة
             </label>
@@ -143,7 +143,7 @@ const Settings = () => {
             </div>
 
             {/* Phone Number */}
-            <div>
+            <div className="col-span-2">
               <label className="apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
                 رقم الهاتف
               </label>
@@ -159,7 +159,7 @@ const Settings = () => {
             </div>
 
             {/* Role */}
-            <div>
+            {/* <div>
               <label className=" apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
                 الدور
               </label>
@@ -176,7 +176,7 @@ const Settings = () => {
                     : "أستاذ"}
                 </option>
               </select>
-            </div>
+            </div> */}
           </div>
 
           {/* Buttons */}
