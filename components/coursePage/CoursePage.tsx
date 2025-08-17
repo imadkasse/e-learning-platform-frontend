@@ -5,7 +5,6 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import CourseCardDetails from "./CourseCardDetails";
 import { Course } from "@/types/course";
-import DynamicVideoPlyr from "./DynamicVideoPlyr";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import Spinner from "../spinner/Spinner";
@@ -15,6 +14,8 @@ import { redirect } from "next/navigation";
 import { Reply } from "./comments and replies/Reply";
 import AddComment from "./comments and replies/AddComment";
 import AddReply from "./comments and replies/AddReply";
+import VideoPlayer from "./VideoPlayer";
+import { Download } from "lucide-react";
 type Props = {
   course: Course;
 };
@@ -35,19 +36,24 @@ const CoursePage = ({ course }: Props) => {
 
   const { user } = useUserStore();
 
-  //set first lesson
+  //set first lesson from first section
   useEffect(() => {
-    setLesson(
-      course?.videos[0] || {
-        _id: "",
-        lessonTitle: "",
-        url: "",
-        duration: 0,
-        isCompleted: false,
-        completedBy: [],
-        comments: [],
+    if (course?.sections && course.sections.length > 0) {
+      const firstSection = course.sections[0];
+      if (firstSection.videos && firstSection.videos.length > 0) {
+        setLesson(
+          firstSection.videos[0] || {
+            _id: "",
+            lessonTitle: "",
+            url: "",
+            duration: 0,
+            isCompleted: false,
+            completedBy: [],
+            comments: [],
+          }
+        );
       }
-    );
+    }
   }, [setLesson, course]);
 
   useEffect(() => {
@@ -101,18 +107,20 @@ const CoursePage = ({ course }: Props) => {
   }
   //section comments
   return (
-    <div className=" flex  flex-row-reverse justify-between gap-7 sm:px-3 ">
+    <div className="  flex  flex-row-reverse justify-between gap-7 sm:px-3  ">
       {/* Course Details */}
 
       <CourseCardDetails
-        courseVideos={course?.videos} //! changed this
+        courseVideos={course?.sections[0].videos}
         courseId={course?._id}
         userId={user._id}
+        sections={course?.sections}
       />
+
       {/* Show Course */}
-      <div className="lg:custom-width-Course ">
-        {/* Welcome video */}
-        <DynamicVideoPlyr videoSrc={lesson?.url || ""} /> {/*//! changed this*/}
+      <div className="lg:custom-width-Course mx-auto">
+        {/* first  video */}
+        <VideoPlayer videoId={lesson?.url} />
         {/* Video Title */}
         <div className="my-4">
           <h1 className="apply-fonts-medium  xs:text-lg lg:text-2xl mb-2">

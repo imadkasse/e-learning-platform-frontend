@@ -73,20 +73,31 @@ const Courses = () => {
           ) : (
             <>
               {courses?.length > 0 ? (
-                courses.map((course) => (
-                  <div key={course._id} className=" max-w-[272px]">
-                    <CourseCard
-                      courseId={course._id}
-                      courseDescription={course.description}
-                      courseImg={course.imageCover}
-                      courseName={course.title}
-                      coursePrice={course.price}
-                      courseRating={course.avgRatings}
-                      students={course.studentsCount}
-                      numberOfVideo={course.videos.length}
-                    />
-                  </div>
-                ))
+                courses.map((course) => {
+                  const videos = course.sections.map((section) => {
+                    return section.videos?.length || 0;
+                  });
+                  const numberOfVideos = videos.reduce(
+                    (acc, curr) => acc + curr,
+                    0
+                  );
+
+                  console.log(numberOfVideos);
+                  return (
+                    <div key={course._id} className=" max-w-[272px]">
+                      <CourseCard
+                        courseId={course._id}
+                        courseDescription={course.description}
+                        courseImg={course.imageCover}
+                        courseName={course.title}
+                        coursePrice={course.price}
+                        courseRating={course.avgRatings}
+                        students={course.studentsCount}
+                        numberOfVideo={numberOfVideos}
+                      />
+                    </div>
+                  );
+                })
               ) : (
                 // ✅ **إظهار رسالة عند عدم وجود دورات**
                 <h1 className="apply-fonts-normal sm:text-3xl mt-5 w-full col-span-3 text-center text-mainColor h-[100vh]">

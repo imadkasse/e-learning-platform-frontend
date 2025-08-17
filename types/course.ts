@@ -23,7 +23,7 @@ type Videos = {
   completedBy: string[];
   comments: Comment[];
 };
-type Section = {
+export type Section = {
   _id: string;
   title: string;
   videos: Videos[];
