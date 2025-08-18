@@ -1,18 +1,19 @@
 "use client";
 import { useSearchUser } from "@/store/searchUser";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { User } from "@/types/user";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const SearchAdmin = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const filter = searchParams.get("filter") || "";
   const token = Cookies.get("token");
-  const [searchData, setsearchData] = useState<string>("");
-  const { setUsers, setLoading } = useSearchUser();
-  const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const [searchData, setsearchData] = useState<string>(filter);
+  const handleSearch = async () => {
     try {
-      setLoading(true);
-      if (searchData !== "") {
+      if (searchData) {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/searchUsers?query=${searchData}`,
           {
@@ -22,37 +23,36 @@ const SearchAdmin = () => {
           }
         );
         const data = await res.json();
-        setUsers(
+        return (
           data.users.filter(
             (user: User) => user.role === "admin" || user.role === "teacher"
           ) || []
         );
-      } else {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await res.json();
-        setUsers(
-          data.users.filter(
-            (user: User) => user.role === "admin" || user.role === "teacher"
-          )
-        );
       }
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      return data.users.filter(
+        (user: User) => user.role === "admin" || user.role === "teacher"
+      );
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
-  
 
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchData) params.set("filter", searchData);
+
+    // حدّث الرابط بالمعلمات الجديدة
+    router.push(`?${params.toString()}`);
+  }, [searchData, router]);
   return (
-    <form className="flex items-center flex-grow" onSubmit={handleSearch}>
+    <form className="flex items-center flex-grow">
       <label className="sr-only">Search</label>
       <div className="relative w-full">
         <div className="absolute z-10 inset-y-0 start-0 flex items-center ps-3 pointer-events-none  ">
@@ -80,9 +80,6 @@ const SearchAdmin = () => {
           placeholder="البحث..."
         />
       </div>
-      <button className="apply-fonts-normal  py-2.5 mx-3 rounded-lg text-white px-4 bg-mainColor hover:bg-mainColorHoverLight hoverEle">
-        إبحث
-      </button>
     </form>
   );
 };

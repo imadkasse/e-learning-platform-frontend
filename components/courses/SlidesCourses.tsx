@@ -53,6 +53,12 @@ const SlidesCourses = ({ courses }: Props) => {
                   }}
                 >
                   {coursesAndCate.courses.map((course) => {
+                    const videoNumber = course.sections.reduce(
+                      (acc, section) => {
+                        return acc + (section.videos?.length || 0);
+                      },
+                      0
+                    );
                     return (
                       <SwiperSlide key={course._id}>
                         <CourseCard
@@ -63,7 +69,7 @@ const SlidesCourses = ({ courses }: Props) => {
                           coursePrice={course.price}
                           courseRating={course.avgRatings}
                           students={course.studentsCount}
-                          numberOfVideo={course.videos.length}
+                          numberOfVideo={videoNumber}
                         />
                       </SwiperSlide>
                     );

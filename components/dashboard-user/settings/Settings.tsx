@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import showToast from "@/utils/showToast";
 import UpdatePassword from "@/components/utlisComponenets/UpdatePassword";
 import Spinner from "@/components/spinner/Spinner";
+import { DollarSign, Wallet } from "lucide-react";
 
 const Settings = () => {
   const router = useRouter();
@@ -32,8 +33,6 @@ const Settings = () => {
       </div>
     );
   }
-
-
 
   const handelupdate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,6 +73,63 @@ const Settings = () => {
           إعدادات الحساب
         </h1>
       </div>
+      {/* عرض رصيد الطالب */}
+      {user && user.role === "student" && (
+        <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-green-100 p-3 rounded-full">
+                <Wallet className="text-green-600" size={24} />
+              </div>
+              <div>
+                <h3 className="apply-fonts-normal text-lg font-semibold text-gray-800 mb-1">
+                  رصيد الحساب
+                </h3>
+                <p className="apply-fonts-normal text-sm text-gray-600">
+                  الرصيد المتاح للشراء
+                </p>
+              </div>
+            </div>
+
+            <div className="text-left">
+              <div className="flex items-center gap-2 mb-1">
+                <DollarSign className="text-green-600" size={20} />
+                <span className="text-2xl font-bold text-green-700">
+                  {user.balance ? user.balance.toLocaleString("ar-DZ") : "0"}
+                </span>
+                <span className="text-lg font-medium text-green-600">DZD</span>
+              </div>
+              <div className="text-xs text-gray-500 apply-fonts-normal">
+                آخر تحديث: اليوم
+              </div>
+            </div>
+          </div>
+
+          {/* شريط إضافي للتفاعل */}
+          <div className="mt-4 pt-4 border-t border-green-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-3 h-3 rounded-full ${
+                    user.balance && user.balance > 0
+                      ? "bg-green-400 animate-pulse"
+                      : "bg-red-400"
+                  }`}
+                ></div>
+                <span className="apply-fonts-normal text-sm text-gray-600">
+                  {user.balance && user.balance > 0
+                    ? "الرصيد متاح للاستخدام"
+                    : "يرجى شحن الرصيد"}
+                </span>
+              </div>
+
+              <button className="apply-fonts-normal bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition-all duration-300 hover:shadow-md transform hover:scale-105">
+                شحن الرصيد
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {user && (
         <form onSubmit={handelupdate}>
           {/* Image */}

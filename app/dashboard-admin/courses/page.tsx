@@ -1,10 +1,14 @@
 import Courses from "@/components/dashboard-admin/courses/Courses";
 import React from "react";
 
-const page = () => {
+const page = async({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) => {
   return (
     <div className="px-1 h-full  container mx-auto ">
-      <Courses />
+      <Courses searchParams={await searchParams}/>
     </div>
   );
 };
