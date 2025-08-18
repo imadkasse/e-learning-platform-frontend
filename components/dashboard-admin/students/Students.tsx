@@ -1,26 +1,24 @@
-"use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import StudentCard from "./StudentCard";
-import Cookies from "js-cookie";
-import Spinner from "@/components/spinner/Spinner";
-import { useSearchUser } from "@/store/searchUser";
 import SearchUsers from "./SearchUsers";
+import { User } from "@/types/user";
+import { cookies } from "next/headers";
+interface StudentsProps {
+  searchParams: {
+    filter?: string;
+  };
+}
+const Students = async ({ searchParams }: StudentsProps) => {
+  const { filter } = searchParams;
 
-const Students = () => {
-  const { users, setUsers, loading, setLoading } = useSearchUser();
+  const cookiesStore = await cookies();
+  const token = cookiesStore.get("token")?.value;
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState<number>(0);
-  const [totalPageArr, setTotalPageArr] = useState<number[]>([]);
-
-  const token = Cookies.get("token");
-
-  useEffect(() => {
-    const fetchAllUsers = async () => {
-      try {
-        setLoading(true);
+  const fetchAllUsers = async () => {
+    try {
+      if (filter) {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users?page=${currentPage}&limit=5`,
+          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/searchUsers?query=${filter}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -28,19 +26,21 @@ const Students = () => {
           }
         );
         const data = await res.json();
-        setUsers(data.users);
-        setTotalPage(data.totalPages);
-        setTotalPageArr(
-          Array.from({ length: data.totalPages }, (_, i) => i + 1)
-        );
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
+        return data.users.filter((user: User) => user.role === "student");
       }
-    };
-    fetchAllUsers();
-  }, [token, currentPage, setUsers, setLoading]);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      return data.users.filter((user: User) => user.role === "student");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const users: User[] = await fetchAllUsers();
 
   return (
     <div className=" lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll relative ">
@@ -59,13 +59,7 @@ const Students = () => {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={3} className="text-center py-4">
-                    <Spinner />
-                  </td>
-                </tr>
-              ) : users?.length > 0 ? (
+              {users?.length > 0 ? (
                 users.map((user) => (
                   <tr key={user._id} className="">
                     <td colSpan={3} className="px-4 py-2">
@@ -90,10 +84,10 @@ const Students = () => {
             </tbody>
           </table>
         </div>
-
-        <nav className="flex justify-center">
+        {/* Pagenation */}
+        {/* <nav className="flex justify-center">
           <ul className="flex items-center -space-x-px h-16 text-md">
-            {/* الزر السابق */}
+           
             <li>
               <button
                 onClick={() => {
@@ -122,7 +116,7 @@ const Students = () => {
               </button>
             </li>
 
-            {/* أزرار الأرقام */}
+         
             {totalPageArr.map((num) => (
               <li key={num}>
                 <button
@@ -140,7 +134,7 @@ const Students = () => {
               </li>
             ))}
 
-            {/* الزر التالي */}
+    
             <li>
               <button
                 onClick={() => {
@@ -169,7 +163,7 @@ const Students = () => {
               </button>
             </li>
           </ul>
-        </nav>
+        </nav> */}
       </div>
     </div>
   );

@@ -42,6 +42,10 @@ const HomePage = async () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4  gap-6">
           {courses.length > 0 ? (
             courses.map((course) => {
+              const videoNumber = course.sections.reduce((acc, section) => {
+                return acc + (section.videos?.length || 0);
+              }, 0);
+
               return (
                 <div key={course._id} className=" max-w-[272px] h-[364px]">
                   <CardCourse
@@ -51,7 +55,7 @@ const HomePage = async () => {
                         ?.percentage || 0
                     }
                     studentsNumber={course.enrolledStudents.length}
-                    numberOfVideo={course.videos.length}
+                    numberOfVideo={videoNumber}
                     courseImg={course.imageCover}
                     courseUrl={`/course/${course._id}`}
                     courseName={course.title}

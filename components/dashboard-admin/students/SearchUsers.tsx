@@ -1,52 +1,26 @@
 "use client";
 import { useSearchUser } from "@/store/searchUser";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const SearchUsers = () => {
-  const token = Cookies.get("token");
-  const [searchData, setsearchData] = useState<string>("");
-  const { setUsers, setLoading } = useSearchUser();
-  const handleSearchUsers = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      if (searchData !== "") {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/searchUsers?query=${searchData}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await res.json();
-        setUsers(data.users);
-      } else {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users?page=1&limit=5`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await res.json();
-        setUsers(data.users);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const filter = searchParams.get("filter") || "";
+  const [searchData, setsearchData] = useState<string>(filter);
 
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchData) params.set("filter", searchData);
+
+    // حدّث الرابط بالمعلمات الجديدة
+    router.push(`?${params.toString()}`);
+  }, [searchData, router]);
   return (
     <>
-      <form
-        className="flex items-center flex-grow"
-        onSubmit={handleSearchUsers}
-      >
+      <form className="flex items-center flex-grow">
         <label className="sr-only">Search</label>
         <div className="relative w-full">
           <div className="absolute  inset-y-0 start-0 flex items-center ps-3 pointer-events-none  ">
@@ -75,9 +49,6 @@ const SearchUsers = () => {
             onChange={(e) => setsearchData(e.target.value)}
           />
         </div>
-        <button className="apply-fonts-normal py-2.5 mx-3 rounded-lg text-white px-4 bg-mainColor hover:bg-mainColorHoverLight hoverEle">
-          إبحث
-        </button>
       </form>
     </>
   );

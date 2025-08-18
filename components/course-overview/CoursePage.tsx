@@ -9,12 +9,11 @@ import { Rating } from "@mui/material";
 import Image from "next/image";
 
 import CourseCard from "./CourseCard";
-// import DynamicVideoPlyr from "./DynamicVideoPlyr";
 import AddReview from "./Reviews/AddReview";
 import { useUserStore } from "@/store/userStore";
 import { Course } from "@/types/course";
-import { ChevronDown, ChevronUp, Folder } from "lucide-react";
-import React, { useState } from "react";
+import { ChevronDown, ChevronUp, Clock, Folder, Play } from "lucide-react";
+import React, { Fragment, useState } from "react";
 
 type Props = {
   course: Course;
@@ -123,53 +122,97 @@ export const CoursePage = ({ course }: Props) => {
             <table className="table-auto w-full border-collapse">
               <tbody>
                 {course.sections?.map((section, index) => (
-                  <React.Fragment key={section._id}>
+                  <Fragment key={section._id}>
                     {/* عنوان القسم */}
-                    <tr className="bg-gray-100 border">
+                    <tr className="border-b border-gray-200">
                       <td colSpan={3} className="p-0">
                         <button
                           onClick={() => toggleSection(index)}
-                          className="flex items-center justify-between w-full py-3 px-4 text-right text-lg font-semibold "
+                          className="flex items-center justify-between w-full py-4 px-6 text-right   transition-all duration-300 ease-in-out group"
                         >
-                          <div className="flex items-center gap-2">
-                            <Folder className="text-blue-500" size={20} />
-                            {section.title}
+                          <div className="flex items-center gap-3">
+                            <div className="transform transition-all duration-300 ease-in-out group-hover:scale-110">
+                              {openIndex === index ? (
+                                <ChevronUp
+                                  className="text-blue-700 transition-all duration-300"
+                                  size={20}
+                                />
+                              ) : (
+                                <ChevronDown
+                                  className="text-gray-600 group-hover:text-blue-600 transition-all duration-300"
+                                  size={20}
+                                />
+                              )}
+                            </div>
+                            <span
+                              className={`text-lg font-semibold  ${
+                                openIndex === index
+                                  ? "text-blue-700"
+                                  : "text-gray-800 group-hover:text-blue-700 transition-all duration-300"
+                              }`}
+                            >
+                              {section.title}
+                            </span>
                           </div>
-                          {openIndex === index ? (
-                            <ChevronUp className="text-gray-500" size={20} />
-                          ) : (
-                            <ChevronDown className="text-gray-500" size={20} />
-                          )}
+
+                          <div className="flex items-center gap-3">
+                            {/* <div className="flex items-center gap-2 text-gray-500">
+                              <Clock size={14} />
+                              <span className="text-sm font-medium">21م</span>
+                            </div> */}
+                            <div className="flex items-center gap-2 text-gray-500">
+                              {/* <span className="w-2 h-2 bg-gray-400 rounded-full"></span> */}
+                              <span className="text-sm font-medium">
+                                {section.videos.length} درس
+                              </span>
+                            </div>
+                          </div>
                         </button>
                       </td>
                     </tr>
 
                     {/* فيديوهات القسم */}
-                    {openIndex === index &&
-                      section.videos.map((video) => (
-                        <tr
-                          key={video._id}
-                          className="bg-white hover:bg-gray-50 transition"
-                        >
-                          {/* زر التشغيل */}
-                          <td className="px-4 py-2 text-right w-12">
-                            <button className="text-mainColor hover:text-mainColorHover transition">
-                              <PlayArrow />
-                            </button>
-                          </td>
+                    {openIndex === index && (
+                      <tr>
+                        <td colSpan={3} className="p-0 bg-white">
+                          <div className="border-l-4 border-blue-500 bg-blue-50/30">
+                            {section.videos.map((video, videoIndex) => (
+                              <div
+                                key={video._id}
+                                className={`flex items-center py-3 px-6 hover:bg-blue-50 transition-all duration-300 ease-in-out cursor-pointer group animate-slideDown border-b border-gray-100 last:border-b-0`}
+                                style={{
+                                  animationDelay: `${videoIndex * 80}ms`,
+                                }}
+                              >
+                                {/* زر التشغيل */}
+                                <div className="flex items-center justify-center w-8 h-8 ml-4">
+                                  <button className="flex items-center justify-center w-8 h-8 bg-blue-100 hover:bg-blue-600 text-blue-600 hover:text-white rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 group-hover:shadow-md">
+                                    <Play
+                                      size={12}
+                                      className="mr-0.5 transform group-hover:scale-110 transition-transform duration-300"
+                                    />
+                                  </button>
+                                </div>
 
-                          {/* اسم الدرس */}
-                          <td className="px-4 py-2 text-right apply-fonts-normal">
-                            {video.lessonTitle}
-                          </td>
+                                {/* اسم الدرس */}
+                                <div className="flex-1 text-right px-4">
+                                  <h4 className="font-medium text-gray-800 group-hover:text-blue-700 transition-colors duration-300">
+                                    {video.lessonTitle}
+                                  </h4>
+                                </div>
 
-                          {/* مدة الدرس */}
-                          <td className="px-4 py-2 text-right text-gray-600 w-32">
-                            {(Number(video.duration) / 60).toFixed(3)} دقيقة
-                          </td>
-                        </tr>
-                      ))}
-                  </React.Fragment>
+                                {/* مدة الدرس */}
+                                <div className="text-gray-500 text-sm font-medium min-w-[80px] text-center">
+                                  {(Number(video.duration) / 60).toFixed(0)}{" "}
+                                  دقيقة
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
@@ -252,3 +295,33 @@ export const CoursePage = ({ course }: Props) => {
     </div>
   );
 };
+<style jsx>{`
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slideDown {
+    animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  .group:hover .animate-pulse-hover {
+    animation: pulse 2s infinite;
+  }
+`}</style>;

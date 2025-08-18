@@ -1,36 +1,27 @@
 "use client";
 import { useCoursesStore } from "@/store/coursesStore";
 import showToast from "@/utils/showToast";
-import React, { FormEvent, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { FormEvent, useEffect, useState } from "react";
 
 const SearchCourse = () => {
-  const [searchData, setsearchData] = useState<string>("");
-  const { setCourses } = useCoursesStore();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const filter = searchParams.get("filter") || "";
+  const [searchData, setsearchData] = useState<string>(filter);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      if (searchData !== "") {
-        const data = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCourses?query=${searchData}`
-        );
-        const res = await data.json();
-        setCourses(res.courses);
-      } else {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`
-        );
-        const data = await res.json();
-        setCourses(data.courses);
-      }
-    } catch (error) {
-      //@ts-expect-error:fix...
-      showToast("error", error.response.data.message);
-    }
-  };
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchData) params.set("filter", searchData);
+
+    // حدّث الرابط بالمعلمات الجديدة
+    router.push(`?${params.toString()}`);
+  }, [searchData, router]);
   return (
     <>
-      <form className="flex items-center flex-grow" onSubmit={handleSubmit}>
+      <form className="flex items-center flex-grow">
         <label className="sr-only">Search</label>
         <div className="relative w-full">
           <div className="absolute  inset-y-0 start-0 flex items-center ps-3 pointer-events-none  ">
@@ -60,12 +51,6 @@ const SearchCourse = () => {
             placeholder="البحث..."
           />
         </div>
-        <button
-          type="submit"
-          className="apply-fonts-normal  py-2.5 mx-3 rounded-lg text-white px-4 bg-mainColor hover:bg-mainColorHoverLight hoverEle"
-        >
-          إبحث
-        </button>
       </form>
     </>
   );

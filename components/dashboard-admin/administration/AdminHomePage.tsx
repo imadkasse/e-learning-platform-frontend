@@ -1,24 +1,24 @@
-"use client";
-import React, { useEffect } from "react";
+import React from "react";
 import AdminCardPage from "./AdminCardPage";
-import Cookies from "js-cookie";
 import { User } from "@/types/user";
-import Spinner from "@/components/spinner/Spinner";
 import AddUser from "./AddUser";
-import { useSearchUser } from "@/store/searchUser";
 import SearchAdmin from "./SearchAdmin";
+import { cookies } from "next/headers";
+interface AdminProps {
+  searchParams: {
+    filter?: string;
+  };
+}
+const AdminHomePage = async ({ searchParams }: AdminProps) => {
+  const { filter } = searchParams;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
 
-const AdminHomePage = () => {
-  const token = Cookies.get("token");
-
-  const { setUsers, setLoading, users, loading } = useSearchUser();
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
+  const fetchUsers = async () => {
+    try {
+      if (filter) {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users`,
+          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/searchUsers?query=${filter}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -26,20 +26,26 @@ const AdminHomePage = () => {
           }
         );
         const data = await res.json();
-        setUsers(
+        return (
           data.users.filter(
             (user: User) => user.role === "admin" || user.role === "teacher"
-          )
+          ) || []
         );
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchUsers();
-  }, [token, setLoading, setUsers]);
-
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      return data.users.filter(
+        (user: User) => user.role === "admin" || user.role === "teacher"
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const users: User[] = await fetchUsers();
   return (
     <div className="lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll  ">
       <div className="mb-5 flex items-center lg:gap-6 ">
@@ -60,13 +66,7 @@ const AdminHomePage = () => {
             </tr>
           </thead>
           <tbody className="">
-            {loading ? (
-              <tr>
-                <td colSpan={4} className="text-center">
-                  <Spinner />
-                </td>
-              </tr>
-            ) : (
+            {
               <>
                 {users?.length > 0 ? (
                   users.map((user) => (
@@ -95,7 +95,7 @@ const AdminHomePage = () => {
                   </tr>
                 )}
               </>
-            )}
+            }
           </tbody>
         </table>
       </div>
