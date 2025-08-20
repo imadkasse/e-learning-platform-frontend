@@ -15,7 +15,6 @@ const SearchCourseTeacher = () => {
   const token = Cookies.get("token");
   const handelSearchCourses = async () => {
     try {
-      
       if (query !== "") {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCoursesByTeacher?query=${query}`,
@@ -40,7 +39,7 @@ const SearchCourseTeacher = () => {
       return data.courses;
     } catch (error) {
       console.log(error);
-    } 
+    }
   };
   useEffect(() => {
     const params = new URLSearchParams();
@@ -62,12 +61,6 @@ const SearchCourseTeacher = () => {
             }}
             placeholder="إبحث ..."
           />
-          <button
-            type="submit"
-            className="absolute top-1 -left-1  apply-fonts-normal  py-1.5 mx-3 rounded-lg text-white px-2 bg-mainColor hover:bg-mainColorHoverLight hoverEle"
-          >
-            <Search />
-          </button>
         </div>
       </form>
     </>
