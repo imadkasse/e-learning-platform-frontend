@@ -25,6 +25,7 @@ const page = async ({ params }: Props) => {
     }
   );
   const data = await res.json();
+  console.log(data.course)
   return (
     <div className="py-3 container mx-auto relative">
       <NavBarCourse />

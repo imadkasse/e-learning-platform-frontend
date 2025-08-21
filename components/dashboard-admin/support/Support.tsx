@@ -3,23 +3,19 @@ import React, { useEffect } from "react";
 import MsgCard from "./MsgCard";
 
 import { io } from "socket.io-client";
-import Cookies from "js-cookie";
 import { useFaq } from "@/store/faqStore";
 
 //connect with server
 const socket = io("https://e-leraning-backend.onrender.com");
 
 const Support = () => {
-  const token = Cookies.get("token");
   const { faqs, setFaqs } = useFaq();
 
   useEffect(() => {
     const fetchedFaqs = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/faq`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         });
         const data = await res.json();
         setFaqs(data.data.faqs);
@@ -41,7 +37,7 @@ const Support = () => {
       socket.off("newFaq");
       socket.off("deleteFaq");
     };
-  }, [token, faqs, setFaqs]);
+  }, [faqs, setFaqs]);
 
   return (
     <div className=" lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll relative">

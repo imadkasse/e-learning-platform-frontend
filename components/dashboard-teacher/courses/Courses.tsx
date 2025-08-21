@@ -3,9 +3,7 @@ import CourseCard from "./CourseCard";
 
 import Link from "next/link";
 import SearchCourseTeacher from "./SearchCourseTeacher";
-import { useUserStore } from "@/store/userStore";
-import { useCoursesStore } from "@/store/coursesStore";
-import Spinner from "@/components/spinner/Spinner";
+
 import { Course } from "@/types/course";
 import { cookies } from "next/headers";
 interface CoursesProps {
@@ -15,17 +13,17 @@ interface CoursesProps {
 }
 const Courses = async ({ searchParams }: CoursesProps) => {
   const { filter } = searchParams;
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const cookiesStore = await cookies();
+  const token = cookiesStore.get("token")?.value;
+
   const getMyCourses = async () => {
     try {
       if (filter) {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCoursesByTeacher?query=${filter}`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            credentials: "include",
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
           }
         );
         const data = await res.json();
@@ -33,10 +31,10 @@ const Courses = async ({ searchParams }: CoursesProps) => {
       }
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
+
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
       const data = await res.json();

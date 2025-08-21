@@ -63,7 +63,7 @@ export const CoursePage = ({ course }: Props) => {
 
         <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
           <iframe
-            src={`https://iframe.mediadelivery.net/embed/476506/${course.sections[0].videos[0].url}?autoplay=false&loop=false&muted=false&preload=false&responsive=false`}
+            src={`https://iframe.mediadelivery.net/embed/476506/${course.sections[0].videos[0]?.url}?autoplay=false&loop=false&muted=false&preload=false&responsive=false`}
             loading="lazy"
             className="absolute top-0 left-0 w-full h-full border-0 rounded-lg shadow-md"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
@@ -242,48 +242,89 @@ export const CoursePage = ({ course }: Props) => {
 
           <div className="flex flex-col gap-5">
             {course.reviews.length > 0 ? (
-              course.reviews.map((review) => {
-                return (
-                  <div key={review._id} className="border-b pb-3">
-                    <div className="flex items-center gap-2">
-                      <Image
-                        src={review.user.thumbnail || "/imgs/personImg.png"}
-                        alt="teacher-username"
-                        width={150}
-                        height={150}
-                        className="rounded-full xs:w-12 xs:h-12"
-                      />
-                      <div className="flex flex-col gap-1">
-                        <h1 className="font-semibold">imad</h1>
-                        <Rating
-                          className="text-courseStarColor"
-                          dir="ltr"
-                          name="half-rating-read"
-                          value={review.rating}
-                          precision={0.5}
-                          readOnly
-                          size="small"
-                        />
+              <div className="space-y-6">
+                {course.reviews.map((review) => {
+                  return (
+                    <div
+                      key={review._id}
+                      className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
+                    >
+                      {/* Review Header */}
+                      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                        <div className="relative">
+                          <Image
+                            src={review.user.thumbnail || "/imgs/logoImg.png"}
+                            alt="user-username"
+                            width={48}
+                            height={48}
+                            className="rounded-full ring-2 ring-[#B9BCFF]/20"
+                          />
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#45DA10] rounded-full border-2 border-white"></div>
+                        </div>
+
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-gray-800 text-sm">
+                              {review.user.username}
+                            </h3>
+                            <span className="px-2 py-1 bg-[#B9BCFF]/20 text-[#3D45EE] text-xs rounded-full font-medium">
+                              طالب
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <svg
+                              className="w-4 h-4 text-gray-400"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            <span className="text-xs text-gray-500 font-medium">
+                              {review.createdAt.split("T")[0]}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <h1 className="text-xl px-1">|</h1>
-                      <div>
-                        <h1 className="font-bold">
-                          {review.createdAt.split("T")[0]}
-                        </h1>
+                      {/* Review Content */}
+                      <div dir="rtl" className="p-4">
+                        <div className="bg-gray-50 rounded-xl p-4 border-r-4 border-[#3D45EE]">
+                          <p className="apply-fonts-normal text-gray-700 leading-relaxed text-sm">
+                            {review.content}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <div dir="rtl" className="mt-1 mx-3">
-                      <p className="p-2 apply-fonts-normal text-[14px] text-courseTextSection">
-                        {review.content}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })
+                  );
+                })}
+              </div>
             ) : (
-              <h1 className="apply-fonts-medium text-courseTextSection text-center lg:text-xl sm:text-lg xs:text-base">
-                لا توجد تعليقات
-              </h1>
+              <div className="text-center py-12">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                  <svg
+                    className="w-8 h-8 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="apply-fonts-normal text-gray-600 text-lg font-medium">
+                  لا توجد أراء بعد
+                </h3>
+                <p className="apply-fonts-normal text-gray-400 text-sm mt-1">
+                  كن أول من يشارك رأيه حول هذه الدورة
+                </p>
+              </div>
             )}
           </div>
         </div>

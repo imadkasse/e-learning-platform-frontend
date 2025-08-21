@@ -1,10 +1,10 @@
 // import { User } from "@/types/user";
 import axios from "axios";
 import { create } from "zustand";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import { User } from "@/types/user";
 
-const token = Cookies.get("token");
+// const token = Cookies.get("token");
 
 export const useUserStore = create<{
   user: User;
@@ -36,9 +36,7 @@ export const useUserStore = create<{
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
       set({ user: res.data.user });

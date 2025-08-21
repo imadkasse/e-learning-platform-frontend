@@ -2,7 +2,6 @@ import React from "react";
 import StudentCard from "./StudentCard";
 import SearchUsers from "./SearchUsers";
 import { User } from "@/types/user";
-import { cookies } from "next/headers";
 interface StudentsProps {
   searchParams: {
     filter?: string;
@@ -11,27 +10,20 @@ interface StudentsProps {
 const Students = async ({ searchParams }: StudentsProps) => {
   const { filter } = searchParams;
 
-  const cookiesStore = await cookies();
-  const token = cookiesStore.get("token")?.value;
-
   const fetchAllUsers = async () => {
     try {
       if (filter) {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/searchUsers?query=${filter}`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            credentials: "include",
           }
         );
         const data = await res.json();
         return data.users.filter((user: User) => user.role === "student");
       }
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: "include",
       });
       const data = await res.json();
       return data.users.filter((user: User) => user.role === "student");

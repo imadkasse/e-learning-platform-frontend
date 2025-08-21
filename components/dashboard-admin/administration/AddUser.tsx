@@ -3,7 +3,6 @@ import showToast from "@/utils/showToast";
 import { CloseOutlined } from "@mui/icons-material";
 import axios from "axios";
 import React, { FormEvent, useState } from "react";
-import Cookies from "js-cookie";
 import { useSearchUser } from "@/store/searchUser";
 
 type UserData = {
@@ -16,7 +15,6 @@ type UserData = {
 };
 
 const AddUser = () => {
-  const token = Cookies.get("token");
   const [showAdd, setshowAdd] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -40,12 +38,12 @@ const AddUser = () => {
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users`,
         userData,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }
       );
       showToast("success", "تمت الإضافة بنجاح");
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/users`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       const data = await res.json();
       setUsers(data.users);

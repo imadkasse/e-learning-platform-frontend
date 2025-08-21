@@ -2,7 +2,6 @@
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import showToast from "@/utils/showToast";
 import axios from "axios";
-import Cookies from "js-cookie";
 import { Loader, X } from "lucide-react";
 import Image from "next/image";
 import "react-toastify/dist/ReactToastify.css";
@@ -68,7 +67,6 @@ interface VideoUpload {
 }
 
 const baseUrl = process.env.NEXT_PUBLIC_BACK_URL;
-const token = Cookies.get("token");
 
 export default function CourseUploader() {
   // stepre
@@ -167,8 +165,8 @@ export default function CourseUploader() {
 
     try {
       const res = await axios.post(`${baseUrl}/api/courses`, formData, {
+        withCredentials: true,
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
@@ -240,8 +238,8 @@ export default function CourseUploader() {
         `${baseUrl}/api/courses/${currentCourse._id}/sections/${sectionId}`,
         formData,
         {
+          withCredentials: true,
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -283,8 +281,8 @@ export default function CourseUploader() {
         `${baseUrl}/api/courses/${currentCourse._id}/files`,
         formData,
         {
+          withCredentials: true,
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }

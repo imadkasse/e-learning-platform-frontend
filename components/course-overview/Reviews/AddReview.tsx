@@ -1,17 +1,16 @@
 "use client";
 import { useCourse } from "@/store/courseStore";
+import { useUserStore } from "@/store/userStore";
 import showToast from "@/utils/showToast";
 import { ChatBubbleOutlineOutlined } from "@mui/icons-material";
 import { Rating } from "@mui/material";
 import axios from "axios";
-import Cookies from "js-cookie";
 import React, { FormEvent, useEffect, useState } from "react";
 
 const AddReview = ({ courseId }: { courseId: string }) => {
-  const token = Cookies.get("token");
   const [rating, setRating] = useState<number>();
   const [content, setContent] = useState<string>("");
-
+  const {user} = useUserStore()
   const { course, setCourse } = useCourse();
 
   useEffect(() => {
@@ -31,7 +30,7 @@ const AddReview = ({ courseId }: { courseId: string }) => {
   // section reviews (Add & delete)
   const handelAddReview = async (e: FormEvent) => {
     e.preventDefault();
-    if (!token) {
+    if (!user) {
       showToast("error", "يجب تسجيل الدخول أولا");
       return;
     }
@@ -43,9 +42,7 @@ const AddReview = ({ courseId }: { courseId: string }) => {
           content,
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
       const newReivew = res.data.review;

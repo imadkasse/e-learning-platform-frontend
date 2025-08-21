@@ -3,7 +3,6 @@ import AdminCardPage from "./AdminCardPage";
 import { User } from "@/types/user";
 import AddUser from "./AddUser";
 import SearchAdmin from "./SearchAdmin";
-import { cookies } from "next/headers";
 interface AdminProps {
   searchParams: {
     filter?: string;
@@ -11,8 +10,6 @@ interface AdminProps {
 }
 const AdminHomePage = async ({ searchParams }: AdminProps) => {
   const { filter } = searchParams;
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
 
   const fetchUsers = async () => {
     try {
@@ -20,9 +17,7 @@ const AdminHomePage = async ({ searchParams }: AdminProps) => {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/searchUsers?query=${filter}`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            credentials: "include",
           }
         );
         const data = await res.json();
@@ -33,9 +28,7 @@ const AdminHomePage = async ({ searchParams }: AdminProps) => {
         );
       }
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: "include",
       });
       const data = await res.json();
       return data.users.filter(

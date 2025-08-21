@@ -14,31 +14,32 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import Cookies from "js-cookie";
 import { useUserStore } from "@/store/userStore";
+import axios from "axios";
+import showToast from "@/utils/showToast";
 
 const SideBar = () => {
   const [toggleSidebar, setToggleSidebar] = useState<boolean>(false);
-  const {setUser} = useUserStore()
+  const { fetchUser } = useUserStore();
   const handleToggle = () => {
     setToggleSidebar(!toggleSidebar);
   };
   const pathName = usePathname();
   const router = useRouter();
-  const handleLogout = () => {
-    Cookies.remove("token");
-       setUser({
-         _id: "",
-         username: "",
-         email: "",
-         role: null,
-         active: false,
-         progress: [],
-         thumbnail: "",
-         enrolledCourses: [],
-         phoneNumber: "",
-         publishedCourses: [],
-         notifications: [],
-       });
-       router.push("/");
+  const handleLogout = async () => {
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
+      showToast("success", "تم تسجيل الخروج بنجاح");
+      Cookies.remove("token");
+      await fetchUser();
+      router.push("/");
+    } catch (error) {
+      console.log(error);
+      showToast("error", "تم تسجيل الخروج بنجاح");
+    }
   };
   return (
     <>

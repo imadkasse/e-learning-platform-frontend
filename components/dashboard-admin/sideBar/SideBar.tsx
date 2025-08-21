@@ -1,5 +1,6 @@
 "use client";
 import { useUserStore } from "@/store/userStore";
+import showToast from "@/utils/showToast";
 import {
   ArrowBackIos,
   ArrowForwardIos,
@@ -12,6 +13,7 @@ import {
   SettingsOutlined,
   SupervisorAccountOutlined,
 } from "@mui/icons-material";
+import axios from "axios";
 import Cookies from "js-cookie";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,24 +27,23 @@ const SideBar = () => {
   };
   const pathName = usePathname();
   const router = useRouter();
-  const { setUser } = useUserStore();
+  const { fetchUser } = useUserStore();
 
-  const handleLogout = () => {
-    Cookies.remove("token");
-    setUser({
-      _id: "",
-      username: "",
-      email: "",
-      role: null,
-      active: false,
-      progress: [],
-      thumbnail: "",
-      enrolledCourses: [],
-      phoneNumber: "",
-      publishedCourses: [],
-      notifications: [],
-    });
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
+      showToast("success", "تم تسجيل الخروج بنجاح");
+      Cookies.remove("token");
+      await fetchUser()
+      router.push("/");
+    } catch (error) {
+      console.log(error);
+      showToast("error", "تم تسجيل الخروج بنجاح");
+    }
   };
   return (
     <>

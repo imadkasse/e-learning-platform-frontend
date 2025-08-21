@@ -1,7 +1,6 @@
 "use client";
 import axios from "axios";
 import React, {  useState } from "react";
-import Cookies from "js-cookie";
 import showToast from "@/utils/showToast";
 import { useFaq } from "@/store/faqStore";
 import { replie } from "@/types/faq";
@@ -13,7 +12,6 @@ type Props = {
   replies: replie[];
 };
 const MsgCard = ({ subject, date, faqId, replies }: Props) => {
-  const token = Cookies.get("token");
   const [expanded, setExpanded] = useState<boolean>(false);
   const { faqs, setFaqs } = useFaq();
   const handelDeleteFaq = async () => {
@@ -21,7 +19,7 @@ const MsgCard = ({ subject, date, faqId, replies }: Props) => {
       await axios.delete(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/faq/${faqId}`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+                   withCredentials:true
         }
       );
       showToast("success", "تم حذف الرسالة بنجاح");

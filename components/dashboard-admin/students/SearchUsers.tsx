@@ -1,7 +1,5 @@
 "use client";
-import { useSearchUser } from "@/store/searchUser";
 import React, { FormEvent, useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const SearchUsers = () => {

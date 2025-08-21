@@ -1,7 +1,6 @@
 "use client";
 import { useSearchUser } from "@/store/searchUser";
 import React, { FormEvent, useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import { User } from "@/types/user";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -9,39 +8,8 @@ const SearchAdmin = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filter = searchParams.get("filter") || "";
-  const token = Cookies.get("token");
   const [searchData, setsearchData] = useState<string>(filter);
-  const handleSearch = async () => {
-    try {
-      if (searchData) {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/searchUsers?query=${searchData}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await res.json();
-        return (
-          data.users.filter(
-            (user: User) => user.role === "admin" || user.role === "teacher"
-          ) || []
-        );
-      }
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      return data.users.filter(
-        (user: User) => user.role === "admin" || user.role === "teacher"
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
 
   useEffect(() => {
     const params = new URLSearchParams();
