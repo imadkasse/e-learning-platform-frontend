@@ -1,7 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import axios from "axios";
 import { User } from "@/types/user";
 
@@ -31,7 +30,6 @@ const GoogleCallback = () => {
     const token = searchParams.get("token");
 
     if (token) {
-      Cookies.set("token", token); // تخزين التوكن
       fetchUserData(token);
     } else {
       setLoading(false); // في حالة عدم وجود التوكن

@@ -4,7 +4,6 @@ import { useCoursesStore } from "@/store/coursesStore";
 import { PeopleOutlineOutlined, PlayLesson } from "@mui/icons-material";
 import { Rating } from "@mui/material";
 import axios from "axios";
-import Cookies from "js-cookie";
 import Image from "next/image";
 import Link from "next/link";
 import "react-toastify/dist/ReactToastify.css";
@@ -35,17 +34,13 @@ const CourseCard = ({
 
   const { courses, setCourses } = useCoursesStore();
 
-  const token = Cookies.get("token");
-
   const handleDeleteCourse = async () => {
     try {
       setLoading(true);
       await axios.delete(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
       setCourses(

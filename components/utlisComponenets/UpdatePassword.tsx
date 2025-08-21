@@ -2,12 +2,9 @@
 import showToast from "@/utils/showToast";
 import axios from "axios";
 import React, { FormEvent, useState } from "react";
-import Cookies from "js-cookie";
 import "react-toastify/dist/ReactToastify.css";
 
 const UpdatePassword = () => {
-  const token = Cookies.get("token");
-
   const [loadingUpdatePassword, setloadingUpdatePassword] =
     useState<boolean>(false);
 
@@ -22,9 +19,7 @@ const UpdatePassword = () => {
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/updatePassword`,
         { currentPassword, password, passwordConfirm },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
       setCurrentPassword("");

@@ -2,17 +2,17 @@ import axios from "axios";
 import { cookies } from "next/headers";
 
 export async function fetchUserServer() {
-  const cookiesStroe = await cookies();
-  const token = cookiesStroe.get("token")?.value;
-  if (!token) return null;
+  const cookiesStore = await cookies();
+  const token = cookiesStore.get("token")?.value;
 
   try {
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        withCredentials: true,
+        headers: token
+          ? { Authorization: `Bearer ${token}` } // لو التوكن موجود استعمله
+          : {},
       }
     );
     return res.data.user;

@@ -14,7 +14,6 @@ import {
 } from "@mui/icons-material";
 import Link from "next/link";
 import showToast from "@/utils/showToast";
-import Cookies from "js-cookie";
 import axios from "axios";
 import { useUserStore } from "@/store/userStore";
 
@@ -34,7 +33,6 @@ const CourseCard = ({
   courseLink,
   id,
 }: Props) => {
-  const token = Cookies.get("token");
   const link = `${process.env.NEXT_PUBLIC_BASE_URL}/course-overview/${id}`;
   const { user, fetchUser } = useUserStore();
   const [isOpen, setIsOpen] = useState<boolean>(true);
@@ -43,7 +41,7 @@ const CourseCard = ({
   };
   const enrollmentCourse = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (!token) {
+    if (!user) {
       showToast("error", "يجب تسجيل الدخول أولا");
       return;
     }
@@ -52,7 +50,7 @@ const CourseCard = ({
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/enrolled/${id}`,
         {},
         {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }
       );
       showToast("success", res.data.message);

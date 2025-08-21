@@ -17,7 +17,6 @@ import { useLesson } from "@/store/lessonStore";
 import { usePathname } from "next/navigation";
 import showToast from "@/utils/showToast";
 import axios from "axios";
-import Cookies from "js-cookie";
 import { useUserStore } from "@/store/userStore";
 import { Section } from "@/types/course";
 
@@ -34,7 +33,6 @@ const CourseCardDetails = ({
   userId,
   sections,
 }: Props) => {
-  const token = Cookies.get("token");
   const pathname = usePathname();
 
   const { user } = useUserStore();
@@ -99,9 +97,7 @@ const CourseCardDetails = ({
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}/videos/${videoId}/completed`,
         {},
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
       const updatedLesson = res.data.lesson;

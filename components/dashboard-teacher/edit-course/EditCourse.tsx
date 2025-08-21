@@ -1026,7 +1026,6 @@ import {
   X,
   Loader2,
 } from "lucide-react";
-import Cookies from "js-cookie";
 import { useUserStore } from "@/store/userStore";
 import { Course, File as FileType, Section } from "@/types/course";
 import Image from "next/image";
@@ -1050,7 +1049,6 @@ type file = {
   file: File | null;
 };
 const CourseEditPage = ({ id }: { id: string }) => {
-  const token = Cookies.get("token");
   const loadingUser = useUserStore((state) => state.loading);
 
   const [course, setCourse] = useState<Course>();
@@ -1155,9 +1153,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
           sectionTitle: newSectionTitle,
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
 
@@ -1207,9 +1203,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}/sections/${currentSectionId}`,
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
 
@@ -1262,9 +1256,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}`,
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
       setCourse(res.data.course);
@@ -1570,9 +1562,9 @@ const CourseEditPage = ({ id }: { id: string }) => {
                         </div>
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={()=>{
-                              openVideoModal()
-                              setCurrentSectionId(section._id)
+                            onClick={() => {
+                              openVideoModal();
+                              setCurrentSectionId(section._id);
                             }}
                             className="flex items-center gap-2 bg-[#45DA10] hover:bg-[#3BC50C] text-white px-3 py-2 rounded-lg transition-colors duration-300"
                           >

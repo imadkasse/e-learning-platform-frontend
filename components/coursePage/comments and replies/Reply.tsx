@@ -1,9 +1,6 @@
 "use client";
 import { User } from "@/types/user";
-import {
-  KeyboardArrowDownRounded,
-  KeyboardArrowUpRounded,
-} from "@mui/icons-material";
+import { ExpandMoreRounded, ExpandLessRounded } from "@mui/icons-material";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -16,50 +13,75 @@ interface Replay {
 
 export const Reply = ({ replys }: { replys: Replay[] }) => {
   const [showComments, setShowComments] = useState<boolean>(false);
+
   return (
-    <>
+    <div className="mt-4">
       <button
-        onClick={() => {
-          setShowComments(!showComments);
-        }}
-        className="p-2 apply-fonts-normal text-[14px] text-courseTextSection flex gap-1"
+        onClick={() => setShowComments(!showComments)}
+        className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-xl text-gray-600 text-sm font-medium transition-colors duration-200"
       >
         {showComments ? (
           <>
-            <KeyboardArrowUpRounded />
-            <p>إخفاء الردود</p>
+            <ExpandLessRounded className="text-lg" />
+            <span className="apply-fonts-normal">
+              إخفاء الردود ({replys.length})
+            </span>
           </>
         ) : (
           <>
-            <KeyboardArrowDownRounded />
-            <p>عرض الردود</p>
+            <ExpandMoreRounded className="text-lg" />
+            <span className="apply-fonts-normal">
+              عرض الردود ({replys.length})
+            </span>
           </>
         )}
       </button>
+
       {showComments && (
-        <div className="mt-3 ml-10 space-y-4">
+        <div className="mt-4 space-y-4 mr-8 border-r-2 border-[#B9BCFF]/30 pr-4">
           {replys.map((reply) => (
-            <div key={reply._id} className="flex items-start gap-2 mt-3 mr-10">
-              <Image
-                src={reply.user.thumbnail || "/imgs/logoImg.png"}
-                alt="user-username"
-                width={40}
-                height={40}
-                className="rounded-full xs:w-8 xs:h-8"
-              />
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <h1 className="font-semibold">{reply.user.username}</h1>
-                  <span className="text-sm text-gray-500">
-                    {reply.createdAt.split("T")[0]}
-                  </span>
+            <div
+              key={reply._id}
+              className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 border border-gray-100 hover:shadow-sm transition-shadow duration-200"
+            >
+              <div className="flex items-start gap-3">
+                <div className="relative flex-shrink-0">
+                  <Image
+                    src={reply.user.thumbnail || "/imgs/logoImg.png"}
+                    alt="user-username"
+                    width={36}
+                    height={36}
+                    className="rounded-full ring-2 ring-[#B9BCFF]/20"
+                  />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#45DA10] rounded-full border-2 border-white"></div>
                 </div>
-                <p className="text-sm text-gray-700">{reply.text}</p>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h4 className="font-semibold text-gray-800 text-sm">
+                      {reply.user.username}
+                    </h4>
+                    <span className="px-2 py-0.5 bg-[#3D45EE]/10 text-[#3D45EE] text-xs rounded-full font-medium">
+                      مدرس
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {reply.createdAt.split("T")[0]}
+                    </span>
+                  </div>
+                  <div
+                    dir="rtl"
+                    className="bg-white rounded-lg p-3 border-r-2 border-[#3D45EE]/20"
+                  >
+                    <p className="apply-fonts-normal text-gray-700 text-sm leading-relaxed">
+                      {reply.text}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 };

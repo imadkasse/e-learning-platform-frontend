@@ -4,7 +4,6 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import React, { FormEvent, useState } from "react";
-import Cookies from "js-cookie";
 
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
@@ -46,7 +45,8 @@ const Login = () => {
       const data = { email: email, password: password };
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`,
-        data
+        data,
+        { withCredentials: true }
       );
       if (!res.data.user.active) {
         showToast(
@@ -55,12 +55,11 @@ const Login = () => {
         );
         return;
       }
-      const token = res.data.token;
-      Cookies.set("token", token);
+      
       const role =
         res.data.user.role === "student" ? "user" : res.data.user.role;
       await fetchUser();
-
+      console.log(res.data);
       router.push(`/dashboard-${role}/courses`);
     } catch (error) {
       // @ts-expect-error: fix after time

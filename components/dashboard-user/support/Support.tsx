@@ -2,7 +2,6 @@
 import axios from "axios";
 import React, { FormEvent, useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import Cookies from "js-cookie";
 import showToast from "@/utils/showToast";
 import { CloseOutlined } from "@mui/icons-material";
 import MsgCard from "./MsgCard";
@@ -14,7 +13,6 @@ import { useUserStore } from "@/store/userStore";
 const socket = io("https://e-leraning-backend.onrender.com"); // تأكد من استبدال الرابط برابط الخادم الخاص بك
 
 const Support = () => {
-  const token = Cookies.get("token");
   const { loading } = useUserStore();
   const [subject, setSubject] = useState<string>("");
   const [message, setMessage] = useState<string>("");
@@ -37,9 +35,7 @@ const Support = () => {
           description: message,
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
 
@@ -64,9 +60,7 @@ const Support = () => {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/faq/myFaqs`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            credentials: "include",
           }
         );
         const data = await res.json();
@@ -84,12 +78,11 @@ const Support = () => {
         setFaqs([...faqs]);
       }
     });
-
     // تنظيف الاستماع عند تدمير المكون
     return () => {
       socket.off("ticketReply");
     };
-  }, [token, setFaqs, faqs]);
+  }, [setFaqs, faqs]);
 
   if (loading) {
     return (
@@ -113,8 +106,8 @@ const Support = () => {
         </button>
       </div>
       <div className="flex flex-col gap-3">
-        {faqs?.length > 0 ? (
-          faqs?.map((faq) => {
+        {faqs.length > 0 ? (
+          faqs.map((faq) => {
             return (
               <MsgCard
                 key={faq._id}

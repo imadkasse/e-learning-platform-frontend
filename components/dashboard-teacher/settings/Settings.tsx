@@ -2,7 +2,6 @@
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import React, { FormEvent, useState } from "react";
-import Cookies from "js-cookie";
 import axios from "axios";
 
 import "react-toastify/dist/ReactToastify.css";
@@ -13,7 +12,6 @@ import Spinner from "@/components/spinner/Spinner";
 
 const Settings = () => {
   const router = useRouter();
-  const token = Cookies.get("token");
   const [loading, setloading] = useState<boolean>(false);
 
   const loadingUser = useUserStore((state) => state.loading);
@@ -49,9 +47,7 @@ const Settings = () => {
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/updateMe`,
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
       showToast("success", "تم تحديث البيانات بنجاح ");

@@ -2,7 +2,6 @@
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import React, { FormEvent, useState } from "react";
-import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,7 +12,6 @@ import { DollarSign, Wallet } from "lucide-react";
 
 const Settings = () => {
   const router = useRouter();
-  const token = Cookies.get("token");
 
   const [loadingUpdate, setLoadingUpdate] = useState<boolean>(false);
 
@@ -49,9 +47,7 @@ const Settings = () => {
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/updateMe`,
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
       showToast("success", "تم تحديث البيانات بنجاح ");

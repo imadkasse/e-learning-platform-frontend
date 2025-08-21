@@ -4,7 +4,6 @@ import { CloseOutlined } from "@mui/icons-material";
 import axios from "axios";
 import React, { FormEvent, useState } from "react";
 
-import Cookies from "js-cookie";
 
 type Props = {
   username: string;
@@ -15,7 +14,6 @@ type Props = {
 };
 
 const MsgCard = ({ username, subject, ticketId, date, description }: Props) => {
-  const token = Cookies.get("token");
   const [replay, setReplay] = useState<string>("");
   const [showReplay, setShowReplay] = useState<boolean>(false);
 
@@ -28,9 +26,7 @@ const MsgCard = ({ username, subject, ticketId, date, description }: Props) => {
           message: replay,
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+         withCredentials:true
         }
       );
       showToast("success", "تم الرد بنجاح");

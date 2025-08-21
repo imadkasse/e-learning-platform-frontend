@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import CourseCard from "./CourseCard";
 import SearchCourse from "./SearchCourse";
 

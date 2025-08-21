@@ -4,7 +4,6 @@ import { CloseOutlined } from "@mui/icons-material";
 import axios from "axios";
 import Image from "next/image";
 import React, { FormEvent, useState } from "react";
-import Cookies from "js-cookie";
 import { useSearchUser } from "@/store/searchUser";
 type Props = {
   studentName: string;
@@ -23,8 +22,6 @@ const StudentCard = ({
   studentImg,
   studentStatus,
 }: Props) => {
-  const token = Cookies.get("token");
-
   const { setUsers } = useSearchUser();
 
   const [showEdit, setShowEdit] = useState<boolean>(false);
@@ -43,7 +40,7 @@ const StudentCard = ({
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/${studentId}`,
         { active: isActive },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }
       );
       showToast("success", "تم تغيير حالة الحساب بنجاح");
@@ -62,15 +59,13 @@ const StudentCard = ({
       await axios.delete(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/${studentId}`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }
       );
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users?page=1&limit=5`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         }
       );
       const data = await res.json();

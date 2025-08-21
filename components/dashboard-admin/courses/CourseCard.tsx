@@ -23,7 +23,6 @@ const CourseCard = ({
   courseImg,
   coursePrice,
 }: Props) => {
-  const token = Cookies.get("token");
   const [loadingBtn, setloadingBtn] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
 
@@ -36,9 +35,7 @@ const CourseCard = ({
       await axios.delete(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials:true
         }
       );
       showToast("success", "تم حذف الكورس بنجاح");

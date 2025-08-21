@@ -26,7 +26,6 @@ const AdminCardPage = ({
   userId,
   userStatus,
 }: Props) => {
-  const token = Cookies.get("token");
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [loadingEdit, setLoadingEdit] = useState<boolean>(false);
@@ -39,13 +38,11 @@ const AdminCardPage = ({
       await axios.delete(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/${userId}`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }
       );
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: "include",
       });
       const data = await res.json();
       setUsers(
@@ -71,13 +68,11 @@ const AdminCardPage = ({
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/${userId}`,
         { active: isActive },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }
       );
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: "include",
       });
       const data = await res.json();
       setUsers(
@@ -112,7 +107,9 @@ const AdminCardPage = ({
             />
           </div>
           <div className="">
-            <h1 className="apply-fonts-normal lg:text-lg text-center">{userName}</h1>
+            <h1 className="apply-fonts-normal lg:text-lg text-center">
+              {userName}
+            </h1>
             <h1 className="text-gray-500 xs:block sm:hidden xl:block">
               {userEmail}
             </h1>
@@ -145,7 +142,6 @@ const AdminCardPage = ({
       {showDeleteModal && (
         <div className="rounded-xl fixed bg-black/40 w-full h-full top-0 left-0 z-30 flex flex-col justify-center py-6 px-10">
           <div className="w-full bg-wygColor rounded-xl">
-            
             <div className="my-4 flex flex-col gap-5">
               <p className="apply-fonts-normal text-center">
                 هل أنت متأكد من حذف هذا المستخدم{" "}

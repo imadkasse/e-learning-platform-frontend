@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
-import Cookies from "js-cookie";
 import showToast from "@/utils/showToast";
 
 const SignUp = () => {
@@ -64,8 +63,7 @@ const SignUp = () => {
         formData
       );
       const role = res.data.user.role === "student" ? "user" : "";
-      const token = res.data.token;
-      Cookies.set(`token`, token, { expires: 7 });
+      
       router.push(`/dashboard-${role}`);
     } catch (error) {
       // @ts-expect-error: fix after time

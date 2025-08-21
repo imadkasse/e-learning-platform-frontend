@@ -11,8 +11,9 @@ import { motion } from "framer-motion";
 import { Link as ScrollLink } from "react-scroll";
 import { useUserStore } from "@/store/userStore";
 import Cookie from "js-cookie";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import showToast from "@/utils/showToast";
 
 const NavBarHome = () => {
   const [menuToggle, setMenuToggle] = useState<boolean | null>(null);
@@ -30,22 +31,24 @@ const NavBarHome = () => {
   const loading = useUserStore((state) => state.loading);
 
   const user = useUserStore((state) => state.user);
-
+  console.log("user", user);
   const role = user.role === "student" ? "user" : user.role;
 
-  const handleLogout = () => {
-    Cookie.remove("token");
-    toast.success("logout succes ", {
-      position: "top-center",
-      autoClose: 1000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      className: "bg-white text-black dark:bg-gray-800 dark:text-white",
-    });
-    setUserMenuToggle(false);
-    window.location.reload();
+  const handleLogout = async () => {
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
+      showToast("success", "تم تسجيل الخروج بنجاح");
+      Cookie.remove("token");
+      setUserMenuToggle(false);
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+      showToast("error", "تم تسجيل الخروج بنجاح");
+    }
   };
 
   return (
