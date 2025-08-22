@@ -20,6 +20,7 @@ type Props = {
 };
 export const CoursePage = ({ course }: Props) => {
   const { user } = useUserStore();
+  const baseUrlVideo=`${process.env.NEXT_PUBLIC_BUNNY_BASE_URL}/${process.env.NEXT_PUBLIC_VIDEO_LIBRARY}`
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleSection = (index: number) => {
@@ -63,7 +64,7 @@ export const CoursePage = ({ course }: Props) => {
 
         <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
           <iframe
-            src={`https://iframe.mediadelivery.net/embed/476506/${course.sections[0].videos[0]?.url}?autoplay=false&loop=false&muted=false&preload=false&responsive=false`}
+            src={`${baseUrlVideo}/${course.sections[0].videos[0]?.url}?autoplay=false&loop=false&muted=false&preload=false&responsive=false`}
             loading="lazy"
             className="absolute top-0 left-0 w-full h-full border-0 rounded-lg shadow-md"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"

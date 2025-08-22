@@ -10,7 +10,7 @@ const HomeUser = () => {
       {/* <SideBar /> */}
       {/* <HomePage /> */}
       {/* <Notifcations /> */}
-      <Courses />
+      {/* <Courses /> */}
     </div>
   );
 };

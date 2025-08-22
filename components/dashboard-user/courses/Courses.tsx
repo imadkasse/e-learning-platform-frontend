@@ -22,7 +22,7 @@ const Courses = async ({ searchParams }: CoursesProps) => {
       }
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`// please add page and limit 
       );
       const data = await res.json();
 
@@ -32,6 +32,7 @@ const Courses = async ({ searchParams }: CoursesProps) => {
     }
   };
   const courses: Course[] = await fetchCourses();
+  
   return (
     <>
       <div className="  lg:custom-width rounded-xl px-4 py-5  overflow-y-scroll relative h-[93vh]">

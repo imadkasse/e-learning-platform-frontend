@@ -25,7 +25,6 @@ const Notifcations = () => {
       </div>
     );
   }
-
   return (
     <div className=" lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll">
       <div className="mb-5">
@@ -34,6 +33,7 @@ const Notifcations = () => {
       <div>
         {notifcation.length > 0 &&
           notifcation.map((notifcation, index) => {
+            console.log(notifcation);
             return (
               <NotificationCard
                 key={index}

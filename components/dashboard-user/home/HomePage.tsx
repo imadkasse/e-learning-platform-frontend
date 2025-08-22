@@ -10,23 +10,36 @@ import { Course } from "@/types/course";
 const HomePage = async () => {
   const cookiesStore = await cookies();
   const token = cookiesStore.get("token")?.value;
+  let myEnrolledCourses: any | null = null;
   let user: User | null = null;
 
-  const fetchUser = async () => {
+  const fetchMyEnrolledCourses = async () => {
     try {
-      const res = await fetch(`${process.env.BACK_URL}/api/users/me`, {
-        credentials: "include",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      const res = await fetch(
+        `${process.env.BACK_URL}/api/courses/my-courses`,
+        {
+          credentials: "include",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
       const data = await res.json();
-      user = data.user;
+      // fetch to export progress of courses 
+      const fetchUser = await fetch(
+        `${process.env.BACK_URL}/api/courses/my-courses`,
+        {
+          credentials: "include",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
+      const userData = await fetchUser.json();
+      user = userData.user;
+      myEnrolledCourses = data.course;
     } catch (err) {
       console.log("err", err);
     }
   };
-  await fetchUser();
-  //@ts-expect-error:fix agin
-  const courses = user?.enrolledCourses;
+  await fetchMyEnrolledCourses();
+  const courses = myEnrolledCourses;
 
   return (
     <div className=" lg:custom-width rounded-xl px-4 py-5 h-[93vh] overflow-y-scroll ">
@@ -37,7 +50,7 @@ const HomePage = async () => {
       <div className="container mx-auto px-8 py-4 ">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4  gap-6">
           {courses?.length > 0 ? (
-            courses?.map((course:Course) => {
+            courses?.map((course: Course) => {
               const videoNumber = course.sections.reduce((acc, section) => {
                 return acc + (section.videos?.length || 0);
               }, 0);
