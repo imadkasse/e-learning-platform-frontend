@@ -10,7 +10,7 @@ import Link from "next/link";
 import Spinner from "../spinner/Spinner";
 import { useLesson } from "@/store/lessonStore";
 import "react-toastify/dist/ReactToastify.css";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { Reply } from "./comments and replies/Reply";
 import AddComment from "./comments and replies/AddComment";
 import AddReply from "./comments and replies/AddReply";
@@ -72,6 +72,7 @@ const CoursePage = ({ course }: Props) => {
       setIsPublichedCourse(publichedStatus);
     }
   }, [user, course]);
+
   //add spinner
   if (isEnrolled === undefined || isPublichedCourse === undefined) {
     return <Spinner />;
@@ -104,6 +105,7 @@ const CoursePage = ({ course }: Props) => {
   if (user.role === "teacher" && !isPublichedCourse) {
     redirect(`/dashboard-teacher/courses`);
   }
+
   //section comments
   return (
     <div className="  flex  flex-row-reverse justify-between gap-7 sm:px-3  ">
