@@ -23,4 +23,12 @@ export type Lesson = {
   isCompleted: boolean;
   completedBy: string[];
   comments: Comment[];
+  files: File[];
+  description: string;
+};
+type File = {
+  _id: string;
+  filename: string;
+  size: number;
+  url: string;
 };
