@@ -10,6 +10,7 @@ export async function generateStaticParams() {
     cache: "no-store",
   });
   const data = await res.json();
+  console.log(data)
   return data.courses.map((course: { _id: string }) => ({
     courseId: course._id,
   }));

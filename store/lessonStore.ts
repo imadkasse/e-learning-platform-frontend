@@ -13,6 +13,8 @@ export const useLesson = create<{
     isCompleted: false,
     completedBy: [],
     comments: [],
+    description: "",
+    files: [],
   },
   setLesson: (newLesson: Lesson) => {
     set(() => ({ lesson: newLesson }));

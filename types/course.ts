@@ -22,6 +22,8 @@ type Videos = {
   isCompleted: boolean;
   completedBy: string[];
   comments: Comment[];
+  files: File[];
+  description:string
 };
 export type Section = {
   _id: string;
@@ -42,7 +44,6 @@ export type Course = {
   published: boolean;
   createdAt: string;
   sections: Section[]; //! replace to Sections => [{title:'',videos:Videos[]}
-  files: File[]; //edit in feature
   avgRatings: number;
   active: boolean;
   progress?: number;

@@ -180,20 +180,20 @@ const CoursePage = ({ course }: Props) => {
         {/* description Course */}
         <div className="my-4">
           <h1 className="apply-fonts-medium xs:text-lg lg:text-2xl mb-2">
-            وصف الدورة
+            وصف الدرس
           </h1>
           <p className="apply-fonts-normal text-[14px] text-courseTextSection leading-8 pl-5 xs:line-clamp-4  md:line-clamp-6">
-            {course?.description}
+            {lesson.description}
           </p>
         </div>
         {/* Course Fiels */}
         <div className="my-4">
           <h1 className="apply-fonts-medium  xs:text-lg lg:text-2xl mb-2">
-            ملفات الدورة
+            ملفات الدرس
           </h1>
           <div className="flex flex-col gap-3">
-            {course?.files ? (
-              course?.files.map((file) => {
+            {lesson?.files ? (
+              lesson?.files.map((file) => {
                 return (
                   <div
                     key={file._id}
