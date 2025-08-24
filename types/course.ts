@@ -14,7 +14,7 @@ type Comment = {
   createdAt: string;
   replies: Reply[];
 };
-type Videos = {
+export type Videos = {
   _id: string;
   lessonTitle: string;
   url: string; //! this is just videoId you need to add baseUrl from .env

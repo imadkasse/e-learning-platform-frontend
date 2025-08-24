@@ -1,8 +1,9 @@
-import React from "react";
+import React, { Suspense } from "react";
 import AdminCardPage from "./AdminCardPage";
 import { User } from "@/types/user";
 import AddUser from "./AddUser";
 import SearchAdmin from "./SearchAdmin";
+import { cookies } from "next/headers";
 interface AdminProps {
   searchParams: {
     filter?: string;
@@ -10,6 +11,8 @@ interface AdminProps {
 }
 const AdminHomePage = async ({ searchParams }: AdminProps) => {
   const { filter } = searchParams;
+  const cookiesStore = await cookies();
+  const token = cookiesStore.get("token")?.value;
 
   const fetchUsers = async () => {
     try {
@@ -18,6 +21,9 @@ const AdminHomePage = async ({ searchParams }: AdminProps) => {
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/searchUsers?query=${filter}`,
           {
             credentials: "include",
+            headers: token
+              ? { Authorization: `Bearer ${token}` } // لو التوكن موجود استعمله
+              : {},
           }
         );
         const data = await res.json();
@@ -27,13 +33,17 @@ const AdminHomePage = async ({ searchParams }: AdminProps) => {
           ) || []
         );
       }
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/users`, {
-        credentials: "include",
-      });
-      const data = await res.json();
-      return data.users.filter(
-        (user: User) => user.role === "admin" || user.role === "teacher"
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/users?role=admin&role=teacher`,
+        {
+          credentials: "include",
+          headers: token
+            ? { Authorization: `Bearer ${token}` } // لو التوكن موجود استعمله
+            : {},
+        }
       );
+      const data = await res.json();
+      return data.users;
     } catch (error) {
       console.error(error);
     }
