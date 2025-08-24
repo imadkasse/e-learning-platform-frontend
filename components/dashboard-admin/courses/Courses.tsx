@@ -10,6 +10,7 @@ interface CoursesProps {
 }
 const Courses = async ({ searchParams }: CoursesProps) => {
   const { filter } = searchParams;
+  
 
   const fetchCourse = async () => {
     try {

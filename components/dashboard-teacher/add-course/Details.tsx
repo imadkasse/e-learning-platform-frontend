@@ -82,7 +82,7 @@ interface Videos {
 interface VideoUpload {
   title: string;
   file: File;
-  duration: number;
+  duration: string;
   description: string;
 }
 
@@ -248,7 +248,7 @@ export default function CourseUploader() {
     sectionId: string,
     title: string,
     file: File,
-    duration: number,
+    duration: string,
     description: string
   ) => {
     if (!sectionId?.trim()) {
@@ -267,7 +267,7 @@ export default function CourseUploader() {
       showToast("error", "الرجاء رفع الفيديو");
       return;
     }
-    if (duration === 0) {
+    if (!duration?.trim()) {
       showToast("error", "الرجاء وضع مدة الفيديو");
       return;
     }
@@ -950,7 +950,7 @@ interface StepSectionsAndVideosProps {
     sectionId: string,
     title: string,
     file: File,
-    duration: number,
+    duration: string,
     description: string
   ) => void;
   loadingAddVideoToSection: boolean;
@@ -1002,7 +1002,7 @@ function StepSectionsAndVideos({
     sectionId: string,
     videoIndex: number,
     field: "title" | "file" | "duration" | "description",
-    value: string | File | number
+    value: string | File
   ) => {
     setVideosUpload((prev) => {
       const sectionVideos = prev[sectionId] || [];
@@ -1019,7 +1019,7 @@ function StepSectionsAndVideos({
         ...prev,
         [sectionId]: [
           ...sectionVideos,
-          { title: "", file: null as any, duration: 0, description: "" },
+          { title: "", file: null as any, duration: "", description: "" },
         ],
       };
     });
@@ -1120,7 +1120,7 @@ function StepSectionsAndVideos({
                       className="w-full border-2 border-gray-200 p-3 rounded-lg focus:outline-none focus:border-indigo-500 apply-fonts-normal"
                     />
                     <input
-                      type="number"
+                      type="text"
                       placeholder="مدة الفيديو"
                       value={video.duration}
                       onChange={(e) =>
@@ -1128,7 +1128,7 @@ function StepSectionsAndVideos({
                           section._id,
                           videoIndex,
                           "duration",
-                          Number(e.target.value)
+                          e.target.value
                         )
                       }
                       className="w-full border-2 border-gray-200 p-3 rounded-lg focus:outline-none focus:border-indigo-500 "
@@ -1169,7 +1169,7 @@ function StepSectionsAndVideos({
                             video.file &&
                             video.title &&
                             video.description &&
-                            video.duration > 0
+                            video.duration
                           ) {
                             await addVideoToSection(
                               section._id,
