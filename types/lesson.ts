@@ -19,7 +19,7 @@ export type Lesson = {
   _id: string;
   lessonTitle: string;
   url: string;
-  duration: number;
+  duration: string;
   isCompleted: boolean;
   completedBy: string[];
   comments: Comment[];

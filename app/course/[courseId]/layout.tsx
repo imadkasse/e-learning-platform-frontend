@@ -8,7 +8,15 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const courseData = await fetch(
-    `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${(await params).courseId}`
+    `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${
+      (
+        await params
+      ).courseId
+    }`,
+    {
+      cache: "no-store",
+      
+    }
   );
   const course = await courseData.json();
   return {
@@ -22,7 +30,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await fetchUserServer();
-  
+
   return (
     <>
       <div>

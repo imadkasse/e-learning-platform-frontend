@@ -9,6 +9,12 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import showToast from "@/utils/showToast";
 import { useUserStore } from "@/store/userStore";
+import * as z from "zod";
+
+const UserSchema = z.object({
+  email: z.string().email("البريد الإلكتروني غير صالح"),
+  password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+});
 
 const Login = () => {
   const router = useRouter();
@@ -19,11 +25,24 @@ const Login = () => {
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // errors
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {}
+  );
+
   const { fetchUser } = useUserStore();
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
+    const result = UserSchema.pick({ password: true }).safeParse({
+      password: value,
+    });
+    setErrors((prev) => ({
+      ...prev,
+      password: result.success ? undefined : result.error.issues[0].message,
+    }));
     // تحقق من صحة كلمة المرور (مثلاً، يجب أن تكون أطول من 6 حروف)
     setIsPasswordValid(value.length >= 6);
   };
@@ -31,6 +50,11 @@ const Login = () => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(value);
+    const result = UserSchema.pick({ email: true }).safeParse({ email: value });
+    setErrors((prev) => ({
+      ...prev,
+      email: result.success ? undefined : result.error.issues[0].message,
+    }));
     // تحقق من صحة البريد باستخدام تعبير منتظم بسيط
     setIsValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
   };
@@ -41,6 +65,12 @@ const Login = () => {
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    const result = UserSchema.safeParse({ email, password });
+    if (!result.success) {
+      showToast("error", result.error.issues[0].message);
+      setLoading(false);
+      return;
+    }
     try {
       const data = { email: email, password: password };
       const res = await axios.post(
@@ -55,7 +85,7 @@ const Login = () => {
         );
         return;
       }
-      
+
       const role =
         res.data.user.role === "student" ? "user" : res.data.user.role;
       await fetchUser();
@@ -68,6 +98,7 @@ const Login = () => {
       setLoading(false);
     }
   };
+
   return (
     <div className="container mx-auto py-4  h-[70vh] w-full flex items-center justify-center flex-col">
       <Link
@@ -96,10 +127,14 @@ const Login = () => {
           onChange={handleEmailChange}
           required
           placeholder="البريد الإلكتروني"
-          className={`  w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 
-            ${isValid ? "border-green-400" : "border-red-700"}`}
+          className={`w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 rounded ${
+            errors.email ? "border-red-700" : "border-green-400"
+          }`}
         />
-
+        {errors.email && (
+          <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+        )}
+        {/* passsword */}
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
@@ -107,9 +142,12 @@ const Login = () => {
             onChange={handlePasswordChange}
             placeholder="كلمة المرور"
             required
-            className={` w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 
-            ${isPasswordValid ? "border-green-400" : "border-red-700"}`}
+            className={` w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 rounded
+            ${errors.password ? "border-red-700" : "border-green-400"}`}
           />
+          {errors.password && (
+            <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+          )}
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
