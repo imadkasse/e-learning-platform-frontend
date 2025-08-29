@@ -59,10 +59,12 @@ const CoursePage = ({ course }: Props) => {
             _id: "",
             lessonTitle: "",
             url: "",
-            duration: 0,
+            duration: "0",
             isCompleted: false,
             completedBy: [],
             comments: [],
+            description: "",
+            files: [],
           }
         );
       }
@@ -177,7 +179,7 @@ const CoursePage = ({ course }: Props) => {
   }
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen relative">
       <div className="flex flex-row-reverse justify-between gap-8 p-4 max-w-[2000px] mx-auto">
         {/* Course Details Sidebar */}
         <CourseCardDetails
@@ -359,7 +361,7 @@ const CoursePage = ({ course }: Props) => {
           </div>
 
           {/* Comments Section */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/50">
+          <div className="bg-white/80   rounded-2xl shadow-xl p-6 border border-white/50 ">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                 <Comment className="text-white text-lg" />
@@ -372,14 +374,14 @@ const CoursePage = ({ course }: Props) => {
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 ">
               {lesson?.comments && lesson.comments.length > 0 ? (
                 <>
                   {lesson.comments.map((comment, index) => (
                     <div
                       key={comment._id}
                       id={comment._id}
-                      className="group bg-gradient-to-r from-white to-gray-50/50 rounded-2xl border border-gray-200/50 hover:border-purple-300/50 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+                      className="group bg-gradient-to-r from-white to-gray-50/50 rounded-2xl border border-gray-200/50 hover:border-purple-300/50 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden "
                     >
                       {/* Comment Header */}
                       <div className="bg-gradient-to-r from-gray-50 to-purple-50/30 p-4 border-b border-gray-200/50">
@@ -435,7 +437,7 @@ const CoursePage = ({ course }: Props) => {
 
                       {/* Comment Content */}
                       <div className="p-4">
-                        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border-r-4 border-gradient-to-b from-purple-500 to-pink-500">
+                        <div className=" rounded-xl p-4 border-r-4 border-gradient-to-b ">
                           <p
                             className="apply-fonts-normal text-gray-700 leading-relaxed"
                             dir="rtl"
@@ -446,9 +448,9 @@ const CoursePage = ({ course }: Props) => {
                       </div>
 
                       {/* Reply Section */}
-                      <div className="px-4 pb-4">
+                      <div className="px-4 pb-4  ">
                         {user.role !== "student" && (
-                          <div className="mb-3">
+                          <div className="mb-3 relative">
                             <AddReply commentId={comment._id} />
                           </div>
                         )}

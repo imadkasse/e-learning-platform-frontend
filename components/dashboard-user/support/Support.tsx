@@ -106,7 +106,7 @@ const Support = () => {
         </button>
       </div>
       <div className="flex flex-col gap-3">
-        {faqs.length > 0 ? (
+        {faqs ? (
           faqs.map((faq) => {
             return (
               <MsgCard

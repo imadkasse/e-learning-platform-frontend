@@ -7,6 +7,18 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import showToast from "@/utils/showToast";
+import * as z from "zod";
+const UserSchema = z
+  .object({
+    username: z.string().min(3, "اسم المستخدم يجب أن يكون 3 أحرف على الأقل"),
+    email: z.string().email("البريد الإلكتروني غير صالح"),
+    password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "كلمة المرور وتأكيدها غير متطابقين",
+    path: ["confirmPassword"],
+  });
 
 const SignUp = () => {
   const router = useRouter();
@@ -22,6 +34,13 @@ const SignUp = () => {
   const [passwordIsMatch, setPasswordIsMatch] = useState(false);
 
   const [isValid, setIsValid] = useState(false);
+  // errors
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+    username?: string;
+  }>({});
 
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -29,6 +48,14 @@ const SignUp = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
+
+    const result = UserSchema.pick({ password: true }).safeParse({
+      password: value,
+    });
+    setErrors((prev) => ({
+      ...prev,
+      password: result.success ? undefined : result.error.issues[0].message,
+    }));
     // تحقق من صحة كلمة المرور (مثلاً، يجب أن تكون أطول من 6 حروف)
     setIsPasswordValid(value.length >= 6);
     setPasswordIsMatch(passwordConfirm === e.target.value);
@@ -37,13 +64,68 @@ const SignUp = () => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEmail(value);
+    const result = UserSchema.pick({ email: true }).safeParse({ email: value });
+    setErrors((prev) => ({
+      ...prev,
+      email: result.success ? undefined : result.error.issues[0].message,
+    }));
     // تحقق من صحة البريد باستخدام تعبير منتظم بسيط
     setIsValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
+  };
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUserName(value);
+
+    const result = UserSchema.pick({ username: true }).safeParse({
+      username: value,
+    });
+    setErrors((prev) => ({
+      ...prev,
+      username: result.success ? undefined : result.error.issues[0].message,
+    }));
+  };
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+    setPasswordConfirm(value);
+
+    const result = UserSchema.safeParse({
+      username,
+      email,
+      password,
+      confirmPassword: value,
+    });
+
+    setErrors((prev) => ({
+      ...prev,
+      confirmPassword: result.success
+        ? undefined
+        : result.error.issues.find((i) => i.path[0] === "confirmPassword")
+            ?.message,
+    }));
   };
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const result = UserSchema.safeParse({
+      username,
+      email,
+      password,
+      confirmPassword: passwordConfirm,
+    });
+
+    if (!result.success) {
+      // اجمع الأخطاء من Zod وضعها في state
+      const fieldErrors: typeof errors = {};
+      result.error.issues.forEach((issue) => {
+        const fieldName = issue.path[0] as keyof typeof errors;
+        fieldErrors[fieldName] = issue.message;
+      });
+      setErrors(fieldErrors);
+      return; // لا تكمل الإرسال
+    }
     const formData = new FormData();
 
     if (image) {
@@ -55,7 +137,6 @@ const SignUp = () => {
     formData.append("password", password);
     formData.append("passwordConfirm", passwordConfirm);
 
-
     setLoading(true);
     try {
       const res = await axios.post(
@@ -63,7 +144,7 @@ const SignUp = () => {
         formData
       );
       const role = res.data.user.role === "student" ? "user" : "";
-      
+
       router.push(`/dashboard-${role}`);
     } catch (error) {
       // @ts-expect-error: fix after time
@@ -105,13 +186,14 @@ const SignUp = () => {
           <input
             type="tetx"
             value={username}
-            onChange={(e) => {
-              setUserName(e.target.value);
-            }}
+            onChange={handleUsernameChange}
             placeholder="إسم المستخدم"
             className={`  w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 
-            ${username.length <= 2 ? "border-red-700" : "border-green-400"} `}
+            ${errors.username ? "border-red-700" : "border-green-400"} `}
           />
+          {errors.username && (
+            <p className="text-red-600 text-sm mt-1">{errors.username}</p>
+          )}
         </div>
         {/* email */}
         <div>
@@ -120,9 +202,12 @@ const SignUp = () => {
             value={email}
             onChange={handleEmailChange}
             placeholder="البريد الإلكتروني"
-            className={`  w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent rounded 
-            ${isValid ? "border-green-400" : "border-red-700"}`}
+            className={`w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent rounded 
+  ${errors.email ? "border-red-700" : "border-green-400"}`}
           />
+          {errors.email && (
+            <p className="text-red-600 text-sm mt-1">{errors.email}</p>
+          )}
         </div>
         {/* image */}
         <div className="flex gap-4 ">
@@ -155,8 +240,11 @@ const SignUp = () => {
             onChange={handlePasswordChange}
             placeholder="كلمة المرور"
             className={` w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 
-            ${isPasswordValid ? "border-green-400" : "border-red-700"}`}
+            ${errors.password ? "border-red-700" : "border-green-400"}`}
           />
+          {errors.password && (
+            <p className="text-red-600 text-sm mt-1">{errors.password}</p>
+          )}
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
@@ -170,19 +258,16 @@ const SignUp = () => {
           <input
             type="password"
             value={passwordConfirm}
-            onChange={(e) => {
-              setPasswordConfirm(e.target.value);
-              setIsPasswordValid(e.target.value.length >= 6);
-              setPasswordIsMatch(password === e.target.value);
-            }}
+            onChange={handleConfirmPasswordChange}
             placeholder="تأكيد كلمة المرور "
             className={` w-full px-4 py-3 bg-gray-100 text-md outline-none border-b-2 border-transparent  rounded 
-            ${
-              isPasswordValid && passwordIsMatch
-                ? "border-green-400"
-                : "border-red-700"
-            }`}
+            ${errors.confirmPassword ? "border-red-700" : "border-green-400"}`}
           />
+          {errors.confirmPassword && (
+            <p className="text-red-600 text-sm mt-1">
+              {errors.confirmPassword}
+            </p>
+          )}
         </div>
 
         <div>

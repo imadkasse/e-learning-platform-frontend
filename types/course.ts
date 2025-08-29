@@ -18,7 +18,7 @@ export type Videos = {
   _id: string;
   lessonTitle: string;
   url: string; //! this is just videoId you need to add baseUrl from .env
-  duration: number;
+  duration: string;
   isCompleted: boolean;
   completedBy: string[];
   comments: Comment[];
