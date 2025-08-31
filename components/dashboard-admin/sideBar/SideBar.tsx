@@ -15,6 +15,7 @@ import {
 } from "@mui/icons-material";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { Tickets } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -136,6 +137,17 @@ const SideBar = () => {
                 <NotificationsOutlined />
                 <p>الإشعارات</p>
               </Link>
+              <Link
+                href={`/dashboard-admin/coupons`}
+                className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                  pathName === "/dashboard-admin/coupons"
+                    ? "bg-mainColor/50"
+                    : ""
+                }  my-2`}
+              >
+                <Tickets />
+                <p>الكوبونات</p>
+              </Link>
             </div>
           </nav>
         </div>
@@ -245,6 +257,17 @@ const SideBar = () => {
               >
                 <NotificationsOutlined />
                 <p>الإشعارات</p>
+              </Link>
+              <Link
+                href={`/dashboard-admin/coupons`}
+                className={`flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
+                  pathName === "/dashboard-admin/coupons"
+                    ? "bg-mainColor/50"
+                    : ""
+                } my-2`}
+              >
+                <Tickets />
+                <p>الكوبونات</p>
               </Link>
             </div>
           </nav>

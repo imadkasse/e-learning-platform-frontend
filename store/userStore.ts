@@ -1,10 +1,9 @@
 // import { User } from "@/types/user";
 import axios from "axios";
 import { create } from "zustand";
-// import Cookies from "js-cookie";
 import { User } from "@/types/user";
 
-// const token = Cookies.get("token");
+
 
 export const useUserStore = create<{
   user: User;
@@ -37,6 +36,7 @@ export const useUserStore = create<{
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
         {
           withCredentials: true,
+          
         }
       );
       set({ user: res.data.user });
