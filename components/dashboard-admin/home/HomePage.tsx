@@ -14,7 +14,7 @@ import { AdminCharts } from "@/components/charts/AdminCharts";
 import { colors } from "@/constants/colors";
 import { AdminData } from "@/types/dashboard";
 
-const HomePage = async ({ data }: { data: AdminData }) => {
+const HomePage =  ({ data }: { data: AdminData }) => {
   return (
     <div className="lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll space-y-6">
       {/* العنوان والترحيب */}

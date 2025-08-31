@@ -1,6 +1,7 @@
 import "@/app/globals.css";
 import { fetchUserServer } from "@/lib/fetchUserServer";
 import UserProvider from "@/providers/UserProvider";
+import { ToastContainer } from "react-toastify";
 
 interface Props {
   params: Promise<{ courseId: string }>;
@@ -15,12 +16,12 @@ export async function generateMetadata({ params }: Props) {
     }`,
     {
       cache: "no-store",
-      
     }
   );
-  const course = await courseData.json();
+  const data = await courseData.json();
   return {
-    title: course.course.title,
+    title: data.course ? data.course.title : "Error",
+    description: data.course ? data.course.description : "Error",
   };
 }
 
@@ -34,6 +35,7 @@ export default async function RootLayout({
   return (
     <>
       <div>
+        <ToastContainer />
         <UserProvider user={user}>{children}</UserProvider>
       </div>
     </>

@@ -11,6 +11,9 @@ import {
   Users,
   Twitter,
   Instagram,
+  Tag,
+  X,
+  Check,
 } from "lucide-react";
 import Link from "next/link";
 import showToast from "@/utils/showToast";
@@ -35,9 +38,46 @@ const CourseCard = ({
   const link = `${process.env.NEXT_PUBLIC_BASE_URL}/course-overview/${id}`;
   const { user, fetchUser } = useUserStore();
   const [isOpen, setIsOpen] = useState<boolean>(true);
+  const [couponCode, setCouponCode] = useState<string>("");
+  const [priceState, setPriceState] = useState(price);
+  const [appliedCoupon, setAppliedCoupon] = useState<string>("");
+  const [originalPrice] = useState(price);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState<boolean>(false);
 
   const handelOpenAndColsed = () => {
     setIsOpen(!isOpen);
+  };
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) {
+      showToast("error", "يرجى إدخال كود الخصم");
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/coupons/use/${id}`,
+        { code: couponCode.trim() },
+        { withCredentials: true }
+      );
+
+      setPriceState(res.data.finalPrice);
+      setAppliedCoupon(couponCode.trim());
+      setCouponCode("");
+      showToast("success", "تم تطبيق كود الخصم بنجاح ✅");
+    } catch (error) {
+      //@ts-expect-error:fix again
+      showToast("error", error.response?.data?.message);
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setPriceState(originalPrice);
+    setAppliedCoupon("");
+    showToast("info", "تم إزالة كود الخصم");
   };
 
   const enrollmentCourse = async (e: FormEvent<HTMLButtonElement>) => {
@@ -47,9 +87,14 @@ const CourseCard = ({
       return;
     }
     try {
+      const requestData: { couponCode?: string } = {};
+      if (appliedCoupon.trim()) {
+        requestData.couponCode = appliedCoupon.trim();
+      }
+
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/enrolled/${id}`,
-        {},
+        requestData,
         {
           withCredentials: true,
         }
@@ -95,22 +140,28 @@ const CourseCard = ({
       <div
         className={`transition-all duration-300 ease-in-out ${
           isOpen ? "xs:hidden lg:block" : "w-[400px]"
-        } xs:fixed lg:relative z-10 xs:bg-white lg:bg-transparent w-[400px]`}
+        } xs:fixed lg:relative  z-10 xs:bg-white lg:bg-transparent w-[400px]`}
       >
         <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden sticky top-8">
           {/* Price Header */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 text-center">
             <div className="text-3xl font-bold mb-2">
-              {price === 0 ? (
+              {priceState === 0 ? (
                 <span className="text-yellow-300">مجاناً الآن</span>
               ) : (
                 <>
-                  <span>{price}</span>
+                  <span>{priceState}</span>
                   <span className="text-lg mr-2">DA</span>
                 </>
               )}
             </div>
-            {price !== 0 && (
+            {/* Show original price if discount is applied */}
+            {appliedCoupon && originalPrice !== priceState && (
+              <div className="text-blue-200 text-sm line-through">
+                السعر الأصلي: {originalPrice} DA
+              </div>
+            )}
+            {priceState !== 0 && (
               <div className="text-blue-100 text-sm">سعر خاص لفترة محدودة</div>
             )}
           </div>
@@ -146,8 +197,77 @@ const CourseCard = ({
             </div>
           </div>
 
+          {/* Applied Coupon Display */}
+          {appliedCoupon && (
+            <div className="mx-6 mb-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Check size={16} className="text-green-600" />
+                  </div>
+                  <div>
+                    <span className="apply-fonts-normal text-sm font-medium text-green-800">
+                      كود الخصم المطبق
+                    </span>
+                    <div className="text-green-700 font-bold text-sm">
+                      {appliedCoupon}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={removeCoupon}
+                  className="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-lg flex items-center justify-center transition-colors duration-200"
+                  title="إزالة كود الخصم"
+                >
+                  <X size={16} className="text-red-600" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Coupon Code Input */}
+          <div
+            className={`${
+              user.enrolledCourses?.some((c) => c._id === id) || appliedCoupon
+                ? "hidden"
+                : "block"
+            }  p-6 border-t border-slate-200`}
+          >
+            <div className="mb-4">
+              <label className="apply-fonts-normal block text-sm font-medium text-slate-700 mb-2">
+                كود الخصم (اختياري)
+              </label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <Tag size={18} className="text-slate-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    placeholder="أدخل كود الخصم"
+                    className="w-full pr-10 pl-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white"
+                    onKeyPress={(e) => e.key === "Enter" && applyCoupon()}
+                  />
+                </div>
+                <button
+                  onClick={applyCoupon}
+                  disabled={!couponCode.trim() || isApplyingCoupon}
+                  className="px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-slate-300 disabled:to-slate-400 text-white rounded-xl font-medium transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+                >
+                  {isApplyingCoupon ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <span className="apply-fonts-normal text-sm">تطبيق</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* Enrollment Button */}
-          <div className="p-6">
+          <div className="p-6 pt-0">
             {user.role === "teacher" || user.role === "admin" ? (
               <div className="text-center py-4 text-slate-500 bg-slate-100 rounded-xl">
                 <span className="apply-fonts-normal">أنت مدرس في المنصة</span>
@@ -155,14 +275,14 @@ const CourseCard = ({
             ) : (
               <button
                 onClick={enrollmentCourse}
-                disabled={user.enrolledCourses.some((c) => c._id === id)}
+                disabled={user.enrolledCourses?.some((c) => c._id === id)}
                 className={`apply-fonts-normal w-full p-4 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl ${
-                  user.enrolledCourses.some((c) => c._id === id)
+                  user.enrolledCourses?.some((c) => c._id === id)
                     ? "bg-green-500 cursor-not-allowed"
                     : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                 }`}
               >
-                {user.enrolledCourses.some((c) => c._id === id)
+                {user.enrolledCourses?.some((c) => c._id === id)
                   ? "أنت منضم بالفعل ✓"
                   : "الانضمام للدورة"}
               </button>
