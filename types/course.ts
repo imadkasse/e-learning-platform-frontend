@@ -23,12 +23,13 @@ export type Videos = {
   completedBy: string[];
   comments: Comment[];
   files: File[];
-  description:string
+  description: string;
 };
 export type Section = {
   _id: string;
   title: string;
   videos: Videos[];
+  courseId?: string;
 };
 
 export type Course = {
@@ -40,7 +41,7 @@ export type Course = {
   duration: number;
   price: number;
   studentsCount: number;
-  enrolledStudents: string[]; //edit in feature
+  enrolledStudents: string[]; //edit in feature(add Type)
   published: boolean;
   createdAt: string;
   sections: Section[]; //! replace to Sections => [{title:'',videos:Videos[]}

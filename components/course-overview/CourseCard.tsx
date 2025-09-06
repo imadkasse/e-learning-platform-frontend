@@ -140,9 +140,9 @@ const CourseCard = ({
       <div
         className={`transition-all duration-300 ease-in-out ${
           isOpen ? "xs:hidden lg:block" : "w-[400px]"
-        } xs:fixed lg:relative  z-10 xs:bg-white lg:bg-transparent w-[400px]`}
+        } xs:fixed lg:relative   z-10 xs:bg-white lg:bg-transparent w-[400px]`}
       >
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden sticky top-8">
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden sticky top-12">
           {/* Price Header */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 text-center">
             <div className="text-3xl font-bold mb-2">
@@ -228,7 +228,10 @@ const CourseCard = ({
           {/* Coupon Code Input */}
           <div
             className={`${
-              user.enrolledCourses?.some((c) => c._id === id) || appliedCoupon
+              user.enrolledCourses?.some((c) => c._id === id) ||
+              appliedCoupon ||
+              user.role === "teacher" ||
+              user.role === "admin"
                 ? "hidden"
                 : "block"
             }  p-6 border-t border-slate-200`}

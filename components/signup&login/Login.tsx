@@ -90,7 +90,7 @@ const Login = () => {
         res.data.user.role === "student" ? "user" : res.data.user.role;
       await fetchUser();
       console.log(res.data);
-      router.push(`/dashboard-${role}/courses`);
+      router.push(`/dashboard-${role}`);
     } catch (error) {
       // @ts-expect-error: fix after time
       showToast("error", error.response.data.error);

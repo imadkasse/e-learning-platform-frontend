@@ -23,23 +23,22 @@ const HomePage = async () => {
         }
       );
       const data = await res.json();
-      // fetch to export progress of courses 
-      const fetchUser = await fetch(
-        `${process.env.BACK_URL}/api/courses/my-courses`,
-        {
-          credentials: "include",
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }
-      );
-      const userData = await fetchUser.json();
-      user = userData.user;
+
       myEnrolledCourses = data.course;
+      const resUser = await fetch(`${process.env.BACK_URL}/api/users/me`, {
+        credentials: "include",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const userData = await resUser.json();
+      user = userData.user;
+      console.log("userData", user);
     } catch (err) {
       console.log("err", err);
     }
   };
   await fetchMyEnrolledCourses();
   const courses = myEnrolledCourses;
+  console.log("user", user);
 
   return (
     <div className=" lg:custom-width rounded-xl px-4 py-5 h-[93vh] overflow-y-scroll ">
@@ -56,7 +55,10 @@ const HomePage = async () => {
               }, 0);
 
               return (
-                <div key={course._id} className=" max-w-[272px] h-[364px]">
+                <div
+                  key={course._id}
+                  className="w-full max-w-sm mx-auto h-auto min-h-[400px] flex-shrink-0"
+                >
                   <CardCourse
                     key={course._id}
                     progresBar={

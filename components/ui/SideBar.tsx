@@ -1,15 +1,5 @@
 "use client";
-import {
-  ChevronLeft,
-  ChevronRight,
-  HelpCircle,
-  Home,
-  LogOut,
-  Bell,
-  User,
-  Play,
-  Settings,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, LogOut, LucideProps } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,8 +8,20 @@ import Cookies from "js-cookie";
 import { useUserStore } from "@/store/userStore";
 import axios from "axios";
 import showToast from "@/utils/showToast";
+type mainMenuItemsProps = {
+  href: string;
+  icon: React.ForwardRefExoticComponent<
+    Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+  >;
+  label: string;
+  exact?: boolean;
+};
+interface Props {
+  mainMenuItems: mainMenuItemsProps[];
+  bottomMenuItems: mainMenuItemsProps[];
+}
 
-const SideBar = () => {
+const SideBar = ({ mainMenuItems, bottomMenuItems }: Props) => {
   const router = useRouter();
   const [toggleSidebar, setToggleSidebar] = useState<boolean>(false);
   const { fetchUser } = useUserStore();
@@ -46,34 +48,6 @@ const SideBar = () => {
       showToast("error", "تم تسجيل الخروج بنجاح");
     }
   };
-
-  const mainMenuItems = [
-    {
-      href: "/dashboard-teacher",
-      icon: Home,
-      label: "الرئيسية",
-      exact: true,
-    },
-    {
-      href: "/dashboard-teacher/courses",
-      icon: Play,
-      label: "الدورات",
-    },
-    {
-      href: "/dashboard-teacher/notification",
-      icon: Bell,
-      label: "الإشعارات",
-    },
-  ];
-
-  const bottomMenuItems = [
-
-    {
-      href: "/dashboard-teacher/settings",
-      icon: Settings,
-      label: "الإعدادات",
-    },
-  ];
 
   const isActiveLink = (href: string, exact = false) => {
     if (exact) {

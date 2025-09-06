@@ -126,6 +126,8 @@ export const CouponCard = ({
       showToast("success", response.data.message);
     } catch (error) {
       console.error("خطأ في الشبكة:", error);
+   
+
     } finally {
       setIsDeleting(false);
     }
@@ -196,7 +198,7 @@ export const CouponCard = ({
             <div className="font-medium">
               {coupon.maxUsage
                 ? `${coupon.usedCount} / ${coupon.maxUsage}`
-                : `غير محدود`}
+                : `غير محدود/${coupon.usedCount}`}
             </div>
           </div>
 

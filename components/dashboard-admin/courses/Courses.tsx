@@ -32,12 +32,12 @@ const Courses = async ({ searchParams }: CoursesProps) => {
   };
   const courses: Course[] = await fetchCourse();
   return (
-    <div className=" lg:custom-width rounded-xl h-[94vh] overflow-y-scroll px-4 py-5 relative ">
+    <div className="  rounded-xl h-[94vh] overflow-y-scroll px-4 py-5 relative ">
       <div className="mb-5 flex items-center gap-6">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الدورات</h1>
         <SearchCourse />
       </div>
-      <div className="container mx-auto px-8 py-4">
+      <div className=" px-8 py-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  gap-6">
           {courses?.length > 0 ? (
             courses.map((c) => {

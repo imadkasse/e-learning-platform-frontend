@@ -1,6 +1,7 @@
 import "@/app/globals.css";
 import { fetchUserServer } from "@/lib/fetchUserServer";
 import UserProvider from "@/providers/UserProvider";
+import { redirect } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 
 interface Props {
@@ -31,7 +32,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await fetchUserServer();
-
+  
+  if (!user) {
+    redirect("/login");
+  }
   return (
     <>
       <div>
