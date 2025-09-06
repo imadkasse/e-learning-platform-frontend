@@ -45,7 +45,7 @@ const Students = async ({ searchParams }: StudentsProps) => {
   const users: User[] = await fetchAllUsers();
 
   return (
-    <div className=" lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll ">
+    <div className="  rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll ">
       {/* Header Section */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -67,75 +67,8 @@ const Students = async ({ searchParams }: StudentsProps) => {
           </div>
         </div>
       </div>
-
-      {/* Content Section */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-        {users?.length > 0 ? (
-          <>
-            {/* Desktop Table Header */}
-            <div className="hidden md:block bg-mainColor text-white">
-              <div className="grid grid-cols-12 gap-4 px-6 py-4">
-                <div className="col-span-4">
-                  <h3 className="apply-fonts-normal font-semibold text-lg">
-                    معلومات الطالب
-                  </h3>
-                </div>
-                <div className="col-span-2 text-center">
-                  <h3 className="apply-fonts-normal font-semibold text-lg">
-                    تاريخ الانضمام
-                  </h3>
-                </div>
-                <div className="col-span-2 text-center">
-                  <h3 className="apply-fonts-normal font-semibold text-lg">
-                    الحالة
-                  </h3>
-                </div>
-                <div className="col-span-3 text-center">
-                  <h3 className="apply-fonts-normal font-semibold text-lg">
-                    العمليات
-                  </h3>
-                </div>
-              </div>
-            </div>
-
-            {/* Students List */}
-            <div className="divide-y divide-gray-100">
-              {users.map((user, index) => (
-                <div
-                  key={user._id}
-                  className="hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <StudentCard
-                    studentImg={user.thumbnail || "/imgs/logoImg.png"}
-                    studentName={user.username}
-                    studentEmail={user.email}
-                    studentJoinDate={user.createdAt?.split("T")[0]}
-                    studentId={user._id}
-                    studentStatus={user.active}
-                  />
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 px-6">
-            <div className="bg-gray-100 rounded-full p-6 mb-6">
-              <Users className="w-12 h-12 text-gray-400" />
-            </div>
-            <h3 className="apply-fonts-normal text-xl font-semibold text-gray-600 mb-2">
-              لا توجد نتائج
-            </h3>
-            <p className="apply-fonts-normal text-gray-500 text-center max-w-md">
-              {filter
-                ? `لم يتم العثور على أي طلاب يطابقون "${filter}"`
-                : "لا يوجد أي طلاب مسجلين في النظام حالياً"}
-            </p>
-          </div>
-        )}
-      </div>
-
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
         <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -219,6 +152,71 @@ const Students = async ({ searchParams }: StudentsProps) => {
             </div>
           </div>
         </div>
+      </div>
+      {/* Content Section */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        {users?.length > 0 ? (
+          <>
+            {/* Desktop Table Header */}
+            <div className="hidden md:block bg-mainColor text-white">
+              <div className="grid grid-cols-12 gap-4 px-6 py-4">
+                <div className="col-span-4">
+                  <h3 className="apply-fonts-normal font-semibold text-lg">
+                    معلومات الطالب
+                  </h3>
+                </div>
+                <div className="col-span-2 text-center">
+                  <h3 className="apply-fonts-normal font-semibold text-lg">
+                    تاريخ الانضمام
+                  </h3>
+                </div>
+                <div className="col-span-2 text-center">
+                  <h3 className="apply-fonts-normal font-semibold text-lg">
+                    الحالة
+                  </h3>
+                </div>
+                <div className="col-span-3 text-center">
+                  <h3 className="apply-fonts-normal font-semibold text-lg">
+                    العمليات
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            {/* Students List */}
+            <div className="divide-y divide-gray-100">
+              {users.map((user, index) => (
+                <div
+                  key={user._id}
+                  className="hover:bg-gray-50 transition-colors duration-200"
+                >
+                  <StudentCard
+                    studentImg={user.thumbnail || "/imgs/logoImg.png"}
+                    studentName={user.username}
+                    studentEmail={user.email}
+                    studentJoinDate={user.createdAt?.split("T")[0]}
+                    studentId={user._id}
+                    studentStatus={user.active}
+                  />
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 px-6">
+            <div className="bg-gray-100 rounded-full p-6 mb-6">
+              <Users className="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 className="apply-fonts-normal text-xl font-semibold text-gray-600 mb-2">
+              لا توجد نتائج
+            </h3>
+            <p className="apply-fonts-normal text-gray-500 text-center max-w-md">
+              {filter
+                ? `لم يتم العثور على أي طلاب يطابقون "${filter}"`
+                : "لا يوجد أي طلاب مسجلين في النظام حالياً"}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

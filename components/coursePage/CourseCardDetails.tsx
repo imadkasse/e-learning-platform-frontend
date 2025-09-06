@@ -17,7 +17,6 @@ import {
   Close,
 } from "@mui/icons-material";
 import Link from "next/link";
-import { Lesson } from "@/types/lesson";
 import { useLesson } from "@/store/lessonStore";
 import { usePathname } from "next/navigation";
 import showToast from "@/utils/showToast";
@@ -49,7 +48,7 @@ const CourseCardDetails = ({ courseId, userId, sections }: Props) => {
   let numberOfCompletedVideo = 0;
   sections.forEach((section) => {
     section.videos.forEach((video) => {
-      if (video.completedBy.includes("as")) {
+      if (video.completedBy.includes(user._id)) {
         numberOfCompletedVideo++;
       }
     });
@@ -96,7 +95,8 @@ const CourseCardDetails = ({ courseId, userId, sections }: Props) => {
       );
       const updatedLesson = res.data.lesson;
       setLesson(updatedLesson);
-
+      //
+      numberOfCompletedVideo++;
       setCompletedVideos((prev) =>
         prev.includes(videoId)
           ? prev.filter((id) => id !== videoId)
@@ -171,20 +171,22 @@ const CourseCardDetails = ({ courseId, userId, sections }: Props) => {
           </div>
 
           {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>
-                {numberOfCompletedVideo} من {getTotalVideos()} فيديو
-              </span>
-              <span>{getCompletionPercentage()}%</span>
+          {user.role === "student" && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>
+                  {numberOfCompletedVideo} من {getTotalVideos()} فيديو
+                </span>
+                <span>{getCompletionPercentage()}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-700 ease-out"
+                  style={{ width: `${getCompletionPercentage()}%` }}
+                />
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-              <div
-                className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-700 ease-out"
-                style={{ width: `${getCompletionPercentage()}%` }}
-              />
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Sections Content */}

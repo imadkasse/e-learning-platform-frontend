@@ -2,7 +2,7 @@
 import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { colors } from "@/constants/colors";
 import { X, Plus, Loader2 } from "lucide-react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import showToast from "@/utils/showToast";
 import { Coupon } from "@/types/coupon";
 
@@ -106,7 +106,13 @@ const AddCoupon = ({
       // onSuccess();
       // onClose();
     } catch (error) {
+      const axiosError = error as AxiosError;
       console.error("خطأ في الشبكة:", error);
+      showToast(
+        "error",
+        (axiosError.response?.data as { message: string })?.message ||
+          "An error occurred"
+      );
     } finally {
       setIsLoading(false);
     }

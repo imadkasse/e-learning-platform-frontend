@@ -131,6 +131,7 @@ export default function CourseUploader() {
   const [loadingDeleteVideo, setLoadingDeleteVideo] = useState<string>("");
   const [loadingUploadFile, setLoadingUploadFile] = useState<string>("");
   const [loadingDeleteCourse, setLoadingDeleteCourse] = useState(false);
+ 
 
   // Modal states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -288,6 +289,7 @@ export default function CourseUploader() {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+         
         }
       );
       showToast("success", res.data.message);
@@ -1196,6 +1198,8 @@ function StepSectionsAndVideos({
                           </>
                         )}
                       </button>
+                      {/* Progress Bar */}
+                     
                       <button
                         type="button"
                         onClick={() =>
@@ -1617,3 +1621,5 @@ function StepPublish({ currentCourse }: StepPublishProps) {
     </div>
   );
 }
+
+

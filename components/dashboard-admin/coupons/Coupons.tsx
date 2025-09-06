@@ -22,7 +22,7 @@ const Coupons = ({ couponsData }: CouponsProps) => {
   return (
     <>
       <div
-        className="lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll"
+        className=" rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll"
         dir="rtl"
       >
         {/* رأس الصفحة */}

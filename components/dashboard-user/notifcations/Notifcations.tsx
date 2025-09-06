@@ -5,14 +5,12 @@ import { io } from "socket.io-client";
 import { User } from "@/types/user";
 import { Comment } from "@/types/lesson";
 import { useUserStore } from "@/store/userStore";
-
+import { Bell, BellOff } from "lucide-react";
 import Spinner from "@/components/spinner/Spinner";
-// import { useUserStore } from "@/store/userStore";
-// import Link from "next/link";
 
 const socket = io(process.env.NEXT_PUBLIC_BACK_URL);
 
-type Notifcation = {
+type Notification = {
   message: string;
   comment: Comment;
   courseImage: string;
@@ -20,64 +18,95 @@ type Notifcation = {
   user: User;
   lessonNumber: number;
 };
-const Notifcations = () => {
-  const { user, loading } = useUserStore();
 
-  const [notifcation, setNotifcation] = useState<Notifcation[]>([]);
+const Notifications = () => {
+  const { user, loading } = useUserStore();
+  const [notification, setNotification] = useState<Notification[]>([]);
 
   useEffect(() => {
     socket.on("newReply", (data) => {
-      setNotifcation([...notifcation, data]);
+      setNotification([...notification, data]);
     });
-  }, [notifcation]);
+  }, [notification]);
 
   if (loading) {
     return (
-      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
+      <div className="bg-white lg:custom-width rounded-xl px-6 py-8 h-[93vh] flex items-center justify-center shadow-sm">
         <Spinner />
       </div>
     );
   }
 
+  const allNotifications = [...notification, ...user.notifications];
+  const hasNotifications = allNotifications.length > 0;
 
   return (
-    <div className=" lg:custom-width rounded-xl px-4 py-5 h-[93vh] overflow-y-scroll ">
-      <div className="mb-5">
-        <h1 className="apply-fonts-normal text-2xl font-semibold ">إشعارتك</h1>
+    <div className=" lg:custom-width rounded-xl px-6 py-8 h-[93vh] overflow-hidden flex flex-col shadow-sm">
+      {/* Header */}
+      <div className="mb-8 flex items-center gap-3">
+        <div className="p-3 bg-blue-50 rounded-full">
+          <Bell className="w-6 h-6 text-mainColor" />
+        </div>
+        <div>
+          <h1 className="apply-fonts-medium text-2xl font-bold text-gray-800">
+            إشعاراتك
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            {hasNotifications
+              ? `لديك ${allNotifications.length} إشعار${
+                  allNotifications.length > 1 ? "ات" : ""
+                }`
+              : "لا توجد إشعارات جديدة"}
+          </p>
+        </div>
       </div>
-      <div>
-        {notifcation.length > 0 &&
-          notifcation.map((notifcation, index) => {
-            return (
+
+      {/* Notifications Content */}
+      <div className="flex-1 overflow-y-auto">
+        {hasNotifications ? (
+          <div className="space-y-4">
+            {/* Real-time notifications */}
+            {notification.map((notif, index) => (
               <NotificationCard
-                key={index}
-                lessonNumber={notifcation.lessonNumber}
-                notifcationDate={notifcation.comment.createdAt.split("T")[0]}
-                notifcationImg={notifcation.courseImage}
-                notifcationName={notifcation.message}
-                courseId={notifcation.courseId}
+                key={`realtime-${index}`}
+                lessonNumber={notif.lessonNumber}
+                notificationDate={notif.comment.createdAt.split("T")[0]}
+                notificationImg={notif.courseImage}
+                notificationName={notif.message}
+                courseId={notif.courseId}
+                isNew={true}
               />
-            );
-          })}
-        {user.notifications.length > 0 ? (
-          user.notifications.map((notifcation, index) => {
-            return (
+            ))}
+
+            {/* User notifications */}
+            {user.notifications.map((notif, index) => (
               <NotificationCard
-                key={index}
-                lessonNumber={notifcation.lessonNumber}
-                notifcationDate={notifcation.createdAt.split("T")[0]}
-                notifcationImg={notifcation.courseImage}
-                notifcationName={notifcation.message}
-                courseId={notifcation.courseId}
+                key={`user-${index}`}
+                lessonNumber={notif.lessonNumber}
+                notificationDate={notif.createdAt.split("T")[0]}
+                notificationImg={notif.courseImage}
+                notificationName={notif.message}
+                courseId={notif.courseId}
+                isNew={false}
               />
-            );
-          })
+            ))}
+          </div>
         ) : (
-          <h1 className="text-mainColor text-xl text-center font-semibold">لا توجد أي إشعارات</h1>
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="p-4 bg-gray-50 rounded-full mb-4">
+              <BellOff className="w-12 h-12 text-gray-400" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-600 mb-2">
+              لا توجد إشعارات
+            </h2>
+            <p className="text-gray-500 max-w-sm">
+              ستظهر هنا جميع الإشعارات والتحديثات المهمة المتعلقة بدوراتك
+            </p>
+          </div>
         )}
       </div>
     </div>
   );
 };
 
-export default Notifcations;
+export default Notifications;

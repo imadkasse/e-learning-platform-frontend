@@ -8,8 +8,6 @@ import {
   FilePresent,
   Comment,
   Schedule,
-  Visibility,
-  PlayCircleFilledWhite,
 } from "@mui/icons-material";
 
 import Image from "next/image";
@@ -21,7 +19,7 @@ import Link from "next/link";
 import Spinner from "../spinner/Spinner";
 import { useLesson } from "@/store/lessonStore";
 import "react-toastify/dist/ReactToastify.css";
-import { redirect, usePathname } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Reply } from "./comments and replies/Reply";
 import AddComment from "./comments and replies/AddComment";
 import AddReply from "./comments and replies/AddReply";

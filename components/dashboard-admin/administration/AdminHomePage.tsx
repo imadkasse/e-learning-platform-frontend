@@ -53,7 +53,7 @@ const AdminHomePage = async ({ searchParams }: AdminProps) => {
   const teachers = users?.filter((user) => user.role === "teacher") || [];
 
   return (
-    <div className=" lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll ">
+    <div className="  rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll  ">
       {/* Header Section */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -84,7 +84,7 @@ const AdminHomePage = async ({ searchParams }: AdminProps) => {
       </div>
 
       {/* Stats Cards */}
-      <div className="lg:custom-width px-6 py-6">
+      <div className=" px-6 py-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
             <div className="flex items-center justify-between">

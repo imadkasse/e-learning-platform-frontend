@@ -10,10 +10,11 @@ import React from "react";
 
 const NavBarCourse = async () => {
   const user = await fetchUserServer();
+  
   const role =
-    user.role === "student"
+    user?.role === "student"
       ? "user"
-      : user.role === "teacher"
+      : user?.role === "teacher"
       ? "teacher"
       : "admin";
   return (

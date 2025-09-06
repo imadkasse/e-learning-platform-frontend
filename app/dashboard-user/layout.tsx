@@ -24,12 +24,13 @@ export default async function RootLayout({
   if (user.role !== "student") {
     redirect(`/dashboard-${user.role}`);
   }
+
   return (
     <>
-      <div className="flex gap-3 p-[20px] h-screen">
+      <div className="flex gap-4 p-[20px] h-screen bg-gray-50/50">
         <SideBar />
         <ToastContainer />
-        <main className="flex-1">
+        <main className="flex-1 ">
           <UserProvider user={user}>{children}</UserProvider>
         </main>
       </div>

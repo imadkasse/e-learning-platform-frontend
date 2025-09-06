@@ -115,7 +115,7 @@ const StudentCard = ({
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "غير محدد";
     const date = new Date(dateString);
-    return date.toLocaleDateString("ar-SA", {
+    return date.toLocaleDateString("ar-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -126,7 +126,7 @@ const StudentCard = ({
     <>
       {/* Desktop Layout */}
       <div className="hidden md:block">
-        <div className="grid grid-cols-12 gap-4 items-center px-6 py-6 hover:bg-gray-50/50 transition-colors duration-200">
+        <div className="grid grid-cols-12 gap-4 items-center px-6 py-6 hover:bg-gray-50/50 transition-colors duration-200 overflow-auto">
           {/* Student Info */}
           <div className="col-span-4 flex items-center gap-4">
             <div className="relative">
@@ -153,7 +153,7 @@ const StudentCard = ({
 
           {/* Join Date */}
           <div className="col-span-2 text-center">
-            <p className="apply-fonts-normal text-gray-700 font-medium text-sm">
+            <p className=" text-gray-700 font-medium text-sm">
               {formatDate(studentJoinDate)}
             </p>
           </div>
@@ -239,7 +239,7 @@ const StudentCard = ({
                   <p className="text-sm text-gray-500 truncate mb-2">
                     {studentEmail}
                   </p>
-                  <p className="apply-fonts-normal text-sm text-gray-600 mb-2">
+                  <p className="text-sm text-gray-600 mb-2">
                     انضم في: {formatDate(studentJoinDate)}
                   </p>
                 </div>
