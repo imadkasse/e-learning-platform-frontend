@@ -15,6 +15,8 @@ import {
   AdminPanelSettingsOutlined,
   LocalOfferOutlined,
   KeyboardArrowDownOutlined,
+  PersonAddOutlined,
+  LoginOutlined,
 } from "@mui/icons-material";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link as ScrollLink } from "react-scroll";
@@ -432,13 +434,13 @@ const NavBarHome = () => {
           </button>
           <Link
             href={"/login"}
-            className="hoverEle hover:bg-mainColorHoverLight bg-mainColor xs:text-base md:text-[20px] apply-fonts-normal text-white xs:py-2 xs:px-3 md:py-2 md:px-5 rounded-3xl text-center"
+            className="xs:hidden md:block hoverEle hover:bg-mainColorHoverLight bg-mainColor xs:text-base md:text-[20px] apply-fonts-normal text-white xs:py-2 xs:px-3 md:py-2 md:px-5 rounded-3xl text-center"
           >
             تسجيل الدخول
           </Link>
           <Link
             href={"/signup"}
-            className="xs:text-base md:text-[20px] apply-fonts-normal font-light rounded-3xl text-center"
+            className="xs:hidden md:block xs:text-base md:text-[20px] apply-fonts-normal font-light rounded-3xl text-center"
           >
             إنشاء حساب
           </Link>
@@ -539,12 +541,12 @@ const NavBarHome = () => {
                 ))}
 
                 {/* User Section in Mobile Menu */}
-                {user._id && (
+                {user._id ? (
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7, duration: 0.4 }}
-                    className="w-full max-w-xs mt-8 pt-8 border-t border-white/20"
+                    className="w-full max-w-xs mt-6 pt-6 border-t border-white/20"
                   >
                     <div className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 mb-4">
                       <div className="relative">
@@ -580,10 +582,50 @@ const NavBarHome = () => {
                     <Link
                       href={`/dashboard-${role}`}
                       onClick={handleColseToggle}
-                      className="flex items-center justify-center gap-3 w-full p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-xl text-white border border-blue-400/30 transition-all duration-300"
+                      className="flex items-center justify-center gap-3 w-full p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-xl text-white border border-blue-400/30 transition-all duration-300 mb-3"
                     >
                       <HomeOutlined fontSize="small" />
                       <span className="apply-fonts-normal">لوحة التحكم</span>
+                    </Link>
+                  </motion.div>
+                ) : (
+                  /* أزرار التسجيل في القائمة المحمولة للمستخدمين غير المسجلين */
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7, duration: 0.4 }}
+                    className="w-full max-w-xs mt-6 pt-6 border-t border-white/20 space-y-4"
+                  >
+                    <Link
+                      href="/login"
+                      onClick={handleColseToggle}
+                      className="flex items-center justify-center gap-3 w-full p-4 bg-blue-500/20 hover:bg-blue-500/30 rounded-2xl text-white border border-blue-400/30 transition-all duration-300 group"
+                    >
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 group-hover:bg-white/30 transition-all duration-300">
+                        <LoginOutlined
+                          fontSize="small"
+                          className="text-blue-300"
+                        />
+                      </div>
+                      <span className="text-lg font-medium apply-fonts-normal group-hover:translate-x-2 transition-transform duration-300">
+                        تسجيل الدخول
+                      </span>
+                    </Link>
+
+                    <Link
+                      href="/signup"
+                      onClick={handleColseToggle}
+                      className="flex items-center justify-center gap-3 w-full p-4 bg-green-500/20 hover:bg-green-500/30 rounded-2xl text-white border border-green-400/30 transition-all duration-300 group"
+                    >
+                      <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 group-hover:bg-white/30 transition-all duration-300">
+                        <PersonAddOutlined
+                          fontSize="small"
+                          className="text-green-300"
+                        />
+                      </div>
+                      <span className="text-lg font-medium apply-fonts-normal group-hover:translate-x-2 transition-transform duration-300">
+                        إنشاء حساب
+                      </span>
                     </Link>
                   </motion.div>
                 )}
