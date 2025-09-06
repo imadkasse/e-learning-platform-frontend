@@ -11,7 +11,7 @@ export async function fetchUserServer() {
         headers: token
           ? { Authorization: `Bearer ${token}` } // لو التوكن موجود استعمله
           : {},
-        credentials: "include",
+        // credentials: "include",
       }
     );
     const data = await res.json();
