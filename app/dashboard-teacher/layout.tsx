@@ -17,9 +17,10 @@ export default async function RootLayout({
 }>) {
   const user = await fetchUserServer();
   console.log("user : dashboard-teacher", user);
-  // if (!user) {
-  //   redirect("/login");
-  // }
+  if (!user) {
+    console.log("user : dashboard-teacher", user);
+    redirect("/login");
+  }
 
   if (user.role !== "teacher") {
     redirect(`/dashboard-${user.role === "student" ? "user" : user.role}`);
