@@ -7,7 +7,7 @@ const page = async({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) => {
   return (
-    <div className=" h-full container mx-auto  ">
+    <div className=" h-full  ">
       <Courses searchParams={await searchParams}/>
     </div>
   );

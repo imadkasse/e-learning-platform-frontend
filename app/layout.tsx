@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { fetchUserServer } from "@/lib/fetchUserServer";
-import { redirect } from "next/navigation";
 import UserProvider from "@/providers/UserProvider";
 
 // import Footer from "@/components/footer/Footer";

@@ -8,7 +8,7 @@ import {
   Calendar,
   Users,
   Trash2,
-  X,
+
   AlertTriangle,
 } from "lucide-react";
 import axios from "axios";
@@ -59,7 +59,7 @@ const DeleteConfirmationModal = ({
           <p className="text-gray-600 mb-6" dir="rtl">
             هل أنت متأكد من حذف الكوبون{" "}
             <span className="font-bold" style={{ color: colors.mainColor }}>
-              "{couponCode}"
+              {couponCode}
             </span>
             ؟ هذا الإجراء لا يمكن التراجع عنه.
           </p>

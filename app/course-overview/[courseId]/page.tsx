@@ -15,9 +15,7 @@ interface Props {
   params: Promise<{ courseId: string }>;
 }
 export async function generateStaticParams() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`, {
-    cache: "no-store",
-  });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`);
   const data = await res.json();
   // لنفترض أن data.courses هي مصفوفة من الدورات وكل دورة تحتوي على _id
   return data.courses.map((course: { _id: string }) => ({
@@ -32,7 +30,10 @@ const page = async ({ params }: Props) => {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`,
       {
-        cache: "no-store",
+        cache: "force-cache",
+        next: {
+          revalidate: 120,
+        },
       }
     );
 

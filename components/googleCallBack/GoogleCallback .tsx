@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { User } from "@/types/user";
 
@@ -10,9 +10,8 @@ const GoogleCallback = () => {
   const [userData, setUserData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserData = async (token: string) => {
+  const fetchUserData = useCallback(async () => {
     try {
-      // localStorage.setItem("token", token); // 🔑 تخزين التوكن
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
         {
@@ -22,21 +21,21 @@ const GoogleCallback = () => {
       setUserData(response.data.user);
     } catch (error) {
       console.error("Error fetching user data:", error);
-      router.push("/signup"); // إعادة توجيه عند الخطأ
+      router.push("/signup");
     } finally {
       setLoading(false);
     }
-  };
+  }, [setUserData, router, setLoading]);
 
   useEffect(() => {
     const token = searchParams.get("token");
     if (token) {
-      fetchUserData(token);
+      fetchUserData();
     } else {
       setLoading(false);
       router.push("/signup");
     }
-  }, [searchParams]);
+  }, [searchParams, router, fetchUserData]);
 
   useEffect(() => {
     if (!loading && userData) {

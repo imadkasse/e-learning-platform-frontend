@@ -19,10 +19,10 @@ const UserSchema = z.object({
 const Login = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [isValid, setIsValid] = useState(false);
+  const [, setIsValid] = useState(false);
 
   const [password, setPassword] = useState("");
-  const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [, setIsPasswordValid] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 

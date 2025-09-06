@@ -22,7 +22,7 @@ interface TeacherChartsProps {
   data: TeacherData;
 }
 
-export const TeacherCharts: React.FC<TeacherChartsProps> = ({ data }) => {
+export const TeacherCharts: React.FC<TeacherChartsProps> = () => {
   // بيانات الأداء الشهري
   const monthlyPerformance = [
     { month: "يناير", students: 45, revenue: 15000, courses: 8 },

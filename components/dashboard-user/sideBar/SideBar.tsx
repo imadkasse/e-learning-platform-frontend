@@ -6,9 +6,9 @@ import {
   Home,
   LogOut,
   Bell,
-  User,
   Play,
   Settings,
+  LucideProps,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -32,7 +32,7 @@ const SideBar = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await axios.post(
+     await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/logout`,
         {},
         { withCredentials: true }
@@ -93,7 +93,9 @@ const SideBar = () => {
     exact = false,
   }: {
     href: string;
-    icon: any;
+    icon: React.ForwardRefExoticComponent<
+      Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+    >;
     label: string;
     exact?: boolean;
   }) => (

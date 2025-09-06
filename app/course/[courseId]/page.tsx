@@ -16,7 +16,7 @@ interface Props {
 }
 export async function generateStaticParams() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`, {
-    cache: "no-store",
+    cache: "default",
   });
   const data = await res.json();
   console.log(data);
@@ -32,7 +32,7 @@ const page = async ({ params }: Props) => {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`,
       {
-        cache: "no-store",
+        cache: "default",
       }
     );
 

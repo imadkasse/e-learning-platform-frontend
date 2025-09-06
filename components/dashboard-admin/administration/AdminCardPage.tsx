@@ -3,7 +3,6 @@ import showToast from "@/utils/showToast";
 import { CloseOutlined } from "@mui/icons-material";
 import Image from "next/image";
 import React, { FormEvent, useState } from "react";
-import Cookies from "js-cookie";
 import axios from "axios";
 import { useSearchUser } from "@/store/searchUser";
 import { User } from "@/types/user";

@@ -15,7 +15,7 @@ import { TeacherCharts } from "@/components/charts/TeacherCharts";
 import { colors } from "@/constants/colors";
 import { TeacherData } from "@/types/dashboard";
 
-const HomePage = async ({ data }: { data: TeacherData }) => {
+const HomePage =  ({ data }: { data: TeacherData }) => {
   return (
     <div className="lg:custom-width rounded-xl px-4 py-5 h-[94vh] overflow-y-scroll space-y-6">
       {/* العنوان والترحيب */}

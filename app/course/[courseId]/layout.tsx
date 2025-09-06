@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props) {
       ).courseId
     }`,
     {
-      cache: "no-store",
+      cache: "default",
     }
   );
   const data = await courseData.json();

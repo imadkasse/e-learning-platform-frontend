@@ -22,7 +22,7 @@ const page = async () => {
   };
   const data: TeacherData | null = await getAnalyticsAdmin();
   return (
-    <div className="px-1 h-full container mx-auto  ">
+    <div className="px-1 h-full   ">
       <HomePage data={data} />
     </div>
   );

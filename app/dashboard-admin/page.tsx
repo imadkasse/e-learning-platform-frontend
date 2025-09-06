@@ -31,7 +31,7 @@ const page = async () => {
   };
   const data: AdminData | null = await getAnalyticsAdmin();
   return (
-    <div className="px-1 h-full  container mx-auto ">
+    <div className="px-1 h-full   ">
       <HomePage data={data} />
     </div>
   );
