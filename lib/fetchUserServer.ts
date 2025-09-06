@@ -15,6 +15,7 @@ export async function fetchUserServer() {
       }
     );
     const data = await res.json();
+    console.log("data:fetching userr", data.user);
     return data.user;
   } catch (error) {
     console.log(error);
