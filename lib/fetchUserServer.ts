@@ -1,21 +1,21 @@
-import axios from "axios";
 import { cookies } from "next/headers";
 
 export async function fetchUserServer() {
   const cookiesStore = await cookies();
   const token = cookiesStore.get("token")?.value;
-  
+
   try {
-    const res = await axios.get(
+    const res = await fetch(
       `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
       {
-        withCredentials: true,
         headers: token
           ? { Authorization: `Bearer ${token}` } // لو التوكن موجود استعمله
           : {},
+        credentials: "include",
       }
     );
-    return res.data.user;
+    const data = await res.json();
+    return data.user;
   } catch (error) {
     console.log(error);
     return null;
