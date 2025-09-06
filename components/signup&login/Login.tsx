@@ -90,6 +90,9 @@ const Login = () => {
         res.data.user.role === "student" ? "user" : res.data.user.role;
       await fetchUser();
       console.log(res.data);
+      document.cookie
+        .split(";")
+        .forEach((c) => console.log("cookie in browser:", c));
       router.push(`/dashboard-${role}`);
     } catch (error) {
       // @ts-expect-error: fix after time
