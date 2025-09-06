@@ -4,7 +4,6 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   BookOpen,
-  ImageIcon,
   DollarSign,
   Tag,
   FileText,
@@ -15,7 +14,6 @@ import {
   File,
   Link,
   Save,
-  Eye,
   Upload,
   Settings,
   PlayCircle,
@@ -27,13 +25,7 @@ import {
   AlertTriangle,
   Clock,
 } from "lucide-react";
-import { useUserStore } from "@/store/userStore";
-import {
-  Course,
-  File as FileType,
-  Section,
-  Videos as VideoType,
-} from "@/types/course";
+import { Course, Section } from "@/types/course";
 import Image from "next/image";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
@@ -41,7 +33,7 @@ import showToast from "@/utils/showToast";
 import { useRouter } from "next/navigation";
 
 interface CourseDetails {
-  imageCover: any;
+  imageCover: File | null;
   title: string;
   price: number;
   description: string;
@@ -227,7 +219,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
     description: "",
     price: 0,
     category: "",
-    imageCover: "",
+    imageCover: null,
     concepts: [],
   });
 
@@ -327,7 +319,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
 
   const updateSection = async (sectionId: string, newTitle: string) => {
     try {
-      const response = await axios.put(
+      await axios.put(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}/sections/${sectionId}`,
         {
           title: newTitle,
@@ -465,7 +457,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
   ) => {
     console.log("new title", newTitle);
     try {
-      const response = await axios.put(
+      await axios.put(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}/sections/${sectionId}/videos/${videoId}`,
         {
           title: newTitle,
@@ -1273,7 +1265,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
                     <FolderOpen className="mx-auto mb-4" size={48} />
                     <p className="text-lg mb-2">لا توجد أقسام بعد</p>
                     <p className="text-sm">
-                      انقر على "إضافة قسم" لبدء إنشاء محتوى الكورس
+                      {`انقر على "إضافة قسم" لبدء إنشاء محتوى الكورس`}
                     </p>
                   </div>
                 )}

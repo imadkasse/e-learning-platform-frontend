@@ -10,7 +10,14 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const courseData = await fetch(
-    `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${(await params).courseId}`
+    `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${
+      (
+        await params
+      ).courseId
+    }`,
+    {
+      cache: "default",
+    }
   );
   const data = await courseData.json();
   return {

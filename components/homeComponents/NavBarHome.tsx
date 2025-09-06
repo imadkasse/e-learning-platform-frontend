@@ -45,7 +45,7 @@ const NavBarHome = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/logout`,
         {},
         { withCredentials: true }

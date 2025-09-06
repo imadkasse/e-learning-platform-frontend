@@ -1,7 +1,5 @@
 "use client";
-import { useSearchUser } from "@/store/searchUser";
-import React, { FormEvent, useEffect, useState } from "react";
-import { User } from "@/types/user";
+import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const SearchAdmin = () => {

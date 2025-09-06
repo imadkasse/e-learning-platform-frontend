@@ -12,20 +12,18 @@ const SearchUsers = () => {
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
   // Debounced search function
-  const debouncedSearch = useCallback(
-    debounce((searchTerm: string) => {
-      setIsLoading(true);
-      const params = new URLSearchParams();
+  const handleSearch = (searchTerm: string) => {
+    setIsLoading(true);
+    const params = new URLSearchParams();
 
-      if (searchTerm.trim()) {
-        params.set("filter", searchTerm.trim());
-      }
+    if (searchTerm.trim()) {
+      params.set("filter", searchTerm.trim());
+    }
 
-      router.push(`?${params.toString()}`);
-      setTimeout(() => setIsLoading(false), 300);
-    }, 500),
-    [router]
-  );
+    router.push(`?${params.toString()}`);
+    setTimeout(() => setIsLoading(false), 300);
+  };
+  const debouncedSearch = useCallback(debounce(handleSearch, 500), [router]);
 
   useEffect(() => {
     debouncedSearch(searchData);
@@ -121,7 +119,7 @@ const SearchUsers = () => {
               <span className="apply-fonts-normal">
                 البحث عن:
                 <span className="font-semibold text-blue-600 mx-1">
-                  "{filter}"
+                  {filter}
                 </span>
               </span>
             </div>
@@ -205,7 +203,7 @@ const SearchUsers = () => {
 };
 
 // Debounce utility function
-function debounce<T extends (...args: any[]) => any>(
+function debounce<T extends (...args: string[]) => unknown>(
   func: T,
   wait: number
 ): T & { cancel: () => void } {

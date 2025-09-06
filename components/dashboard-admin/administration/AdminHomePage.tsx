@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React from "react";
 import AdminCardPage from "./AdminCardPage";
 import { User } from "@/types/user";
 import AddUser from "./AddUser";

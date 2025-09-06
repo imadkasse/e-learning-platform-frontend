@@ -4,7 +4,6 @@ import { Person, PlayLesson } from "@mui/icons-material";
 import axios from "axios";
 import Image from "next/image";
 import React, { FormEvent, useState } from "react";
-import Cookies from "js-cookie";
 import { useCoursesStore } from "@/store/coursesStore";
 
 type Props = {

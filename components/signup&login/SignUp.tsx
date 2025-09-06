@@ -31,7 +31,7 @@ const SignUp = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [passwordIsMatch, setPasswordIsMatch] = useState(false);
+  const [, setPasswordIsMatch] = useState(false);
 
   const [isValid, setIsValid] = useState(false);
   // errors
@@ -42,7 +42,7 @@ const SignUp = () => {
     username?: string;
   }>({});
 
-  const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [, setIsPasswordValid] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {

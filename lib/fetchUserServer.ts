@@ -17,6 +17,7 @@ export async function fetchUserServer() {
     );
     return res.data.user;
   } catch (error) {
+    console.log(error);
     return null;
   }
 }

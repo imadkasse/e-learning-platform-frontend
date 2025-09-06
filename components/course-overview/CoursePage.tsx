@@ -10,7 +10,7 @@ import {
   ChevronUp,
   Folder,
 } from "lucide-react";
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 
 import CourseCard from "./CourseCard";
 import AddReview from "./Reviews/AddReview";
@@ -251,7 +251,7 @@ export const CoursePage = ({ course }: Props) => {
                       {/* Section Videos */}
                       {openIndex === index && (
                         <div className="border-t border-slate-200 bg-slate-50">
-                          {section.videos.map((video, videoIndex) => (
+                          {section.videos.map((video) => (
                             <div
                               key={video._id}
                               className="flex items-center py-4 px-6 hover:bg-white transition-colors duration-300 cursor-pointer group border-b border-slate-100 last:border-b-0"

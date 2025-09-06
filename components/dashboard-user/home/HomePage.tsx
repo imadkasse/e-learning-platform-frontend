@@ -10,7 +10,7 @@ import { Course } from "@/types/course";
 const HomePage = async () => {
   const cookiesStore = await cookies();
   const token = cookiesStore.get("token")?.value;
-  let myEnrolledCourses: any | null = null;
+  let myEnrolledCourses: Course[] | null = [];
   let user: User | null = null;
 
   const fetchMyEnrolledCourses = async () => {
@@ -31,14 +31,12 @@ const HomePage = async () => {
       });
       const userData = await resUser.json();
       user = userData.user;
-      console.log("userData", user);
     } catch (err) {
       console.log("err", err);
     }
   };
   await fetchMyEnrolledCourses();
-  const courses = myEnrolledCourses;
-  console.log("user", user);
+  const courses: Course[] | null = myEnrolledCourses;
 
   return (
     <div className=" lg:custom-width rounded-xl px-4 py-5 h-[93vh] overflow-y-scroll ">

@@ -6,22 +6,21 @@ import {
   Home,
   LogOut,
   Bell,
-  User,
   Play,
   Settings,
   UsersRound,
   UserStar,
   Tickets,
+  LucideProps,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import Cookies from "js-cookie";
 import { useUserStore } from "@/store/userStore";
 import axios from "axios";
 import showToast from "@/utils/showToast";
-import { Person2 } from "@mui/icons-material";
 
 const SideBar = () => {
   const router = useRouter();
@@ -36,7 +35,7 @@ const SideBar = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/logout`,
         {},
         { withCredentials: true }
@@ -73,7 +72,7 @@ const SideBar = () => {
       icon: UserStar,
       label: "الإدارة",
     },
-     {
+    {
       href: "/dashboard-admin/coupons",
       icon: Tickets,
       label: "الكوبونات",
@@ -112,7 +111,9 @@ const SideBar = () => {
     exact = false,
   }: {
     href: string;
-    icon: any;
+    icon: React.ForwardRefExoticComponent<
+      Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+    >;
     label: string;
     exact?: boolean;
   }) => (

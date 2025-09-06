@@ -185,7 +185,7 @@ const Students = async ({ searchParams }: StudentsProps) => {
 
             {/* Students List */}
             <div className="divide-y divide-gray-100">
-              {users.map((user, index) => (
+              {users.map((user) => (
                 <div
                   key={user._id}
                   className="hover:bg-gray-50 transition-colors duration-200"

@@ -46,10 +46,6 @@ interface Course {
   updatedAt: string;
 }
 
-type AddSection = {
-  title: string;
-};
-
 type Section = {
   _id: string;
   title: string;
@@ -81,7 +77,7 @@ interface Videos {
 
 interface VideoUpload {
   title: string;
-  file: File;
+  file: File | null;
   duration: string;
   description: string;
 }
@@ -93,7 +89,6 @@ export default function CourseUploader() {
   // stepre
   const [step, setStep] = useState(1);
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 3));
-  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
   // step one create course details
   const [newconcept, setNewConcept] = useState<string>("");
@@ -131,7 +126,6 @@ export default function CourseUploader() {
   const [loadingDeleteVideo, setLoadingDeleteVideo] = useState<string>("");
   const [loadingUploadFile, setLoadingUploadFile] = useState<string>("");
   const [loadingDeleteCourse, setLoadingDeleteCourse] = useState(false);
- 
 
   // Modal states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -289,7 +283,6 @@ export default function CourseUploader() {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-         
         }
       );
       showToast("success", res.data.message);
@@ -1021,7 +1014,12 @@ function StepSectionsAndVideos({
         ...prev,
         [sectionId]: [
           ...sectionVideos,
-          { title: "", file: null as any, duration: "", description: "" },
+          {
+            title: "",
+            file: null as File | null,
+            duration: "",
+            description: "",
+          },
         ],
       };
     });
@@ -1199,7 +1197,7 @@ function StepSectionsAndVideos({
                         )}
                       </button>
                       {/* Progress Bar */}
-                     
+
                       <button
                         type="button"
                         onClick={() =>
@@ -1621,5 +1619,3 @@ function StepPublish({ currentCourse }: StepPublishProps) {
     </div>
   );
 }
-
-

@@ -22,7 +22,6 @@ interface AddCouponProps {
 const AddCoupon = ({
   isOpen,
   onClose,
-  onSuccess,
   setCoupons,
   coupons,
 }: AddCouponProps) => {

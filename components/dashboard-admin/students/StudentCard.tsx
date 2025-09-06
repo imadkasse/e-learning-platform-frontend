@@ -561,7 +561,7 @@ const StudentCard = ({
               <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
                 <p className="apply-fonts-normal text-red-800">
                   هل أنت متأكد من حذف الطالب{" "}
-                  <span className="font-semibold">"{studentName}"</span>{" "}
+                  <span className="font-semibold">{studentName}</span>{" "}
                   نهائياً؟
                 </p>
                 <p className="text-sm text-red-600 mt-2">

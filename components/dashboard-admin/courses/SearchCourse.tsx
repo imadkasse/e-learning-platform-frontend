@@ -1,8 +1,7 @@
 "use client";
-import { useCoursesStore } from "@/store/coursesStore";
-import showToast from "@/utils/showToast";
+
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, {  useEffect, useState } from "react";
 
 const SearchCourse = () => {
   const router = useRouter();
