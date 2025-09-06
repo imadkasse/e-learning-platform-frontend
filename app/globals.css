@@ -90,6 +90,9 @@
   filter: blur(6px); /* قيمة التعتيم عند اكتشاف التفاعل */
 }
 /* html,*/
+html {
+  scroll-behavior: smooth;
+}
 body {
   overflow-x: visible !important;
-} 
+}

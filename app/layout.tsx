@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { fetchUserServer } from "@/lib/fetchUserServer";
+import UserProvider from "@/providers/UserProvider";
 
 // import Footer from "@/components/footer/Footer";
 // import Footer from "@/components/footer/Footer";
@@ -14,10 +16,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await fetchUserServer();
+  // if (!user) {
+  //   redirect("/login");
+  // }
+
+  // if (user.role == "student") {
+  //   redirect(`/dashboard-${user.role}`);
+  // }
   return (
     <html lang="en" dir="rtl">
       <body className={` antialiased `}>
-        {children}
+        <UserProvider user={user}>{children}</UserProvider>
+        {/* {children} */}
         {/* <Footer /> */}
       </body>
     </html>

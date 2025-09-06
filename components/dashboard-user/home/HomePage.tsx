@@ -3,34 +3,40 @@ import CardCourse from "./CardCourse";
 import Image from "next/image";
 import { Person, PlayLesson } from "@mui/icons-material";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { User } from "@/types/user";
+import { cookies } from "next/headers";
+import { Course } from "@/types/course";
 
 const HomePage = async () => {
   const cookiesStore = await cookies();
-
   const token = cookiesStore.get("token")?.value;
+  let myEnrolledCourses: Course[] | null = [];
+  let user: User | null = null;
 
-  let user: User;
-
-  const fetchUser = async () => {
+  const fetchMyEnrolledCourses = async () => {
     try {
-      const res = await fetch(`${process.env.BACK_URL}/api/users/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${process.env.BACK_URL}/api/courses/my-courses`,
+        {
+          credentials: "include",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
       const data = await res.json();
-      user = data.user;
+
+      myEnrolledCourses = data.course;
+      const resUser = await fetch(`${process.env.BACK_URL}/api/users/me`, {
+        credentials: "include",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const userData = await resUser.json();
+      user = userData.user;
     } catch (err) {
-      console.log(err);
+      console.log("err", err);
     }
   };
-
-  await fetchUser();
-
-  //@ts-expect-error:fix agin
-  const courses = user.enrolledCourses;
+  await fetchMyEnrolledCourses();
+  const courses: Course[] | null = myEnrolledCourses;
 
   return (
     <div className=" lg:custom-width rounded-xl px-4 py-5 h-[93vh] overflow-y-scroll ">
@@ -40,18 +46,25 @@ const HomePage = async () => {
       {/* My Courses */}
       <div className="container mx-auto px-8 py-4 ">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4  gap-6">
-          {courses.length > 0 ? (
-            courses.map((course) => {
+          {courses?.length > 0 ? (
+            courses?.map((course: Course) => {
+              const videoNumber = course.sections.reduce((acc, section) => {
+                return acc + (section.videos?.length || 0);
+              }, 0);
+
               return (
-                <div key={course._id} className=" max-w-[272px] h-[364px]">
+                <div
+                  key={course._id}
+                  className="w-full max-w-sm mx-auto h-auto min-h-[400px] flex-shrink-0"
+                >
                   <CardCourse
                     key={course._id}
                     progresBar={
-                      user.progress.find((p) => p.course === course._id)
+                      user?.progress.find((p) => p.course === course._id)
                         ?.percentage || 0
                     }
                     studentsNumber={course.enrolledStudents.length}
-                    numberOfVideo={course.videos.length}
+                    numberOfVideo={videoNumber}
                     courseImg={course.imageCover}
                     courseUrl={`/course/${course._id}`}
                     courseName={course.title}

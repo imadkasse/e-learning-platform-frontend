@@ -5,14 +5,12 @@ import {
   HomeOutlined,
   NotificationsNoneOutlined,
 } from "@mui/icons-material";
-import Cookies from "js-cookie";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 const NavBarCourse = () => {
   const { user } = useUserStore();
-  const token = Cookies.get("token");
   const role =
     user.role === "student"
       ? "user"
@@ -35,7 +33,7 @@ const NavBarCourse = () => {
         </h1>
       </Link>
 
-      {token ? (
+      {user ? (
         <div className="flex sm:gap-5 xs:gap-1 ">
           <Link
             href={`/dashboard-${role}`}

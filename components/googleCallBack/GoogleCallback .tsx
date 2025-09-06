@@ -1,7 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { User } from "@/types/user";
 
@@ -11,46 +10,51 @@ const GoogleCallback = () => {
   const [userData, setUserData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserData = async (token: string) => {
+  const fetchUserData = useCallback(async () => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }
       );
       setUserData(response.data.user);
     } catch (error) {
       console.error("Error fetching user data:", error);
+      router.push("/signup");
     } finally {
       setLoading(false);
     }
-  };
+  }, [setUserData, router, setLoading]);
 
   useEffect(() => {
     const token = searchParams.get("token");
-
     if (token) {
-      Cookies.set("token", token); // تخزين التوكن
-      fetchUserData(token);
+      fetchUserData();
     } else {
-      setLoading(false); // في حالة عدم وجود التوكن
+      setLoading(false);
+      router.push("/signup");
     }
-  }, [searchParams]);
+  }, [searchParams, router, fetchUserData]);
 
   useEffect(() => {
     if (!loading && userData) {
-      const role = userData?.role === "student" ? "user" : "";
-      if (role) {
-        router.push(`/dashboard-${role}`);
+      if (userData.role === "student") {
+        router.push("/dashboard-user");
+      } else if (userData.role === "admin") {
+        router.push("/dashboard-admin");
       } else {
-        router.push("/"); // إعادة التوجيه للصفحة الرئيسية في حال عدم وجود دور
+        router.push("/sigunp");
       }
     }
   }, [loading, userData, router]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   return null;

@@ -14,14 +14,22 @@ type Comment = {
   createdAt: string;
   replies: Reply[];
 };
-type Videos = {
+export type Videos = {
   _id: string;
   lessonTitle: string;
-  url: string;
-  duration: number;
+  url: string; //! this is just videoId you need to add baseUrl from .env
+  duration: string;
   isCompleted: boolean;
   completedBy: string[];
   comments: Comment[];
+  files: File[];
+  description: string;
+};
+export type Section = {
+  _id: string;
+  title: string;
+  videos: Videos[];
+  courseId?: string;
 };
 
 export type Course = {
@@ -33,11 +41,10 @@ export type Course = {
   duration: number;
   price: number;
   studentsCount: number;
-  enrolledStudents: string[]; //edit in feature
+  enrolledStudents: string[]; //edit in feature(add Type)
   published: boolean;
   createdAt: string;
-  videos: Videos[]; //edit in feature
-  files: File[]; //edit in feature
+  sections: Section[]; //! replace to Sections => [{title:'',videos:Videos[]}
   avgRatings: number;
   active: boolean;
   progress?: number;
@@ -63,4 +70,23 @@ export type File = {
   filename: string;
   size: number;
   url: string;
+};
+
+export type CreateCourse = {
+  title: string;
+  description: string;
+  imageCover: string;
+  price: number;
+  published: boolean;
+  createdAt: string;
+  sections: [
+    {
+      title: string;
+      videos: Videos;
+    }
+  ];
+  files: File[]; //edit in feature
+  active: boolean;
+  category: string;
+  concepts: string[];
 };

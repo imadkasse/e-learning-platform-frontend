@@ -1,15 +1,18 @@
 "use client";
-import {
-  AccessTimeOutlined,
-  CheckCircle,
-  PlayArrow,
-  PlayCircleOutlined,
-} from "@mui/icons-material";
 import { Rating } from "@mui/material";
 import Image from "next/image";
+import {
+  Clock,
+  CheckCircle,
+  Play,
+  PlayCircle,
+  ChevronDown,
+  ChevronUp,
+  Folder,
+} from "lucide-react";
+import React, { useState } from "react";
 
 import CourseCard from "./CourseCard";
-import DynamicVideoPlyr from "./DynamicVideoPlyr";
 import AddReview from "./Reviews/AddReview";
 import { useUserStore } from "@/store/userStore";
 import { Course } from "@/types/course";
@@ -17,195 +20,381 @@ import { Course } from "@/types/course";
 type Props = {
   course: Course;
 };
+
 export const CoursePage = ({ course }: Props) => {
   const { user } = useUserStore();
+  const baseUrlVideo = `${process.env.NEXT_PUBLIC_BUNNY_BASE_URL}/${process.env.NEXT_PUBLIC_VIDEO_LIBRARY}`;
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
+  const toggleSection = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
   const instructor = course.instructor;
 
+  function parseDuration(duration: string): number {
+    const parts = duration.split(":").map(Number);
+
+    if (parts.length === 3) {
+      const [hours, minutes, seconds] = parts;
+      return hours * 3600 + minutes * 60 + seconds;
+    }
+
+    if (parts.length === 2) {
+      const [minutes, seconds] = parts;
+      return minutes * 60 + seconds;
+    }
+    if (parts.length === 1) {
+      return parts[0] * 60;
+    }
+    return 0;
+  }
+
+  function formatDuration(totalSeconds: number): string {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return [
+      hours.toString().padStart(2, "0"),
+      minutes.toString().padStart(2, "0"),
+      seconds.toString().padStart(2, "0"),
+    ].join(":");
+  }
+  const duration = formatDuration(
+    course.sections.reduce(
+      (total, section) =>
+        total +
+        section.videos.reduce(
+          (sectionTotal, video) => sectionTotal + parseDuration(video.duration),
+          0
+        ),
+      0
+    )
+  );
+  const videosNumber = course.sections.reduce((acc, section) => {
+    return acc + (section.videos?.length || 0);
+  }, 0);
+
   return (
-    <div className="mt-6 flex  flex-row-reverse justify-between gap-7 px-3 ">
-      {/* Course Card */}
-      <CourseCard
-        id={course._id}
-        price={course.price}
-        duration={course.duration}
-        studentNumber={course.enrolledStudents.length}
-        courseLink={course._id}
-      />
-      {/* Show Course  */}
-      <div className="lg:custom-width-Course ">
-        {/* title Of Course  */}
-        <div>
-          <h1 className="apply-fonts-medium text-lg">{course.title}</h1>
-        </div>
-        {/* Teacher Information */}
-        <div className="my-5 border-b-2 py-4 flex items-center gap-3">
-          <Image
-            src={instructor.thumbnail || "/imgs/personImg.png"}
-            alt="teacher-username"
-            width={150}
-            height={150}
-            className="rounded-full xs:w-14 xs:h-14"
+    <div className="h-screen">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-row-reverse justify-between gap-8 max-w-7xl mx-auto">
+          {/* Course Card */}
+          <CourseCard
+            id={course._id}
+            price={course.price}
+            duration={duration}
+            studentNumber={course.enrolledStudents.length}
+            courseLink={course._id}
           />
-          <div className="flex flex-col gap-1">
-            <h3 className="apply-fonts-normal text-courseTextSection text-[14px]">
-              أستاذ الدورة
-            </h3>
-            <h1 className="font-medium">{instructor.username}</h1>
-          </div>
-        </div>
-        {/* Welcome video */}
 
-        <DynamicVideoPlyr videoSrc={course.videos[0]?.url} />
+          {/* Main Content */}
+          <div className="flex-1 max-w-4xl">
+            {/* Course Header */}
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
+              <div className="p-8">
+                <h1 className="apply-fonts-medium text-3xl text-slate-800 mb-6 leading-tight">
+                  {course.title}
+                </h1>
 
-        {/* description Course */}
-        <div className="my-4">
-          <h1 className="apply-fonts-medium  text-lg mb-2">وصف الدورة</h1>
-          <p className="apply-fonts-normal text-[14px] text-courseTextSection leading-8 pl-5 xs:line-clamp-4  md:line-clamp-6">
-            {course.description}
-          </p>
-        </div>
-        {/* Consepts Course */}
-        <div className="my-4  px-5 py-2 bg-courseConseptColor">
-          <h1 className="apply-fonts-medium text-lg ">
-            المفاهيم التي سنتطرق إليها
-          </h1>
-          <div className="mt-2 py-2 grid grid-cols-2  gap-2">
-            {course.concepts?.map((concept, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <CheckCircle fontSize="small" className="text-green-500" />
-                <h1 className="apply-fonts-normal text-[14px] text-courseTextSection">
-                  {concept}
-                </h1>
+                {/* Instructor Info */}
+                <div className="flex items-center gap-4 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                  <div className="relative">
+                    <Image
+                      src={instructor.thumbnail || "/imgs/personImg.png"}
+                      alt="teacher-username"
+                      width={80}
+                      height={80}
+                      className="rounded-full ring-4 ring-blue-200/50 shadow-lg"
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-white shadow-md"></div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="text-blue-600 font-medium text-sm bg-blue-100 px-3 py-1 rounded-full w-fit">
+                      أستاذ الدورة
+                    </span>
+                    <h2 className="font-bold text-lg text-slate-800">
+                      {instructor.username}
+                    </h2>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-        {/* all videos */}
-        <div>
-          <div className="flex justify-between border-b">
-            <h1 className="apply-fonts-medium  text-lg mb-2">المنهاج</h1>
-            <div className="flex  gap-6 px-2">
-              <div className="flex  items-center gap-1">
-                <PlayCircleOutlined className="text-mainColor" />
-                <h1 className="flex  items-center">
-                  {course.videos.length}
-                  <span className="apply-fonts-normal text-[13px]">درس</span>
-                </h1>
+            </div>
+
+            {/* Welcome Video */}
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
+              <div className="p-6">
+                <div
+                  className="relative w-full rounded-xl overflow-hidden shadow-inner"
+                  style={{ paddingTop: "56.25%" }}
+                >
+                  <iframe
+                    src={`${baseUrlVideo}/${course.sections[0].videos[0]?.url}?autoplay=false&loop=false&muted=false&preload=false&responsive=false`}
+                    loading="lazy"
+                    className="absolute top-0 left-0 w-full h-full border-0"
+                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
               </div>
-              <div className="flex  items-center gap-1">
-                <AccessTimeOutlined className="text-courseIconsSection" />
-                <h1 className="flex  items-center">
-                  {/* added after time */}
-                  {(course.duration / 3600).toFixed(2)}
-                  <span className="mr-1 apply-fonts-normal text-[13px]">ساعة</span>
-                </h1>
+            </div>
+
+            {/* Course Description */}
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
+              <div className="p-8">
+                <h2 className="apply-fonts-medium text-2xl text-slate-800 mb-6 flex items-center gap-3">
+                  <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></div>
+                  وصف الدورة
+                </h2>
+                <div className="bg-slate-50 rounded-xl p-6 border-r-4 border-blue-500">
+                  <p className="apply-fonts-normal text-slate-700 leading-8 text-base">
+                    {course.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Course Concepts */}
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
+              <div className="p-8">
+                <h2 className="apply-fonts-medium text-2xl text-slate-800 mb-6 flex items-center gap-3">
+                  <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></div>
+                  المفاهيم التي سنتطرق إليها
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {course.concepts?.map((concept, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-4 bg-green-50 rounded-xl border border-green-100 hover:bg-green-100 transition-colors duration-300"
+                    >
+                      <CheckCircle
+                        size={20}
+                        className="text-green-600 flex-shrink-0"
+                      />
+                      <span className="apply-fonts-normal text-slate-700 font-medium">
+                        {concept}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Course Curriculum */}
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
+              <div className="p-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="apply-fonts-medium text-2xl text-slate-800 flex items-center gap-3">
+                    <div className="w-1 h-8 bg-gradient-to-b from-purple-500 to-violet-600 rounded-full"></div>
+                    المنهاج
+                  </h2>
+                  <div className="flex gap-6">
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <PlayCircle size={20} className="text-blue-600" />
+                      <span className="font-medium">{videosNumber} درس</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <Clock size={20} className="text-orange-600" />
+                      <span className="font-medium">{duration} </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {course.sections?.map((section, index) => (
+                    <div
+                      key={section._id}
+                      className="border border-slate-200 rounded-xl overflow-hidden"
+                    >
+                      {/* Section Header */}
+                      <button
+                        onClick={() => toggleSection(index)}
+                        className="flex items-center justify-between w-full p-6 text-right hover:bg-slate-50 transition-all duration-300 group"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="transform transition-transform duration-300 group-hover:scale-110">
+                            {openIndex === index ? (
+                              <ChevronUp className="text-blue-600" size={24} />
+                            ) : (
+                              <ChevronDown
+                                className="text-slate-600 group-hover:text-blue-600"
+                                size={24}
+                              />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">
+                              {index + 1}
+                            </div>
+                            <span
+                              className={`text-lg font-bold ${
+                                openIndex === index
+                                  ? "text-blue-700"
+                                  : "text-slate-800 group-hover:text-blue-700"
+                              } transition-colors duration-300`}
+                            >
+                              {section.title}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 text-slate-500">
+                          <div className="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-lg">
+                            <Folder size={16} />
+                            <span className="text-sm font-medium">
+                              {section.videos.length} درس
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+
+                      {/* Section Videos */}
+                      {openIndex === index && (
+                        <div className="border-t border-slate-200 bg-slate-50">
+                          {section.videos.map((video) => (
+                            <div
+                              key={video._id}
+                              className="flex items-center py-4 px-6 hover:bg-white transition-colors duration-300 cursor-pointer group border-b border-slate-100 last:border-b-0"
+                            >
+                              <div className="flex items-center gap-4 flex-1">
+                                <button className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-full transition-all duration-300 transform hover:scale-110 shadow-lg group-hover:shadow-xl">
+                                  <Play size={16} className="mr-0.5" />
+                                </button>
+
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors duration-300 mb-1">
+                                    {video.lessonTitle}
+                                  </h4>
+                                  <div className="flex items-center gap-2 text-slate-500">
+                                    <Clock size={14} />
+                                    <span className="text-sm font-medium">
+                                      {video.duration}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Course Reviews */}
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
+              <div className="p-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="apply-fonts-medium text-2xl text-slate-800 flex items-center gap-3">
+                    <div className="w-1 h-8 bg-gradient-to-b from-yellow-500 to-orange-600 rounded-full"></div>
+                    تقييم الدورة
+                  </h2>
+                  <div className="flex items-center gap-3 bg-gradient-to-r from-yellow-50 to-orange-50 px-4 py-3 rounded-xl border border-yellow-200">
+                    <span className="font-bold text-xl text-slate-800">
+                      {course.avgRatings}
+                    </span>
+                    <Rating
+                      className="text-yellow-500"
+                      dir="ltr"
+                      name="half-rating-read"
+                      value={course.avgRatings}
+                      precision={0.5}
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-slate-800 mb-6">
+                    أراء التلاميذ ({course.reviews.length})
+                  </h3>
+
+                  {course.reviews.length > 0 ? (
+                    <div className="space-y-6">
+                      {course.reviews.map((review) => (
+                        <div
+                          key={review._id}
+                          className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+                        >
+                          <div className="flex items-center gap-4 p-6 border-b border-slate-200">
+                            <div className="relative">
+                              <Image
+                                src={
+                                  review.user.thumbnail || "/imgs/logoImg.png"
+                                }
+                                alt="user-username"
+                                width={56}
+                                height={56}
+                                className="rounded-full ring-3 ring-blue-200/50 shadow-lg"
+                              />
+                              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-3 border-white shadow-md"></div>
+                            </div>
+
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="font-bold text-slate-800">
+                                  {review.user.username}
+                                </h3>
+                                <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+                                  طالب
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 text-slate-500">
+                                <Clock size={16} />
+                                <span className="text-sm font-medium">
+                                  {review.createdAt.split("T")[0]}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="p-6">
+                            <div className="bg-white rounded-xl p-6 border-r-4 border-blue-500 shadow-inner">
+                              <p className="apply-fonts-normal text-slate-700 leading-relaxed">
+                                {review.content}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border-2 border-dashed border-slate-300">
+                      <div className="inline-flex items-center justify-center w-20 h-20 bg-slate-200 rounded-full mb-6">
+                        <svg
+                          className="w-10 h-10 text-slate-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="apply-fonts-normal text-slate-600 text-xl font-semibold mb-2">
+                        لا توجد أراء بعد
+                      </h3>
+                      <p className="apply-fonts-normal text-slate-500">
+                        كن أول من يشارك رأيه حول هذه الدورة
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Add Review */}
+                {user.role === "teacher" ? null : (
+                  <AddReview courseId={course._id} />
+                )}
               </div>
             </div>
           </div>
-          <div className="">
-            <table className="table-auto w-full  ">
-              <tbody>
-                {course.videos.map((video) => (
-                  <tr
-                    key={video._id}
-                    className="bg-white hover:bg-gray-50 transition"
-                  >
-                    {/* زر التشغيل */}
-                    <td className="px-4 py-2 text-right">
-                      <button className="text-mainColor hover:text-mainColorHover transition">
-                        <PlayArrow />
-                      </button>
-                    </td>
-
-                    {/* اسم الدرس */}
-                    <td className="px-4 py-2 text-right apply-fonts-normal">
-                      {video.lessonTitle}
-                    </td>
-
-                    {/* مدة الدرس */}
-                    <td className="px-4 py-2 text-right text-gray-600">
-                      {(Number(video.duration) / 60).toFixed(3)} دقيقة
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
-        {/* course reviews */}
-        <div className="mt-5 flex  items-center justify-between">
-          <h1 className="apply-fonts-medium  text-lg mb-2">تقييم الدورة</h1>
-          <div className="flex items-center gap-1 px-3">
-            <p className="font-bold text-[15px]">{course.avgRatings}</p>
-            <Rating
-              className="text-courseStarColor"
-              dir="ltr"
-              name="half-rating-read"
-              value={course.avgRatings}
-              precision={0.5}
-              readOnly
-            />
-          </div>
-        </div>
-        {/* stduents reviews */}
-        <div className="mt-5">
-          <h1 className="  text-lg mb-8">
-            <span className="apply-fonts-medium">أراء التلاميذ </span>(
-            {course.reviews.length})
-          </h1>
-
-          <div className="flex flex-col gap-5">
-            {course.reviews.length > 0 ? (
-              course.reviews.map((review) => {
-                return (
-                  <div key={review._id} className="border-b pb-3">
-                    <div className="flex items-center gap-2">
-                      <Image
-                        src={review.user.thumbnail || "/imgs/personImg.png"}
-                        alt="teacher-username"
-                        width={150}
-                        height={150}
-                        className="rounded-full xs:w-12 xs:h-12"
-                      />
-                      <div className="flex flex-col gap-1">
-                        <h1 className="font-semibold">imad</h1>
-                        <Rating
-                          className="text-courseStarColor"
-                          dir="ltr"
-                          name="half-rating-read"
-                          value={review.rating}
-                          precision={0.5}
-                          readOnly
-                          size="small"
-                        />
-                      </div>
-                      <h1 className="text-xl px-1">|</h1>
-                      <div>
-                        <h1 className="font-bold">
-                          {review.createdAt.split("T")[0]}
-                        </h1>
-                      </div>
-                    </div>
-                    <div dir="rtl" className="mt-1 mx-3">
-                      <p className="p-2 apply-fonts-normal text-[14px] text-courseTextSection">
-                        {review.content}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <h1 className="apply-fonts-medium text-courseTextSection text-center lg:text-xl sm:text-lg xs:text-base">
-                لا توجد تعليقات
-              </h1>
-            )}
-          </div>
-        </div>
-
-        {/* add review */}
-
-        {user.role === "teacher" ? <></> : <AddReview courseId={course._id} />}
       </div>
     </div>
   );

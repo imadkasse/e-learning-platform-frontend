@@ -21,7 +21,7 @@ export const useCourse = create<{
     enrolledStudents: [],
     published: false,
     createdAt: "",
-    videos: [],
+    sections: [],
     files: [],
     avgRatings: 0,
     active: false,

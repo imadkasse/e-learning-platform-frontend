@@ -1,6 +1,5 @@
 import React from "react";
 // import SideBar from "../sideBar/SideBar";
-import Courses from "../courses/Courses";
 // import Notifcations from "../notifcations/Notifcations";
 // import HomePage from "./HomePage";
 
@@ -10,7 +9,7 @@ const HomeUser = () => {
       {/* <SideBar /> */}
       {/* <HomePage /> */}
       {/* <Notifcations /> */}
-      <Courses />
+      {/* <Courses /> */}
     </div>
   );
 };

@@ -1,62 +1,56 @@
-"use client";
-import React, { useEffect } from "react";
+import React from "react";
 import CourseCard from "./CourseCard";
 import SearchCourse from "./SearchCourse";
-import Spinner from "@/components/spinner/Spinner";
 
-import { useCoursesStore } from "@/store/coursesStore";
+import { Course } from "@/types/course";
+interface CoursesProps {
+  searchParams: {
+    filter?: string;
+  };
+}
+const Courses = async ({ searchParams }: CoursesProps) => {
+  const { filter } = searchParams;
+  
 
-const Courses = () => {
-  const { courses, setCourses, loading, setLoading } = useCoursesStore();
-
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`
+  const fetchCourse = async () => {
+    try {
+      if (filter) {
+        const data = await fetch(
+          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCourses?query=${filter}`
         );
-        const data = await res.json();
-
-        setCourses(data.courses);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
+        const res = await data.json();
+        return res.courses;
       }
-    };
-    fetchCourse();
-  }, [setCourses, setLoading]);
-
-  if (loading) {
-    return (
-      <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[100vh] ">
-        <Spinner />
-      </div>
-    );
-  }
-
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`
+      );
+      const data = await res.json();
+      return data.courses;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const courses: Course[] = await fetchCourse();
   return (
-    <div className=" lg:custom-width rounded-xl h-[94vh] overflow-y-scroll px-4 py-5 relative ">
+    <div className="  rounded-xl h-[94vh] overflow-y-scroll px-4 py-5 relative ">
       <div className="mb-5 flex items-center gap-6">
         <h1 className="apply-fonts-normal text-2xl font-semibold ">الدورات</h1>
         <SearchCourse />
       </div>
-      <div className="container mx-auto px-8 py-4">
+      <div className=" px-8 py-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  gap-6">
-          {loading ? (
-            <div className="lg:col-span-3 md:col-span-2">
-              <Spinner />
-            </div>
-          ) : courses?.length > 0 ? (
+          {courses?.length > 0 ? (
             courses.map((c) => {
+              const videoNumber = c.sections.reduce((acc, section) => {
+                return acc + (section.videos?.length || 0);
+              }, 0);
               return (
                 <div key={c._id} className="max-w[272px]">
                   <CourseCard
                     courseId={c._id}
                     courseImg={c.imageCover}
                     students={c.studentsCount}
-                    numberOfVideo={c.videos.length}
+                    numberOfVideo={videoNumber}
                     coursePrice={c.price}
                     courseName={c.title}
                   />
@@ -64,7 +58,7 @@ const Courses = () => {
               );
             })
           ) : (
-            <h1 className="text-center col-span-3">course Not Found</h1>
+            <h1 className="text-center col-span-3">لا توجد أي كورسات</h1>
           )}
         </div>
       </div>

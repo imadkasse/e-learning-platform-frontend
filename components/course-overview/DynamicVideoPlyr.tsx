@@ -17,7 +17,11 @@ type Props = {
 };
 
 const DynamicVideoPlyr = ({ videoSrc }: Props) => {
-  return <VideoPlyr videoSrc={videoSrc} />;
+  return (
+    <VideoPlyr
+      videoSrc={`${process.env.NEXT_PUBLIC_BUNNY_BASE_URL}${videoSrc}`}
+    />
+  );
 };
 
 export default DynamicVideoPlyr;

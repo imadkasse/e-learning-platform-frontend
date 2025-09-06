@@ -2,7 +2,6 @@
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import React, { FormEvent, useState } from "react";
-import Cookies from "js-cookie";
 import axios from "axios";
 
 import "react-toastify/dist/ReactToastify.css";
@@ -13,7 +12,6 @@ import Spinner from "@/components/spinner/Spinner";
 
 const Settings = () => {
   const router = useRouter();
-  const token = Cookies.get("token");
   const [loading, setloading] = useState<boolean>(false);
 
   const loadingUser = useUserStore((state) => state.loading);
@@ -34,8 +32,6 @@ const Settings = () => {
     );
   }
 
-
-
   const handelupdate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData();
@@ -47,13 +43,11 @@ const Settings = () => {
     formData.append("phoneNumber", numPhone);
     setloading(true);
     try {
-       await axios.patch(
+      await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/updateMe`,
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
       showToast("success", "تم تحديث البيانات بنجاح ");
@@ -145,8 +139,8 @@ const Settings = () => {
           </div>
 
           {/* Phone Number */}
-          <div>
-            <label className="apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
+          <div className="col-span-2">
+            <label className="apply-fonts-normal  block mb-2 text-sm font-medium text-gray-900">
               رقم الهاتف
             </label>
             <input
@@ -154,14 +148,14 @@ const Settings = () => {
               value={numPhone}
               placeholder={user.phoneNumber}
               onChange={(e) => setNumPhone(e.target.value)}
-              name="price"
-              id="price"
+              name="phone"
+              id="phone"
               className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
             />
           </div>
 
           {/* Role */}
-          <div>
+          {/* <div>
             <label className=" apply-fonts-normal block mb-2 text-sm font-medium text-gray-900">
               الدور
             </label>
@@ -178,7 +172,7 @@ const Settings = () => {
                   : "طالب"}
               </option>
             </select>
-          </div>
+          </div> */}
         </div>
 
         {/* Buttons */}

@@ -20,4 +20,5 @@ export type User = {
   phoneNumber: string;
   notifications: Notifcation[];
   createdAt?: string;
+  balance?: number;
 };

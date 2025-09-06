@@ -1,283 +1,282 @@
 "use client";
-import { useUserStore } from "@/store/userStore";
 import {
-  ArrowBackIos,
-  ArrowForwardIos,
-  ContactSupportOutlined,
-  GroupsOutlined,
-  HomeOutlined,
-  LogoutOutlined,
-  NotificationsOutlined,
-  PlayLessonOutlined,
-  SettingsOutlined,
-  SupervisorAccountOutlined,
-} from "@mui/icons-material";
-import Cookies from "js-cookie";
+  ChevronLeft,
+  ChevronRight,
+  HelpCircle,
+  Home,
+  LogOut,
+  Bell,
+  Play,
+  Settings,
+  UsersRound,
+  UserStar,
+  Tickets,
+  LucideProps,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, {  useState } from "react";
+import Cookies from "js-cookie";
+import { useUserStore } from "@/store/userStore";
+import axios from "axios";
+import showToast from "@/utils/showToast";
 
 const SideBar = () => {
+  const router = useRouter();
   const [toggleSidebar, setToggleSidebar] = useState<boolean>(false);
+  const { fetchUser } = useUserStore();
+
   const handleToggle = () => {
     setToggleSidebar(!toggleSidebar);
   };
-  const pathName = usePathname();
-  const router = useRouter();
-  const { setUser } = useUserStore();
 
-  const handleLogout = () => {
-    Cookies.remove("token");
-    setUser({
-      _id: "",
-      username: "",
-      email: "",
-      role: null,
-      active: false,
-      progress: [],
-      thumbnail: "",
-      enrolledCourses: [],
-      phoneNumber: "",
-      publishedCourses: [],
-      notifications: [],
-    });
-    router.push("/");
+  const pathName = usePathname();
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
+      showToast("success", "تم تسجيل الخروج بنجاح");
+      Cookies.remove("token");
+      await fetchUser();
+      router.push("/");
+    } catch (error) {
+      console.log(error);
+      showToast("error", "تم تسجيل الخروج بنجاح");
+    }
   };
+
+  const mainMenuItems = [
+    {
+      href: "/dashboard-admin",
+      icon: Home,
+      label: "الرئيسية",
+      exact: true,
+    },
+    {
+      href: "/dashboard-admin/courses",
+      icon: Play,
+      label: "الدورات",
+    },
+    {
+      href: "/dashboard-admin/students",
+      icon: UsersRound,
+      label: "الطلاب",
+    },
+    {
+      href: "/dashboard-admin/administration",
+      icon: UserStar,
+      label: "الإدارة",
+    },
+    {
+      href: "/dashboard-admin/coupons",
+      icon: Tickets,
+      label: "الكوبونات",
+    },
+    {
+      href: "/dashboard-admin/notification",
+      icon: Bell,
+      label: "الإشعارات",
+    },
+  ];
+
+  const bottomMenuItems = [
+    {
+      href: "/dashboard-admin/support",
+      icon: HelpCircle,
+      label: "الدعم",
+    },
+    {
+      href: "/dashboard-admin/settings",
+      icon: Settings,
+      label: "الإعدادات",
+    },
+  ];
+
+  const isActiveLink = (href: string, exact = false) => {
+    if (exact) {
+      return pathName === href;
+    }
+    return pathName.startsWith(href);
+  };
+
+  const NavLink = ({
+    href,
+    icon: Icon,
+    label,
+    exact = false,
+  }: {
+    href: string;
+    icon: React.ForwardRefExoticComponent<
+      Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+    >;
+    label: string;
+    exact?: boolean;
+  }) => (
+    <Link
+      href={href}
+      className={`flex items-center gap-4 py-3 px-4 rounded-xl transition-all duration-200 hover:bg-mainColor/50 hover:scale-[1.02] ${
+        isActiveLink(href, exact)
+          ? "bg-mainColor/50 shadow-sm"
+          : "hover:shadow-sm"
+      } my-2`}
+    >
+      <Icon size={20} className="flex-shrink-0" />
+      <span className="text-sm font-medium">{label}</span>
+    </Link>
+  );
+
   return (
     <>
-      {/* in the small screen */}
+      {/* Mobile Sidebar */}
       <div
-        className={`bg-sideBarBgColo text-white py-4 h-[94vh] mb-2 px-3 rounded-xl  transition-all duration-300 ease-in-out ${
-          toggleSidebar ? `w-[300px] ` : `w-[0px]`
-        }  lg:hidden sm:sticky xs:fixed xs:z-50 top-2 xs:right-3  xs:flex flex-col justify-between `}
+        className={`bg-sideBarBgColo text-white py-4 mb-2 px-3 rounded-xl h-[94vh] transition-all duration-300 ease-in-out ${
+          toggleSidebar ? "w-[300px] shadow-2xl" : "w-[60px]"
+        } lg:hidden sm:sticky xs:fixed top-2 xs:right-1 z-10 flex flex-col justify-between`}
       >
-        <button
-          onClick={handleToggle}
-          className="lg:hidden  rounded-full text-black   flex items-center justify-center  "
-        >
-          {toggleSidebar ? (
-            <ArrowForwardIos className="text-xl font-bold text-mainColor m-2 " />
-          ) : (
-            <ArrowBackIos className=" m-2 text-xl font-bold text-mainColor" />
-          )}
-        </button>
-        <div className={`${toggleSidebar ? "block" : "hidden"} `}>
-          <div className="w-full flex justify-center mb-5">
+        {/* Toggle Button */}
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={handleToggle}
+            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200"
+          >
+            {toggleSidebar ? (
+              <ChevronRight size={20} className="text-mainColor" />
+            ) : (
+              <ChevronLeft size={20} className="text-mainColor" />
+            )}
+          </button>
+        </div>
+
+        {/* Logo Section */}
+        <div className={`${toggleSidebar ? "block" : "hidden"} flex-1`}>
+          <div className="w-full flex justify-center mb-6">
             <Link
-              href={`/`}
-              className="flex items-center flex-row-reverse   md:gap-3"
+              href="/"
+              className="flex items-center flex-row-reverse gap-3 hover:scale-105 transition-transform duration-200"
             >
               <Image
                 src="/imgs/dashboard-user-imgs/logoDashUser.png"
                 alt="logoImg"
-                className="md:w-14 md:h-14 xs:w-12 xs:h-12 "
-                width={150}
-                height={150}
+                className="w-12 h-12 rounded-lg"
+                width={48}
+                height={48}
               />
-              <h1 className="md:text-xl xs:text-base font-semibold xs:hidden lg:block">
-                Sience Academie
+              <h1 className="text-lg font-bold text-center">
+                Science Academie
               </h1>
             </Link>
           </div>
-          <nav className="apply-fonts-normal w-full  flex justify-center">
-            <div className="list-none text-[14px] w-[200px]">
-              <Link
-                href={`/dashboard-admin`}
-                className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-admin" ? "bg-mainColor/50" : ""
-                }  my-2`}
-              >
-                <HomeOutlined />
-                <p>الرئيسية</p>
-              </Link>
-              <Link
-                href={`/dashboard-admin/courses`}
-                className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-admin/courses"
-                    ? "bg-mainColor/50"
-                    : ""
-                }  my-2`}
-              >
-                <PlayLessonOutlined />
-                <p>الدورات</p>
-              </Link>
-              <Link
-                href={`/dashboard-admin/students`}
-                className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-admin/students"
-                    ? "bg-mainColor/50"
-                    : ""
-                }  my-2`}
-              >
-                <GroupsOutlined />
-                <p>الطلاب</p>
-              </Link>
-              <Link
-                href={`/dashboard-admin/administration`}
-                className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-admin/administration"
-                    ? "bg-mainColor/50"
-                    : ""
-                }  my-2`}
-              >
-                <SupervisorAccountOutlined />
-                <p>الإدارة</p>
-              </Link>
-              <Link
-                href={`/dashboard-admin/notification`}
-                className={` flex items-center gap-5 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-admin/notification"
-                    ? "bg-mainColor/50"
-                    : ""
-                }  my-2`}
-              >
-                <NotificationsOutlined />
-                <p>الإشعارات</p>
-              </Link>
+
+          {/* Main Navigation */}
+          <nav className="apply-fonts-normal mb-8">
+            <div className="space-y-1">
+              {mainMenuItems.map((item) => (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  icon={item.icon}
+                  label={item.label}
+                  exact={item.exact}
+                />
+              ))}
             </div>
           </nav>
         </div>
+
+        {/* Bottom Navigation */}
         <nav
-          className={`apply-fonts-normal w-full  flex justify-center ${
-            toggleSidebar ? "block" : "hidden"
-          }`}
+          className={`apply-fonts-normal ${toggleSidebar ? "block" : "hidden"}`}
         >
-          <ul className="list-none text-base w-[200px]">
-            <Link
-              href={`/dashboard-admin/support`}
-              className={` flex items-center gap-5 py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                pathName === "/dashboard-admin/support" ? "bg-mainColor/50" : ""
-              } my-2`}
-            >
-              <ContactSupportOutlined />
-              <p>الدعم</p>
-            </Link>
-            <Link
-              href={`/`}
-              className=" flex items-center gap-5 py-2 px-2 rounded-xl hoverEle hover:bg-mainColor/50 my-2"
-            >
-              <SettingsOutlined />
-              <p>الإعدادات</p>
-            </Link>
-            <button
-              onClick={handleLogout}
-              className=" flex items-center gap-5 py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
-            >
-              <LogoutOutlined className="text-red-700" />
-              <p>تسجيل الخروج</p>
-            </button>
-          </ul>
+          <div className="space-y-1 mb-4">
+            {bottomMenuItems.map((item) => (
+              <NavLink
+                key={item.href}
+                href={item.href}
+                icon={item.icon}
+                label={item.label}
+              />
+            ))}
+          </div>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="group w-full flex items-center gap-4 py-3 px-4 rounded-xl transition-all duration-200 hover:bg-red-500/50 hover:scale-[1.02]"
+          >
+            <LogOut
+              size={20}
+              className="text-red-400 group-hover:text-white transition-colors duration-200 flex-shrink-0"
+            />
+            <span className="text-sm font-medium">تسجيل الخروج</span>
+          </button>
         </nav>
       </div>
-      {/* in the large screen */}
-      <div className="bg-sideBarBgColo text-white py-2  px-3 rounded-xl min-h-[94vh] lg:w-[300px]  xs:hidden lg:sticky lg:top-2  lg:flex flex-col justify-between">
+
+      {/* Desktop Sidebar */}
+      <div className="bg-sideBarBgColo text-white py-6 px-4 rounded-xl h-full w-[300px] xs:hidden lg:flex flex-col justify-between shadow-lg">
+        {/* Logo Section */}
         <div>
-          <div className="w-full flex justify-center mb-1">
+          <div className="w-full flex justify-center mb-8">
             <Link
-              href={`/`}
-              className="flex items-center flex-row-reverse   md:gap-3"
+              href="/"
+              className="flex items-center flex-row-reverse gap-3 hover:scale-105 transition-transform duration-200"
             >
               <Image
                 src="/imgs/dashboard-user-imgs/logoDashUser.png"
                 alt="logoImg"
-                className="md:w-14 md:h-14 xs:w-12 xs:h-12 "
-                width={150}
-                height={150}
+                className="w-12 h-12 rounded-lg"
+                width={48}
+                height={48}
               />
-              <h1 className="lg:text-[15px] font-semibold xs:hidden lg:block">
-                Sience Academie
-              </h1>
+              <h1 className="text-md font-bold">Science Academie</h1>
             </Link>
           </div>
-          <nav className="apply-fonts-normal w-full  flex justify-center">
-            <div className="list-none text-[14px] w-[200px]">
-              <Link
-                href={`/dashboard-admin`}
-                className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-admin" ? "bg-mainColor/50" : ""
-                }  my-2`}
-              >
-                <HomeOutlined />
-                <p>الرئيسية</p>
-              </Link>
-              <Link
-                href={`/dashboard-admin/courses`}
-                className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-admin/courses"
-                    ? "bg-mainColor/50"
-                    : ""
-                } my-2`}
-              >
-                <PlayLessonOutlined />
-                <p>الدورات</p>
-              </Link>
-              <Link
-                href={`/dashboard-admin/students`}
-                className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-admin/students"
-                    ? "bg-mainColor/50"
-                    : ""
-                } my-2`}
-              >
-                <GroupsOutlined />
-                <p>الطلاب</p>
-              </Link>
-              <Link
-                href={`/dashboard-admin/administration`}
-                className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-admin/administration"
-                    ? "bg-mainColor/50"
-                    : ""
-                } my-2`}
-              >
-                <SupervisorAccountOutlined />
-                <p>الإدارة</p>
-              </Link>
-              <Link
-                href={`/dashboard-admin/notification`}
-                className={`flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                  pathName === "/dashboard-admin/notification"
-                    ? "bg-mainColor/50"
-                    : ""
-                } my-2`}
-              >
-                <NotificationsOutlined />
-                <p>الإشعارات</p>
-              </Link>
+
+          {/* Main Navigation */}
+          <nav className="apply-fonts-normal">
+            <div className="space-y-2">
+              {mainMenuItems.map((item) => (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  icon={item.icon}
+                  label={item.label}
+                  exact={item.exact}
+                />
+              ))}
             </div>
           </nav>
         </div>
-        <nav className="apply-fonts-normal w-full  flex justify-center">
-          <div className="list-none text-base w-[200px] ">
-            <Link
-              href={`/dashboard-admin/support`}
-              className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                pathName === "/dashboard-admin/support" ? "bg-mainColor/50" : ""
-              } my-2`}
-            >
-              <ContactSupportOutlined />
-              <p>الدعم</p>
-            </Link>
-            <Link
-              href={`/dashboard-admin/settings`}
-              className={` flex items-center gap-4 py-3 px-3 rounded-xl hoverEle hover:bg-mainColor/50 ${
-                pathName === "/dashboard-admin/settings"
-                  ? "bg-mainColor/50"
-                  : ""
-              } my-2`}
-            >
-              <SettingsOutlined />
-              <p>الإعدادات</p>
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="group flex items-center gap-4 py-2 px-2 rounded-xl hoverEle hover:bg-red-800/50 my-2"
-            >
-              <LogoutOutlined className="text-red-700 hoverEle group-hover:text-white" />
-              <p>تسجيل الخروج</p>
-            </button>
+
+        {/* Bottom Navigation */}
+        <nav className="apply-fonts-normal">
+          <div className="space-y-2 mb-4">
+            {bottomMenuItems.map((item) => (
+              <NavLink
+                key={item.href}
+                href={item.href}
+                icon={item.icon}
+                label={item.label}
+              />
+            ))}
           </div>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="group w-full flex items-center gap-4 py-3 px-4 rounded-xl transition-all duration-200 hover:bg-red-500/50 hover:scale-[1.02] border border-red-400/20"
+          >
+            <LogOut
+              size={20}
+              className="text-red-400 group-hover:text-white transition-colors duration-200 flex-shrink-0"
+            />
+            <span className="text-sm font-medium">تسجيل الخروج</span>
+          </button>
         </nav>
       </div>
     </>

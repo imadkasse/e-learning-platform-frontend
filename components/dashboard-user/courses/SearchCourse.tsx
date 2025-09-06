@@ -1,39 +1,25 @@
 "use client";
-import React, { FormEvent, useState } from "react";
-import { useCoursesStore } from "@/store/coursesStore";
+import React, {  useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 //this search for (students , admins)
 const SearchCourse = () => {
-  const [query, setQuery] = useState<string>("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const search = searchParams.get("filter");
+  const [query, setQuery] = useState<string>(search || "");
 
-  const { setCourses, setLoading } = useCoursesStore();
-  const handelSearch = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
+  useEffect(() => {
+    const params = new URLSearchParams();
 
-      if (query !== "") {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCourses?query=${query}`
-        );
-        const data = await res.json();
-        setCourses(data.courses);
-      } else {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`
-        );
-        const data = await res.json();
-        setCourses(data.courses);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    if (query) params.set("filter", query);
+
+    // حدّث الرابط بالمعلمات الجديدة
+    router.push(`?${params.toString()}`);
+  }, [query, router]);
   return (
     <>
-      <form className="flex items-center flex-grow " onSubmit={handelSearch} >
+      <form className="flex items-center flex-grow ">
         <label className="sr-only">Search</label>
         <div className="relative w-full ">
           <div className="absolute  inset-y-0 start-0 flex items-center ps-3 pointer-events-none  ">
@@ -63,12 +49,6 @@ const SearchCourse = () => {
             placeholder="البحث..."
           />
         </div>
-        <button
-          type="submit"
-          className="apply-fonts-normal  py-2.5 mx-3 rounded-lg text-white px-4 bg-mainColor hover:bg-mainColorHoverLight hoverEle"
-        >
-          بحث
-        </button>
       </form>
     </>
   );

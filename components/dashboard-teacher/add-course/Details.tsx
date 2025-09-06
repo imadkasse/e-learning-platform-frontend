@@ -1,455 +1,1621 @@
 "use client";
-import Image from "next/image";
-import React, { useState, ChangeEvent, FormEvent } from "react";
-import Cookies from "js-cookie";
-import axios from "axios";
-import "react-toastify/dist/ReactToastify.css";
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import showToast from "@/utils/showToast";
-import { useUserStore } from "@/store/userStore";
-import Spinner from "@/components/spinner/Spinner";
+import axios from "axios";
+import {
+  Loader,
+  X,
+  Upload,
+  FileText,
+  Video,
+  Trash2,
+  Plus,
+  Eye,
+  AlertTriangle,
+  Info,
+} from "lucide-react";
+import Image from "next/image";
+import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
 
 interface CourseDetails {
-  imageCover: File | null;
-  lessonName: string;
-  lessonVideo: File | null;
-  pdfFiles: File[];
-  courseTitle: string;
-  coursePrice: number;
-  courseDescription: string;
+  title: string;
+  description: string;
   category: string;
-  lessonVideoName: string;
-  pdfFilesNames: string[];
-  concepts: string[];
+  price: number;
+  imageCover: File | null;
 }
 
-const Details: React.FC = () => {
-  // add protected
-  const token = Cookies.get("token");
-  const loadingUser = useUserStore((state) => state.loading);
+interface Course {
+  _id: string;
+  title: string;
+  description: string;
+  instructor: string;
+  sections: Section[];
+  price: number;
+  category: string;
+  studentsCount: number;
+  imageCover: string;
+  enrolledStudents: string[];
+  reviews: string[];
+  numberRatings: number;
+  avgRatings: number;
+  concepts: string[];
+  publishedDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
+type Section = {
+  _id: string;
+  title: string;
+  videos: Videos[];
+};
 
-  const [formData, setFormData] = useState<CourseDetails>({
+interface UploadedFile {
+  _id: string;
+  filename: string;
+  url: string;
+  size: number;
+}
+
+interface Videos {
+  _id: string;
+  lessonTitle: string;
+  url: string;
+  format: string;
+  duration: number;
+  uploadedBy: string;
+  sectionId: string;
+  isCompleted: string;
+  completedBy: string[];
+  comments: string[];
+  files: UploadedFile[];
+  createdAt: string;
+  publishedDate: string;
+}
+
+interface VideoUpload {
+  title: string;
+  file: File | null;
+  duration: string;
+  description: string;
+}
+
+const baseUrl = process.env.NEXT_PUBLIC_BACK_URL;
+
+export default function CourseUploader() {
+  const router = useRouter();
+  // stepre
+  const [step, setStep] = useState(1);
+  const nextStep = () => setStep((prev) => Math.min(prev + 1, 3));
+
+  // step one create course details
+  const [newconcept, setNewConcept] = useState<string>("");
+  const [concepts, setConcepts] = useState<string[]>([]);
+  const [courseDetails, setCourseDetails] = useState<CourseDetails>({
     imageCover: null,
-    lessonName: "",
-    lessonVideo: null,
-    pdfFiles: [],
-    lessonVideoName: "",
-    pdfFilesNames: [],
-    courseTitle: "",
-    coursePrice: 0,
-    courseDescription: "",
+    title: "",
+    price: 0,
+    description: "",
     category: "",
-    concepts: [],
   });
-  // دالة لإضافة مفهوم جديد
-  const handleAddConcept = (concept: string) => {
+  const [currentCourse, setCurrentCourse] = useState<Course>({
+    _id: "",
+    title: "",
+    description: "",
+    instructor: "",
+    sections: [],
+    price: 0,
+    category: "",
+    studentsCount: 0,
+    imageCover: "",
+    enrolledStudents: [],
+    reviews: [],
+    numberRatings: 0,
+    avgRatings: 0,
+    concepts: [],
+    publishedDate: "",
+    createdAt: "",
+    updatedAt: "",
+  });
+  const [loadingCreatingCourse, setloadingCreatingCourse] = useState(false);
+  const [loadingAddSection, setloadingAddSection] = useState(false);
+  const [loadingAddVideoToSection, setloadingAddVideoToSection] =
+    useState(false);
+  const [loadingDeleteVideo, setLoadingDeleteVideo] = useState<string>("");
+  const [loadingUploadFile, setLoadingUploadFile] = useState<string>("");
+  const [loadingDeleteCourse, setLoadingDeleteCourse] = useState(false);
+
+  // Modal states
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteModalConfig, setDeleteModalConfig] = useState<{
+    type: "video" | "file" | "course";
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  // concepts
+  const addConcept = (concept: string) => {
     if (concept.trim() === "") return;
-    setFormData((prevState) => ({
-      ...prevState,
-      concepts: [...prevState.concepts, concept],
-    }));
+    setConcepts((prev) => [...prev, concept]);
+  };
+  const removeConcept = (index: number) => {
+    setConcepts(
+      concepts.filter((concept: string, i: number) => {
+        return i !== index;
+      })
+    );
   };
 
-  // دالة لحذف مفهوم
-  const handleRemoveConcept = (index: number) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      concepts: prevState.concepts.filter((_, i) => i !== index),
-    }));
+  const handleCreateCourse = async () => {
+    // check before send
+    if (!courseDetails.title?.trim()) {
+      showToast("error", "الرجاء إدخال عنوان الكورس");
+      return;
+    }
+    if (!courseDetails.description?.trim()) {
+      showToast("error", "الرجاء إدخال وصف الكورس");
+      return;
+    }
+    if (!courseDetails.price || isNaN(Number(courseDetails.price))) {
+      showToast("error", "الرجاء إدخال سعر صحيح");
+      return;
+    }
+    if (!courseDetails.imageCover) {
+      showToast("error", "الرجاء اختيار صورة غلاف");
+      return;
+    }
+    if (!concepts || concepts.length === 0) {
+      showToast("error", "الرجاء إضافة مفهوم واحد على الأقل");
+      return;
+    }
+
+    setloadingCreatingCourse(true);
+    const formData = new FormData();
+
+    formData.append("title", courseDetails.title);
+    formData.append("description", courseDetails.description);
+    formData.append("price", String(courseDetails.price));
+    if (courseDetails.imageCover) {
+      formData.append("imageCover", courseDetails.imageCover);
+    }
+
+    if (concepts && concepts.length > 0) {
+      concepts.forEach((concept: string, index: number) => {
+        formData.append(`concepts[${index}]`, concept);
+      });
+    }
+
+    try {
+      const res = await axios.post(`${baseUrl}/api/courses`, formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      showToast("success", res.data.message);
+      setCurrentCourse(res.data.course);
+      nextStep();
+    } catch (error) {
+      console.error("Error creating course:", error);
+      showToast("error", "حدث خطأ أثناء إنشاء الكورس");
+    } finally {
+      setloadingCreatingCourse(false);
+    }
   };
 
-  // تخزين قيمة الإدخال الحالي للمفهوم
-  const [conceptInput, setConceptInput] = useState("");
+  // step two create course sections
+  const [sections, setSections] = useState<Section[]>([]);
+  const [title, setTitle] = useState("");
+  const handleAddSctions = async () => {
+    if (!title.trim()) {
+      showToast("error", "الرجاء إدخال عنوان القسم");
+      return;
+    }
+    setloadingAddSection(true);
+    try {
+      const res = await axios.post(
+        `${baseUrl}/api/courses/${currentCourse._id}`,
+        {
+          sectionTitle: title,
+        },
+        { withCredentials: true }
+      );
+      showToast("success", res.data.message);
+      setCurrentCourse({
+        ...currentCourse,
+        sections: [...currentCourse.sections, res.data.section._id],
+      });
+      setSections([...sections, res.data.section]);
+      setTitle(""); // Clear input after successful addition
+    } catch (error) {
+      console.log(error);
+      showToast("error", "حدث خطأ أثناء إنشاء القسم");
+    } finally {
+      setloadingAddSection(false);
+    }
+  };
 
+  // step three add videos to sections and files to videos
+  const addVideoToSection = async (
+    sectionId: string,
+    title: string,
+    file: File,
+    duration: string,
+    description: string
+  ) => {
+    if (!sectionId?.trim()) {
+      showToast("error", "الرجاء اختيار القسم أولا");
+      return;
+    }
+    if (!title?.trim()) {
+      showToast("error", "الرجاء إدخال عنوان الدرس");
+      return;
+    }
+    if (!description?.trim()) {
+      showToast("error", "الرجاء إدخال وصف الدرس");
+      return;
+    }
+    if (!file) {
+      showToast("error", "الرجاء رفع الفيديو");
+      return;
+    }
+    if (!duration?.trim()) {
+      showToast("error", "الرجاء وضع مدة الفيديو");
+      return;
+    }
+    setloadingAddVideoToSection(true);
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("file", file);
+    formData.append("duration", String(duration));
+    formData.append("description", description);
+    console.log(duration, description);
+
+    try {
+      const res = await axios.post(
+        `${baseUrl}/api/courses/${currentCourse._id}/sections/${sectionId}`,
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      showToast("success", res.data.message);
+      setSections((prevSections) =>
+        prevSections.map((sec) =>
+          sec._id === sectionId
+            ? { ...sec, videos: [...sec.videos, res.data.video] }
+            : sec
+        )
+      );
+      console.log(res.data.video);
+    } catch (error) {
+      console.error("Error uploading video:", error);
+      showToast("error", "حدث خطأ أثناء رفع الفيديو");
+    } finally {
+      setloadingAddVideoToSection(false);
+    }
+  };
+
+  // Delete video
+  const deleteVideo = async (sectionId: string, videoId: string) => {
+    setLoadingDeleteVideo(videoId);
+    try {
+      await axios.delete(
+        `${baseUrl}/api/courses/${currentCourse._id}/sections/${sectionId}/videos/${videoId}`,
+        { withCredentials: true }
+      );
+      showToast("success", "تم حذف الفيديو بنجاح");
+      setSections((prevSections) =>
+        prevSections.map((sec) =>
+          sec._id === sectionId
+            ? {
+                ...sec,
+                videos: sec.videos.filter((video) => video._id !== videoId),
+              }
+            : sec
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      showToast("error", "حدث خطأ أثناء حذف الفيديو");
+    } finally {
+      setLoadingDeleteVideo("");
+      setShowDeleteModal(false);
+    }
+  };
+
+  // Add file to video
+  const addFileToVideo = async (
+    sectionId: string,
+    videoId: string,
+    fileName: string,
+    file: File
+  ) => {
+    if (!fileName.trim()) {
+      showToast("error", "الرجاء إدخال إسم الملف");
+      return;
+    }
+    if (!file) {
+      showToast("error", "الرجاء اختيار الملف");
+      return;
+    }
+
+    setLoadingUploadFile(videoId);
+    const formData = new FormData();
+    formData.append("filename", fileName);
+    formData.append("file", file);
+
+    try {
+      const res = await axios.post(
+        `${baseUrl}/api/courses/${currentCourse._id}/sections/${sectionId}/videos/${videoId}/files`,
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      showToast("success", res.data.message);
+
+      // Update the sections state to include the new file
+      setSections((prevSections) =>
+        prevSections.map((sec) =>
+          sec._id === sectionId
+            ? {
+                ...sec,
+                videos: sec.videos.map((video) =>
+                  video._id === videoId
+                    ? { ...video, files: [...video.files, res.data.file] }
+                    : video
+                ),
+              }
+            : sec
+        )
+      );
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      showToast("error", "حدث خطأ أثناء رفع الملف");
+    } finally {
+      setLoadingUploadFile("");
+    }
+  };
+
+  // Delete file from video
+  const deleteFileFromVideo = async (
+    sectionId: string,
+    videoId: string,
+    fileId: string
+  ) => {
+    try {
+      await axios.delete(
+        `${baseUrl}/api/courses/${currentCourse._id}/sections/${sectionId}/videos/${videoId}/files/${fileId}`,
+        { withCredentials: true }
+      );
+      showToast("success", "تم حذف الملف بنجاح");
+
+      // Update the sections state to remove the file
+      setSections((prevSections) =>
+        prevSections.map((sec) =>
+          sec._id === sectionId
+            ? {
+                ...sec,
+                videos: sec.videos.map((video) =>
+                  video._id === videoId
+                    ? {
+                        ...video,
+                        files: video.files.filter(
+                          (file) => file._id !== fileId
+                        ),
+                      }
+                    : video
+                ),
+              }
+            : sec
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      showToast("error", "حدث خطأ أثناء حذف الملف");
+    } finally {
+      setShowDeleteModal(false);
+    }
+  };
+
+  // Delete entire course
+  const deleteCourse = async () => {
+    setLoadingDeleteCourse(true);
+    try {
+      await axios.delete(`${baseUrl}/api/courses/${currentCourse._id}`, {
+        withCredentials: true,
+      });
+      showToast("success", "تم حذف الكورس بنجاح");
+      // Reset all states
+      setStep(1);
+      setCurrentCourse({
+        _id: "",
+        title: "",
+        description: "",
+        instructor: "",
+        sections: [],
+        price: 0,
+        category: "",
+        studentsCount: 0,
+        imageCover: "",
+        enrolledStudents: [],
+        reviews: [],
+        numberRatings: 0,
+        avgRatings: 0,
+        concepts: [],
+        publishedDate: "",
+        createdAt: "",
+        updatedAt: "",
+      });
+      setSections([]);
+      setConcepts([]);
+      setCourseDetails({
+        imageCover: null,
+        title: "",
+        price: 0,
+        description: "",
+        category: "",
+      });
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      showToast("error", "حدث خطأ أثناء حذف الكورس");
+    } finally {
+      setLoadingDeleteCourse(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  const openDeleteModal = (
+    type: "video" | "file" | "course",
+    title: string,
+    message: string,
+    onConfirm: () => void
+  ) => {
+    setDeleteModalConfig({ type, title, message, onConfirm });
+    setShowDeleteModal(true);
+  };
+  const fetchCourseAfterPublished = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${currentCourse._id}`,
+        {
+          withCredentials: true,
+        }
+      );
+      const course = res.data.course;
+      setCurrentCourse(course);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return (
+    <div className="min-h-screen ">
+      <div className="max-w-6xl mx-auto">
+        <div className=" bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white">
+            <h1 className="text-3xl font-bold apply-fonts-normal mb-2">
+              إنشاء كورس جديد
+            </h1>
+            <p className="text-indigo-100 apply-fonts-normal">
+              قم بإنشاء وتنظيم محتوى الكورس الخاص بك
+            </p>
+          </div>
+
+          <div className="p-8">
+            {/* Stepper */}
+            <div className="flex justify-between mb-12 relative">
+              <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 -z-10"></div>
+              {["تفاصيل عامة", "الأقسام و الفيديوهات", "نشر الكورس"].map(
+                (label, index) => (
+                  <div key={index} className="flex flex-col items-center">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                        step === index + 1
+                          ? "bg-indigo-600 text-white shadow-lg transform scale-110"
+                          : step > index + 1
+                          ? "bg-green-500 text-white"
+                          : "bg-gray-200 text-gray-500"
+                      }`}
+                    >
+                      {step > index + 1 ? "✓" : index + 1}
+                    </div>
+                    <span
+                      className={`mt-3 text-sm font-medium apply-fonts-normal transition-colors ${
+                        step === index + 1
+                          ? "text-indigo-600"
+                          : step > index + 1
+                          ? "text-green-600"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {label}
+                    </span>
+                  </div>
+                )
+              )}
+            </div>
+
+            {/* Step Content */}
+            {step === 1 && (
+              <StepGeneralDetails
+                courseDetails={courseDetails}
+                setCourseDetails={setCourseDetails}
+                concepts={concepts}
+                setNewConcept={setNewConcept}
+                newconcept={newconcept}
+                addConcept={addConcept}
+                removeConcept={removeConcept}
+              />
+            )}
+            {step === 2 && (
+              <StepSectionsAndVideos
+                sections={sections}
+                loadingAddSection={loadingAddSection}
+                currentCourse={currentCourse}
+                handleAddSctions={handleAddSctions}
+                title={title}
+                setTitle={setTitle}
+                addVideoToSection={addVideoToSection}
+                loadingAddVideoToSection={loadingAddVideoToSection}
+                deleteVideo={deleteVideo}
+                loadingDeleteVideo={loadingDeleteVideo}
+                addFileToVideo={addFileToVideo}
+                deleteFileFromVideo={deleteFileFromVideo}
+                loadingUploadFile={loadingUploadFile}
+                openDeleteModal={openDeleteModal}
+              />
+            )}
+            {step === 3 && <StepPublish currentCourse={currentCourse} />}
+
+            {/* Navigation */}
+            <div className="flex justify-between mt-12 pt-8 border-t border-gray-200">
+              {/* Back Button with Tooltip */}
+              <div className="relative group">
+                <button
+                  disabled
+                  className="px-8 py-3 bg-gray-100 text-gray-400 rounded-xl font-medium apply-fonts-normal cursor-not-allowed flex items-center gap-2 relative"
+                >
+                  رجوع
+                </button>
+                {/* Tooltip */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-4 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+                  <div className="apply-fonts-normal flex items-center gap-2">
+                    <Info className="w-4 h-4" />
+                    لا يمكن الرجوع للخطوة السابقة لضمان سلامة البيانات
+                  </div>
+                  {/* Arrow */}
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                </div>
+              </div>
+
+              {step !== 3 ? (
+                <button
+                  type="submit"
+                  onClick={async () => {
+                    if (step === 1) {
+                      await handleCreateCourse();
+                    } else if (step === 2) {
+                      await fetchCourseAfterPublished();
+                      nextStep();
+                    } else {
+                      nextStep();
+                    }
+                  }}
+                  disabled={loadingCreatingCourse}
+                  className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium apply-fonts-normal transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {loadingCreatingCourse && (
+                    <Loader className="animate-spin w-4 h-4" />
+                  )}
+                  {loadingCreatingCourse ? "جارٍ الإنشاء..." : "التالي"}
+                </button>
+              ) : (
+                <div className="flex gap-4">
+                  {/* Delete Course Button */}
+                  <button
+                    onClick={() =>
+                      openDeleteModal(
+                        "course",
+                        "حذف الكورس",
+                        "هل أنت متأكد من حذف هذا الكورس نهائياً؟ هذا الإجراء لا يمكن التراجع عنه وسيتم حذف جميع الأقسام والفيديوهات والملفات المرتبطة به.",
+                        deleteCourse
+                      )
+                    }
+                    disabled={loadingDeleteCourse}
+                    className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-medium apply-fonts-normal transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {loadingDeleteCourse ? (
+                      <>
+                        <Loader className="animate-spin w-4 h-4" />
+                        جارٍ الحذف...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="w-4 h-4" />
+                        حذف الكورس
+                      </>
+                    )}
+                  </button>
+
+                  {/* Publish Button */}
+                  <button
+                    onClick={() => {
+                      console.log(currentCourse);
+                      showToast("success", "تم نشر الكورس بنجاح!");
+                      router.push(`/course/${currentCourse._id}`);
+                    }}
+                    className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-medium apply-fonts-normal transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5"
+                  >
+                    🎉 معاينة الكورس
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && deleteModalConfig && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-auto transform transition-all duration-300">
+                  {/* Modal Header */}
+                  <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-t-2xl">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <AlertTriangle className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-xl font-bold apply-fonts-normal">
+                        {deleteModalConfig.title}
+                      </h3>
+                    </div>
+                  </div>
+
+                  {/* Modal Content */}
+                  <div className="p-6">
+                    <p className="text-gray-600 apply-fonts-normal leading-relaxed mb-6">
+                      {deleteModalConfig.message}
+                    </p>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 justify-end">
+                      <button
+                        onClick={() => setShowDeleteModal(false)}
+                        className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium apply-fonts-normal hover:bg-gray-200 transition-colors"
+                      >
+                        إلغاء
+                      </button>
+                      <button
+                        onClick={deleteModalConfig.onConfirm}
+                        disabled={
+                          loadingDeleteVideo !== "" || loadingDeleteCourse
+                        }
+                        className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium apply-fonts-normal hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        {loadingDeleteVideo !== "" || loadingDeleteCourse ? (
+                          <>
+                            <Loader className="animate-spin w-4 h-4" />
+                            جارٍ الحذف...
+                          </>
+                        ) : (
+                          <>
+                            <Trash2 className="w-4 h-4" />
+                            تأكيد الحذف
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Step 1 ---------------- */
+interface StepGeneralDetailsProps {
+  courseDetails: CourseDetails;
+  setCourseDetails: Dispatch<SetStateAction<CourseDetails>>;
+  concepts: string[];
+  newconcept: string;
+  setNewConcept: Dispatch<SetStateAction<string>>;
+  addConcept: (concept: string) => void;
+  removeConcept: (index: number) => void;
+}
+
+function StepGeneralDetails({
+  courseDetails,
+  setCourseDetails,
+  concepts,
+  newconcept,
+  setNewConcept,
+  addConcept,
+  removeConcept,
+}: StepGeneralDetailsProps) {
   const [imageCoverPreview, setImageCoverPreview] = useState<string | null>(
     null
   );
-  const [loading, setLoading] = useState<boolean>(false);
-
-  if (loadingUser) {
-    return <Spinner />;
-  }
 
   const handleImageCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      setFormData((prev) => ({ ...prev, imageCover: file }));
       setImageCoverPreview(URL.createObjectURL(file));
+      setCourseDetails((prev) => ({ ...prev, imageCover: file }));
     }
-  };
-
-  const handleLessonVideoChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setFormData((prev) => ({
-      ...prev,
-      lessonVideo: file,
-      // @ts-expect-error:fix that agin
-      lessonVideoName: file.name, // تحديث اسم الفيديو
-    }));
-  };
-
-  const handlePdfFilesChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setFormData((prev) => ({
-      ...prev,
-      pdfFiles: files,
-      pdfFilesNames: files.map((file) => file.name), // تحديث أسماء ملفات PDF
-    }));
   };
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    const courseData = new FormData();
-
-    if (formData.imageCover)
-      courseData.append("imageCover", formData.imageCover);
-    courseData.append("lessonTitle", formData.lessonName);
-    if (formData.lessonVideo) courseData.append("videos", formData.lessonVideo);
-    formData.pdfFiles.forEach((file) => courseData.append("files", file));
-    courseData.append("title", formData.courseTitle);
-    courseData.append("price", formData.coursePrice.toString());
-    courseData.append("description", formData.courseDescription);
-    courseData.append("category", formData.category);
-    formData.concepts.forEach((concept, index) => {
-      courseData.append(`concepts[${index}]`, concept);
-    });
-
-    setLoading(true);
-    try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`,
-        courseData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      showToast("success", "تم نشر الدورة بنجاح");
-
-      setFormData({
-        imageCover: null,
-        lessonName: "",
-        lessonVideo: null,
-        pdfFiles: [],
-        lessonVideoName: "",
-        pdfFilesNames: [],
-        courseTitle: "",
-        coursePrice: 0,
-        courseDescription: "",
-        category: "",
-        concepts: [],
-      });
-    } catch (error) {
-      //@ts-expect-error:fix
-      showToast("error", error.response.data.message);
-    } finally {
-      setLoading(false);
-    }
+    setCourseDetails((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
-    <div className="p-6 bg-wygColor shadow-xl rounded-xl shadow-mainColorHoverLight min-h-screen">
-      <h1 className="text-2xl font-bold mb-4 apply-fonts-normal">
-        إضافة تفاصيل الدورة
-      </h1>
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6 bg-white p-6 rounded shadow"
-      >
-        {/* صورة الغلاف */}
-        <div className="flex items-center space-x-4">
-          <div className="w-full">
-            <label
-              htmlFor="imageCover"
-              className="block font-medium mb-2 text-gray-700"
-            >
-              صورة الغلاف
-            </label>
-            <div className="relative">
-              <input
-                type="file"
-                id="imageCover"
-                accept="image/*"
-                onChange={handleImageCoverChange}
-                className="hidden"
-              />
-              <label
-                htmlFor="imageCover"
-                className="apply-fonts-normal cursor-pointer bg-mainColor text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-mainColorHoverLight transition-colors duration-300"
-              >
-                اختر صورة
-              </label>
-            </div>
-            {imageCoverPreview && (
-              <div className="mt-4">
-                <p className="text-gray-600 text-sm mb-2 apply-fonts-normal">
-                  معاينة الصورة:
-                </p>
-                <Image
-                  src={imageCoverPreview}
-                  alt="صورة الغلاف"
-                  className="w-[500px] h-[322px]   rounded border"
-                  width={250}
-                  height={250}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* اسم الدرس */}
+    <div className="space-y-8">
+      {/* Course Title & Price */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label
-            htmlFor="lessonName"
-            className="apply-fonts-normal block font-medium mb-2"
-          >
-            اسم الدرس
+          <label className="block text-sm font-semibold text-gray-700 mb-3 apply-fonts-normal">
+            عنوان الكورس
           </label>
           <input
             type="text"
-            id="lessonName"
-            name="lessonName"
-            value={formData.lessonName}
+            placeholder="أدخل عنوان الكورس"
+            value={courseDetails?.title}
             onChange={handleInputChange}
-            className="w-full p-2 border rounded"
+            name="title"
+            className="w-full border-2 border-gray-200 p-4 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors apply-fonts-normal text-lg"
           />
         </div>
-
-        {/* فيديو الدرس */}
-        <div className="flex items-center space-x-4">
-          <div className="w-full">
-            <label
-              htmlFor="lessonVideo"
-              className="block font-medium mb-2 text-gray-700"
-            >
-              فيديو الدرس
-            </label>
-            <div className="relative">
-              <input
-                type="file"
-                id="lessonVideo"
-                accept="video/*"
-                onChange={handleLessonVideoChange}
-                className="hidden"
-              />
-              <label
-                htmlFor="lessonVideo"
-                className="cursor-pointer bg-green-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors duration-300"
-              >
-                اختر فيديو
-              </label>
-            </div>
-            {formData.lessonVideoName && (
-              <p className="mt-5 text-sm text-gray-500">
-                الفيديو المرفوع: {formData.lessonVideoName}
-              </p>
-            )}
-            <p className="mt-3 apply-fonts-normal text-sm text-blue-600">
-              * يرجى رفع الفيديو الأول فقط الآن، ويمكنك تعديل الدورة لاحقًا
-              لإضافة باقي الفيديوهات.
-            </p>
-          </div>
-        </div>
-
-        {/* ملفات PDF */}
-        <div className="flex items-center space-x-4">
-          <div className="w-full">
-            <label
-              htmlFor="pdfFiles"
-              className="block font-medium mb-2 text-gray-700"
-            >
-              ملفات PDF
-            </label>
-            <div className="relative">
-              <input
-                type="file"
-                id="pdfFiles"
-                accept=".pdf"
-                multiple
-                onChange={handlePdfFilesChange}
-                className="hidden"
-              />
-              <label
-                htmlFor="pdfFiles"
-                className="cursor-pointer bg-purple-600 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-purple-700 transition-colors duration-300"
-              >
-                اختر ملفات PDF
-              </label>
-            </div>
-            {formData.pdfFilesNames.length > 0 && (
-              <ul className="mt-5 text-sm text-gray-500">
-                {formData.pdfFilesNames.map((fileName, index) => (
-                  <li key={index}>- {fileName}</li>
-                ))}
-              </ul>
-            )}
-            <p className="mt-3 apply-fonts-normal text-sm text-blue-600">
-              * يمكن إضافة ملفات PDF إضافية عند تعديل الدورة لاحقًا.
-            </p>
-          </div>
-        </div>
-
-        {/* عنوان الدورة */}
         <div>
-          <label htmlFor="courseTitle" className="block font-medium mb-2">
-            عنوان الدورة
-          </label>
-          <input
-            type="text"
-            id="courseTitle"
-            name="courseTitle"
-            value={formData.courseTitle}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        {/* سعر الدورة */}
-        <div>
-          <label htmlFor="coursePrice" className="block font-medium mb-2">
-            سعر الدورة
+          <label className="block text-sm font-semibold text-gray-700 mb-3 apply-fonts-normal">
+            السعر (دينار جزائري)
           </label>
           <input
             type="number"
-            id="coursePrice"
-            name="coursePrice"
-            value={formData.coursePrice}
+            placeholder="0"
+            value={courseDetails?.price}
             onChange={handleInputChange}
-            className="w-full p-2 border rounded"
+            name="price"
+            className="w-full border-2 border-gray-200 p-4 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors text-lg"
           />
         </div>
+      </div>
 
-        {/* وصف الدورة */}
-        <div>
-          <label htmlFor="courseDescription" className="block font-medium mb-2">
-            وصف الدورة
+      {/* Description */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 mb-3 apply-fonts-normal">
+          وصف الكورس
+        </label>
+        <textarea
+          placeholder="اكتب وصفاً تفصيلياً عن محتوى الكورس..."
+          value={courseDetails?.description}
+          onChange={handleInputChange}
+          rows={6}
+          name="description"
+          className="w-full border-2 border-gray-200 p-4 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors apply-fonts-normal text-lg resize-none"
+        />
+      </div>
+
+      {/* Category */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 mb-3 apply-fonts-normal">
+          الفئة
+        </label>
+        <select
+          name="category"
+          value={courseDetails?.category}
+          onChange={handleInputChange}
+          className="w-full border-2 border-gray-200 p-4 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors apply-fonts-normal text-lg"
+        >
+          <option value="">اختر الفئة</option>
+          <option value="رياضيات">رياضيات</option>
+          <option value="فيزياء">فيزياء</option>
+          <option value="كيمياء">كيمياء</option>
+          <option value="برمجة">برمجة</option>
+          <option value="لغات">لغات</option>
+        </select>
+      </div>
+
+      {/* Image Cover */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 mb-3 apply-fonts-normal">
+          صورة الغلاف
+        </label>
+        <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-indigo-400 transition-colors">
+          <input
+            type="file"
+            id="imageCover"
+            accept="image/*"
+            onChange={handleImageCoverChange}
+            className="hidden"
+          />
+          <label htmlFor="imageCover" className="cursor-pointer">
+            {imageCoverPreview ? (
+              <div className="space-y-4">
+                <Image
+                  src={imageCoverPreview}
+                  alt="صورة الغلاف"
+                  className="w-full max-w-md mx-auto rounded-lg shadow-lg"
+                  width={400}
+                  height={250}
+                />
+                <p className="text-indigo-600 font-medium apply-fonts-normal">
+                  انقر لتغيير الصورة
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <Upload className="mx-auto w-12 h-12 text-gray-400" />
+                <div>
+                  <p className="text-lg font-semibold text-gray-600 apply-fonts-normal">
+                    انقر لرفع صورة الغلاف
+                  </p>
+                  <p className="text-sm text-gray-400 apply-fonts-normal">
+                    PNG, JPG أو GIF (الحد الأقصى 5MB)
+                  </p>
+                </div>
+              </div>
+            )}
           </label>
-          <textarea
-            id="courseDescription"
-            name="courseDescription"
-            value={formData.courseDescription}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded"
-            rows={4}
-          ></textarea>
         </div>
-        {/* مفاهيم الدورة */}
-        <div>
-          <label
-            htmlFor="conceptInput"
-            className="apply-fonts-normal block font-medium mb-2"
+      </div>
+
+      {/* Concepts */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-700 mb-3 apply-fonts-normal">
+          المفاهيم الرئيسية
+        </label>
+        <div className="flex gap-3 mb-4">
+          <input
+            type="text"
+            value={newconcept}
+            onChange={(e) => setNewConcept(e.target.value)}
+            placeholder="أضف مفهوماً جديداً"
+            className="flex-1 border-2 border-gray-200 p-4 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors apply-fonts-normal"
+            onKeyPress={(e) => {
+              if (e.key === "Enter" && newconcept.trim()) {
+                addConcept(newconcept);
+                setNewConcept("");
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              if (newconcept.trim()) {
+                addConcept(newconcept);
+                setNewConcept("");
+              }
+            }}
+            className="px-6 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium apply-fonts-normal"
           >
-            مفاهيم الدورة
-          </label>
-          <div className="flex items-center space-x-2 gap-2">
-            <input
-              type="text"
-              id="conceptInput"
-              value={conceptInput}
-              onChange={(e) => setConceptInput(e.target.value)}
-              className="w-full p-2 border rounded"
-              placeholder="أدخل مفهومًا"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                handleAddConcept(conceptInput);
-                setConceptInput("");
-              }}
-              className="apply-fonts-normal p-2 bg-mainColor text-white rounded"
-            >
-              أضف
-            </button>
+            أضف
+          </button>
+        </div>
+
+        {concepts.length > 0 && (
+          <div className="flex flex-wrap gap-3">
+            {concepts.map((concept: string, index: number) => (
+              <div
+                key={index}
+                className="bg-gradient-to-r from-indigo-100 to-purple-100 border border-indigo-200 px-4 py-2 rounded-full flex items-center gap-2"
+              >
+                <span className="apply-fonts-normal text-indigo-800 font-medium">
+                  {concept}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeConcept(index)}
+                  className="text-indigo-600 hover:text-red-600 transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Step 2: Sections and Videos Combined ---------------- */
+interface StepSectionsAndVideosProps {
+  sections: Section[];
+  loadingAddSection: boolean;
+  handleAddSctions: () => void;
+  currentCourse: Course;
+  title: string;
+  setTitle: Dispatch<SetStateAction<string>>;
+  addVideoToSection: (
+    sectionId: string,
+    title: string,
+    file: File,
+    duration: string,
+    description: string
+  ) => void;
+  loadingAddVideoToSection: boolean;
+  deleteVideo: (sectionId: string, videoId: string) => void;
+  loadingDeleteVideo: string;
+  addFileToVideo: (
+    sectionId: string,
+    videoId: string,
+    fileName: string,
+    file: File
+  ) => void;
+  deleteFileFromVideo: (
+    sectionId: string,
+    videoId: string,
+    fileId: string
+  ) => void;
+  loadingUploadFile: string;
+  openDeleteModal: (
+    type: "video" | "file" | "course",
+    title: string,
+    message: string,
+    onConfirm: () => void
+  ) => void;
+}
+
+function StepSectionsAndVideos({
+  sections,
+  loadingAddSection,
+  handleAddSctions,
+  title,
+  setTitle,
+  addVideoToSection,
+  loadingAddVideoToSection,
+  deleteVideo,
+  loadingDeleteVideo,
+  addFileToVideo,
+  deleteFileFromVideo,
+  loadingUploadFile,
+  openDeleteModal,
+}: StepSectionsAndVideosProps) {
+  const [videosUpload, setVideosUpload] = useState<
+    Record<string, VideoUpload[]>
+  >({});
+  const [fileUploads, setFileUploads] = useState<
+    Record<string, { title: string; file: File | null }>
+  >({});
+
+  const handleVideoChange = (
+    sectionId: string,
+    videoIndex: number,
+    field: "title" | "file" | "duration" | "description",
+    value: string | File
+  ) => {
+    setVideosUpload((prev) => {
+      const sectionVideos = prev[sectionId] || [];
+      const updated = [...sectionVideos];
+      updated[videoIndex] = { ...updated[videoIndex], [field]: value };
+      return { ...prev, [sectionId]: updated };
+    });
+  };
+
+  const addVideoField = (sectionId: string) => {
+    setVideosUpload((prev) => {
+      const sectionVideos = prev[sectionId] || [];
+      return {
+        ...prev,
+        [sectionId]: [
+          ...sectionVideos,
+          {
+            title: "",
+            file: null as File | null,
+            duration: "",
+            description: "",
+          },
+        ],
+      };
+    });
+  };
+
+  const removeVideoField = (sectionId: string, videoIndex: number) => {
+    setVideosUpload((prev) => {
+      const sectionVideos = prev[sectionId] || [];
+      return {
+        ...prev,
+        [sectionId]: sectionVideos.filter((_, i) => i !== videoIndex),
+      };
+    });
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Add Section */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200">
+        <h2 className="text-xl font-bold text-gray-800 mb-4 apply-fonts-normal flex items-center gap-2">
+          <Plus className="w-5 h-5" />
+          إضافة قسم جديد
+        </h2>
+        <div className="flex gap-4">
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="عنوان القسم"
+            className="flex-1 border-2 border-gray-200 p-4 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors apply-fonts-normal"
+            onKeyPress={(e) => {
+              if (e.key === "Enter" && title.trim()) {
+                handleAddSctions();
+              }
+            }}
+          />
+          <button
+            onClick={handleAddSctions}
+            disabled={loadingAddSection}
+            className="px-6 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium apply-fonts-normal disabled:opacity-50 flex items-center gap-2"
+          >
+            {loadingAddSection ? (
+              <>
+                <Loader className="animate-spin w-4 h-4" />
+                جاري الحفظ...
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4" />
+                حفظ القسم
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Sections List */}
+      <div className="space-y-6">
+        {sections.map((section, sectionIndex) => (
+          <div
+            key={section._id}
+            className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden shadow-lg"
+          >
+            {/* Section Header */}
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-800 apply-fonts-normal flex items-center gap-2">
+                <div className="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                  {sectionIndex + 1}
+                </div>
+                {section.title}
+              </h3>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Add Video to Section */}
+              <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                <h4 className="font-semibold text-gray-700 mb-4 apply-fonts-normal flex items-center gap-2">
+                  <Video className="w-4 h-4" />
+                  إضافة فيديو جديد
+                </h4>
+
+                {(videosUpload[section._id] || []).map((video, videoIndex) => (
+                  <div
+                    key={videoIndex}
+                    className="space-y-3 mb-4 p-4 bg-white rounded-lg border"
+                  >
+                    <input
+                      type="text"
+                      placeholder="عنوان الفيديو"
+                      value={video.title}
+                      onChange={(e) =>
+                        handleVideoChange(
+                          section._id,
+                          videoIndex,
+                          "title",
+                          e.target.value
+                        )
+                      }
+                      className="w-full border-2 border-gray-200 p-3 rounded-lg focus:outline-none focus:border-indigo-500 apply-fonts-normal"
+                    />
+                    <input
+                      type="text"
+                      placeholder="مدة الفيديو"
+                      value={video.duration}
+                      onChange={(e) =>
+                        handleVideoChange(
+                          section._id,
+                          videoIndex,
+                          "duration",
+                          e.target.value
+                        )
+                      }
+                      className="w-full border-2 border-gray-200 p-3 rounded-lg focus:outline-none focus:border-indigo-500 "
+                    />
+                    <textarea
+                      placeholder="وصف الفيديو"
+                      value={video.description}
+                      onChange={(e) =>
+                        handleVideoChange(
+                          section._id,
+                          videoIndex,
+                          "description",
+                          e.target.value
+                        )
+                      }
+                      className="w-full border-2 border-gray-200 p-3 rounded-lg focus:outline-none focus:border-indigo-500 apply-fonts-normal"
+                    />
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          handleVideoChange(
+                            section._id,
+                            videoIndex,
+                            "file",
+                            e.target.files[0]
+                          );
+                        }
+                      }}
+                      className="w-full border-2 border-gray-200 p-3 rounded-lg bg-gray-50"
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (
+                            video.file &&
+                            video.title &&
+                            video.description &&
+                            video.duration
+                          ) {
+                            await addVideoToSection(
+                              section._id,
+                              video.title,
+                              video.file,
+                              video.duration,
+                              video.description
+                            );
+                            removeVideoField(section._id, videoIndex);
+                          }
+                        }}
+                        disabled={loadingAddVideoToSection}
+                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium apply-fonts-normal flex items-center gap-2 disabled:opacity-50"
+                      >
+                        {loadingAddVideoToSection ? (
+                          <>
+                            <Loader className="animate-spin w-4 h-4" />
+                            جاري الرفع...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4" />
+                            رفع الفيديو
+                          </>
+                        )}
+                      </button>
+                      {/* Progress Bar */}
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeVideoField(section._id, videoIndex)
+                        }
+                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-medium apply-fonts-normal flex items-center gap-2"
+                      >
+                        <X className="w-4 h-4" />
+                        حذف
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => addVideoField(section._id)}
+                  className="w-full border-2 border-dashed border-indigo-300 text-indigo-600 py-3 rounded-lg hover:bg-indigo-50 transition-colors font-medium apply-fonts-normal flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  إضافة فيديو
+                </button>
+              </div>
+
+              {/* Uploaded Videos */}
+              {section.videos.length > 0 && (
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-gray-700 apply-fonts-normal flex items-center gap-2">
+                    <Video className="w-4 h-4" />
+                    الفيديوهات المرفوعة ({section.videos.length})
+                  </h4>
+
+                  {section.videos.map((video) => (
+                    <div
+                      key={video._id}
+                      className="bg-gray-50 border border-gray-200 rounded-xl p-4"
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex-1">
+                          <h5 className="font-semibold text-gray-800 apply-fonts-normal text-lg">
+                            {video.lessonTitle}
+                          </h5>
+                          <p className="text-gray-500 text-sm apply-fonts-normal">
+                            مدة الفيديو: {video.duration} دقيقة
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <a
+                            href={video.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-1"
+                          >
+                            <Eye className="w-3 h-3" />
+                            مشاهدة
+                          </a>
+                          <button
+                            onClick={() =>
+                              openDeleteModal(
+                                "video",
+                                "حذف الفيديو",
+                                `هل أنت متأكد من حذف فيديو "${video.lessonTitle}"؟ سيتم حذف جميع الملفات المرتبطة به أيضاً.`,
+                                () => deleteVideo(section._id, video._id)
+                              )
+                            }
+                            disabled={loadingDeleteVideo === video._id}
+                            className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-colors text-sm font-medium flex items-center gap-1 disabled:opacity-50"
+                          >
+                            {loadingDeleteVideo === video._id ? (
+                              <Loader className="animate-spin w-3 h-3" />
+                            ) : (
+                              <Trash2 className="w-3 h-3" />
+                            )}
+                            حذف
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Add Files to Video */}
+                      <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
+                        <h6 className="font-medium text-gray-700 mb-3 apply-fonts-normal flex items-center gap-2">
+                          <FileText className="w-4 h-4" />
+                          إضافة ملف للدرس
+                        </h6>
+
+                        <div className="flex gap-3 mb-3">
+                          <input
+                            type="text"
+                            placeholder="اسم الملف"
+                            value={fileUploads[video._id]?.title || ""}
+                            onChange={(e) =>
+                              setFileUploads((prev) => ({
+                                ...prev,
+                                [video._id]: {
+                                  ...prev[video._id],
+                                  title: e.target.value,
+                                },
+                              }))
+                            }
+                            className="flex-1 border border-gray-300 p-2 rounded-lg focus:outline-none focus:border-indigo-500 apply-fonts-normal"
+                          />
+                          <input
+                            type="file"
+                            onChange={(e) => {
+                              if (e.target.files && e.target.files[0]) {
+                                setFileUploads((prev) => ({
+                                  ...prev,
+                                  [video._id]: {
+                                    ...prev[video._id],
+                                    file: e.target.files![0],
+                                  },
+                                }));
+                              }
+                            }}
+                            className="flex-1 border border-gray-300 p-2 rounded-lg bg-gray-50"
+                          />
+                          <button
+                            onClick={() => {
+                              const fileData = fileUploads[video._id];
+                              if (fileData?.title && fileData?.file) {
+                                addFileToVideo(
+                                  section._id,
+                                  video._id,
+                                  fileData.title,
+                                  fileData.file
+                                );
+                                setFileUploads((prev) => ({
+                                  ...prev,
+                                  [video._id]: { title: "", file: null },
+                                }));
+                              }
+                            }}
+                            disabled={loadingUploadFile === video._id}
+                            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium apply-fonts-normal flex items-center gap-1 disabled:opacity-50"
+                          >
+                            {loadingUploadFile === video._id ? (
+                              <>
+                                <Loader className="animate-spin w-3 h-3" />
+                                رفع...
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="w-3 h-3" />
+                                رفع
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Display Video Files */}
+                        {video.files && video.files.length > 0 && (
+                          <div className="mt-3 space-y-2">
+                            <p className="text-sm font-medium text-gray-600 apply-fonts-normal">
+                              الملفات المرفوعة:
+                            </p>
+                            {video.files.map((file) => (
+                              <div
+                                key={file._id}
+                                className="flex justify-between items-center bg-green-50 border border-green-200 p-2 rounded-lg"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <FileText className="w-4 h-4 text-green-600" />
+                                  <span className="text-sm font-medium apply-fonts-normal">
+                                    {file.filename}
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    ({(file.size / 1024).toFixed(2)} KB)
+                                  </span>
+                                </div>
+                                <div className="flex gap-2">
+                                  <a
+                                    href={file.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-green-600 hover:text-green-700 text-xs underline"
+                                  >
+                                    تحميل
+                                  </a>
+                                  <button
+                                    onClick={() =>
+                                      openDeleteModal(
+                                        "file",
+                                        "حذف الملف",
+                                        `هل أنت متأكد من حذف ملف "${file.filename}"؟`,
+                                        () =>
+                                          deleteFileFromVideo(
+                                            section._id,
+                                            video._id,
+                                            file._id
+                                          )
+                                      )
+                                    }
+                                    className="text-red-500 hover:text-red-700 text-xs"
+                                  >
+                                    ❌
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+
+        {sections.length === 0 && (
+          <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
+            <Video className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-600 apply-fonts-normal mb-2">
+              لا توجد أقسام بعد
+            </h3>
+            <p className="text-gray-400 apply-fonts-normal">
+              ابدأ بإضافة القسم الأول لتنظيم محتوى الكورس
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Step 3: Publish ---------------- */
+interface StepPublishProps {
+  currentCourse: Course;
+}
+
+function StepPublish({ currentCourse }: StepPublishProps) {
+  console.log(currentCourse);
+  const totalVideos =
+    currentCourse.sections?.reduce(
+      (acc, section) => acc + (section.videos?.length || 0),
+      0
+    ) || 0;
+  const totalFiles =
+    currentCourse.sections?.reduce(
+      (acc, section) =>
+        acc +
+        (section.videos?.reduce(
+          (videoAcc, video) => videoAcc + (video.files?.length || 0),
+          0
+        ) || 0),
+      0
+    ) || 0;
+
+  return (
+    <div className="space-y-8">
+      {/* Course Summary */}
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 apply-fonts-normal flex items-center gap-2">
+          🎉 ملخص الكورس
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-semibold text-gray-700 apply-fonts-normal">
+                عنوان الكورس:
+              </h3>
+              <p className="text-lg text-gray-800 apply-fonts-normal">
+                {currentCourse.title}
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-gray-700 apply-fonts-normal">
+                السعر:
+              </h3>
+              <p className="text-lg text-gray-800">
+                {currentCourse.price} دينار جزائري
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-gray-700 apply-fonts-normal">
+                الفئة:
+              </h3>
+              <p className="text-lg text-gray-800 apply-fonts-normal">
+                {currentCourse.category}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-white p-4 rounded-xl border border-green-200">
+              <h3 className="font-semibold text-gray-700 apply-fonts-normal mb-2">
+                إحصائيات المحتوى:
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="apply-fonts-normal">عدد الأقسام:</span>
+                  <span className="font-semibold">
+                    {currentCourse.sections?.length || 0}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="apply-fonts-normal">عدد الفيديوهات:</span>
+                  <span className="font-semibold">{totalVideos}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="apply-fonts-normal">عدد الملفات:</span>
+                  <span className="font-semibold">{totalFiles}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-green-200">
+              <h3 className="font-semibold text-gray-700 apply-fonts-normal mb-2">
+                المفاهيم:
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {currentCourse.concepts?.map((concept, index) => (
+                  <span
+                    key={index}
+                    className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium apply-fonts-normal"
+                  >
+                    {concept}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* عرض المفاهيم المضافة */}
-        <div>
-          <h3 className="apply-fonts-normal font-medium mb-2">
-            المفاهيم المضافة:
+        <div className="mt-6">
+          <h3 className="font-semibold text-gray-700 apply-fonts-normal mb-2">
+            الوصف:
           </h3>
-          {formData.concepts.length > 0 ? (
-            <ul className="space-y-2">
-              {formData.concepts.map((concept, index) => (
-                <li
-                  key={index}
-                  className="apply-fonts-normal flex justify-between items-center bg-gray-100 p-2 rounded shadow"
-                >
-                  <span>{concept}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveConcept(index)}
-                    className="apply-fonts-normal text-redColor"
-                  >
-                    حذف
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 apply-fonts-normal">
-              لم تتم إضافة أي مفاهيم بعد.
-            </p>
-          )}
+          <p className="text-gray-600 apply-fonts-normal leading-relaxed">
+            {currentCourse.description}
+          </p>
         </div>
-        {/* الفئات */}
-        <div>
-          <label htmlFor="category" className="block font-medium mb-2">
-            الفئة
-          </label>
-          <select
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleInputChange}
-            className="apply-fonts-normal block w-full border rounded p-2"
-            required
-          >
-            <option className="apply-fonts-normal" value="">
-              اختر الفئة
-            </option>
-            <option className="apply-fonts-normal" value="development">
-              علوم
-            </option>
-            <option className="apply-fonts-normal" value="design">
-              فيزياء
-            </option>
-            <option className="apply-fonts-normal" value="marketing">
-              رياضيات
-            </option>
-            <option className="apply-fonts-normal" value="business">
-              أدب عربي
-            </option>
-            <option className="apply-fonts-normal" value="other">
-              فلسفة
-            </option>
-          </select>
-        </div>
+      </div>
 
-        {/* زر الإرسال */}
-        <button
-          type="submit"
-          className={`w-full p-2  text-white font-medium rounded  ${
-            loading
-              ? "bg-mainColorHoverLight cursor-not-allowed"
-              : "bg-mainColor hover:bg-mainColorHoverLight"
-          } hoverEle`}
-        >
-          {loading ? "جاري النشر" : "نشر"}
-        </button>
-      </form>
+      {/* Course Sections Preview */}
+      <div className="bg-white border-2 border-gray-200 rounded-2xl p-6">
+        <h3 className="text-xl font-bold text-gray-800 mb-4 apply-fonts-normal">
+          معاينة الأقسام
+        </h3>
+
+        {currentCourse.sections && currentCourse.sections.length > 0 ? (
+          <div className="space-y-4">
+            {currentCourse.sections.map((section, index) => (
+              <div
+                key={section._id}
+                className="border border-gray-200 rounded-lg p-4"
+              >
+                <h4 className="font-semibold text-gray-800 apply-fonts-normal flex items-center gap-2">
+                  <span className="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm">
+                    {index + 1}
+                  </span>
+                  {section.title}
+                </h4>
+
+                {section.videos && section.videos.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {section.videos.map((video, videoIndex) => (
+                      <div
+                        key={video._id}
+                        className="flex items-center gap-2 text-sm text-gray-600 ml-8"
+                      >
+                        <Video className="w-4 h-4" />
+                        <span className="apply-fonts-normal">
+                          {videoIndex + 1}. {video.lessonTitle}
+                        </span>
+                        {video.files && video.files.length > 0 && (
+                          <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">
+                            {video.files.length} ملف
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 apply-fonts-normal text-center py-8">
+            لا توجد أقسام في الكورس
+          </p>
+        )}
+      </div>
+
+      {/* Success Message */}
+      <div className="text-center bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-8">
+        <div className="text-6xl mb-4">🚀</div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4 apply-fonts-normal">
+          الكورس جاهز للنشر!
+        </h2>
+        <p className="text-gray-600 apply-fonts-normal mb-6">
+          تم إنشاء الكورس بنجاح مع جميع الأقسام والفيديوهات والملفات المرفقة
+        </p>
+        <div className="flex justify-center gap-4">
+          <div className="bg-white px-6 py-3 rounded-xl border border-indigo-200">
+            <span className="text-2xl font-bold text-indigo-600">
+              {currentCourse.sections?.length || 0}
+            </span>
+            <p className="text-sm text-gray-600 apply-fonts-normal">قسم</p>
+          </div>
+          <div className="bg-white px-6 py-3 rounded-xl border border-indigo-200">
+            <span className="text-2xl font-bold text-indigo-600">
+              {totalVideos}
+            </span>
+            <p className="text-sm text-gray-600 apply-fonts-normal">فيديو</p>
+          </div>
+          <div className="bg-white px-6 py-3 rounded-xl border border-indigo-200">
+            <span className="text-2xl font-bold text-indigo-600">
+              {totalFiles}
+            </span>
+            <p className="text-sm text-gray-600 apply-fonts-normal">ملف</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default Details;
+}

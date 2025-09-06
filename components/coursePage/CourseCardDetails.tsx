@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import {
   AccessTimeOutlined,
   ArrowBackIos,
@@ -10,31 +10,33 @@ import {
   Instagram,
   PlayCircleOutlined,
   Twitter,
+  CheckCircle,
+  RadioButtonUnchecked,
+  Share,
+  Close,
 } from "@mui/icons-material";
 import Link from "next/link";
-import { Lesson } from "@/types/lesson";
 import { useLesson } from "@/store/lessonStore";
 import { usePathname } from "next/navigation";
 import showToast from "@/utils/showToast";
 import axios from "axios";
-import Cookies from "js-cookie";
 import { useUserStore } from "@/store/userStore";
+import { Section } from "@/types/course";
 
 type Props = {
   courseId: string | undefined;
   userId: string | undefined;
-  courseVideos: Lesson[] | undefined;
+  sections: Section[];
 };
 
-const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
-  const token = Cookies.get("token");
+const CourseCardDetails = ({ courseId, userId, sections }: Props) => {
   const pathname = usePathname();
-
   const { user } = useUserStore();
 
   const courseUrl = encodeURIComponent(
     `${process.env.NEXT_PUBLIC_BASE_URL}${pathname}`
   );
+
   const copyLink = () => {
     navigator.clipboard.writeText(
       `${process.env.NEXT_PUBLIC_BASE_URL}${pathname}`
@@ -43,30 +45,43 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
   };
 
   let numberOfCompletedVideo = 0;
-  if (courseVideos) {
-    courseVideos.map((video) => {
-      if (video.completedBy?.includes(userId || "")) {
+  sections.forEach((section) => {
+    section.videos.forEach((video) => {
+      if (video.completedBy.includes(user._id)) {
         numberOfCompletedVideo++;
       }
     });
-  }
+  });
 
   const { lesson, setLesson } = useLesson();
 
-  const [isOpenAccordion, setIsOpenAccordion] = useState<boolean>(true);
+  const [isOpenAccordion, setIsOpenAccordion] = useState<
+    {
+      i: number;
+      value: boolean;
+    }[]
+  >(
+    sections.map((_, index) => {
+      return { i: index, value: index === 0 }; // فتح القسم الأول افتراضياً
+    })
+  );
   const [loadingVideoId, setLoadingVideoId] = useState<string | null>(null);
-  //TODO: can you remove and replace with better logic
-  const [completedVideos, setCompletedVideos] = useState<string[]>([]); // fix the error in mark as completed
-  const toggleAccordion = () => setIsOpenAccordion((prev) => !prev);
+  const [completedVideos, setCompletedVideos] = useState<string[]>([]);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const toggleAccordion = (i: number) => {
+    setIsOpenAccordion((prev) =>
+      prev.map((item) =>
+        item.i === i ? { ...item, value: !item.value } : item
+      )
+    );
+  };
+
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const handelOpenAndColsed = () => {
     setIsOpen(!isOpen);
   };
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60); // حساب الدقائق
-    const remainingSeconds = seconds % 60; // حساب الثواني المتبقية
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
+
   const handleCompleteVideo = async (videoId: string) => {
     try {
       setLoadingVideoId(videoId);
@@ -74,14 +89,13 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}/videos/${videoId}/completed`,
         {},
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
         }
       );
       const updatedLesson = res.data.lesson;
       setLesson(updatedLesson);
-
+      //
+      numberOfCompletedVideo++;
       setCompletedVideos((prev) =>
         prev.includes(videoId)
           ? prev.filter((id) => id !== videoId)
@@ -96,182 +110,327 @@ const CourseCardDetails = ({ courseVideos, courseId, userId }: Props) => {
       setLoadingVideoId(null);
     }
   };
+
+  const getTotalVideos = () => {
+    return sections.reduce(
+      (total, section) => total + section.videos.length,
+      0
+    );
+  };
+
+  const getCompletionPercentage = () => {
+    const total = getTotalVideos();
+    return total > 0 ? Math.round((numberOfCompletedVideo / total) * 100) : 0;
+  };
+
   return (
     <>
+      {/* Toggle Button */}
       <button
         onClick={handelOpenAndColsed}
-        className={` transition-all duration-300 ease-in-out ${
-          isOpen ? "xs:ml-0 lg:hidden" : "lg:ml-[402px] xs:ml-[302px] lg:hidden"
-        } xs:fixed lg:hidden z-50 py-2 sm:px-4 xs:px-2  rounded-lg bg-mainColor text-white hover:bg-mainColorHoverLight hoverEle`}
+        className={`fixed lg:hidden z-50 top-20 transition-all duration-500 ease-in-out
+          ${
+            isOpen
+              ? "right-4 bg-gradient-to-r from-blue-600 to-purple-600"
+              : "right-[320px] bg-gradient-to-r from-purple-600 to-blue-600"
+          } 
+          p-3 rounded-full shadow-2xl text-white hover:shadow-3xl transform hover:scale-110
+          backdrop-blur-sm border border-white/20`}
       >
-        {isOpen ? (
-          <div className="flex items-center gap-3">
-            <ArrowForwardIos />
-            <h1 className="apply-fonts-normal text-[13px] xs:hidden sm:block">
-              محتوى الدورة
-            </h1>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <h1 className="apply-fonts-normal text-[13px]  xs:hidden sm:block">
-              محتوى الدورة
-            </h1>
-            <ArrowBackIos />
-          </div>
-        )}
+        <div className="flex items-center justify-center">
+          {isOpen ? (
+            <ArrowForwardIos className="text-lg" />
+          ) : (
+            <ArrowBackIos className="text-lg" />
+          )}
+        </div>
       </button>
+
+      {/* Main Sidebar */}
       <div
-        className={`transition-all duration-300 ease-in-out ${
-          isOpen ? "xs:hidden lg:flex" : "lg:w-[400px] xs:w-[300px]"
-        } border shadow-sm max-h-[85vh]  lg:sticky lg:top-[96px] lg:bottom-5   xs:fixed z-10 xs:bg-wygColor  w-[400px] py-3 px-4 flex flex-col gap-5  `}
-      >   
-        {/* Title & course Details (Videos and progress) */}
-        <section className="flex flex-col gap-3">
-          <div className="w-full text-lg  ">
-            <h1 className="border-b pt-1 pb-2 border-courseTextSection apply-fonts-normal ">
+        className={`transition-all duration-500 ease-in-out transform
+          ${isOpen ? "xs:translate-x-full lg:translate-x-0" : "translate-x-0"}
+          lg:w-[420px] xs:w-[320px] max-h-[90vh] lg:sticky lg:top-[80px]
+          xs:fixed xs:top-16 xs:right-0 z-40 xs:bg-white/95 lg:bg-transparent
+          backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-2xl
+          flex flex-col overflow-hidden`}
+      >
+        {/* Header with Progress */}
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 border-b border-gray-200/50">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-800 apply-fonts-medium">
               محتوى الدورة
-            </h1>
+            </h2>
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="p-2 hover:bg-white/80 rounded-lg transition-colors"
+            >
+              <Share className="text-gray-600" />
+            </button>
           </div>
 
-          {/* course Details (Videos and progress)*/}
-          <div className="border border-gray-300">
-            {/* عنوان Accordion */}
-            <div className="flex items-center justify-between bg-gray-300 py-2 px-1 cursor-pointer">
-              <button onClick={toggleAccordion}>
-                {isOpenAccordion ? (
-                  <ExpandMore className="text-gray-600 transition-transform duration-300" />
-                ) : (
-                  <ExpandMore className="text-gray-600 transition-transform duration-300 rotate-180" />
-                )}
-              </button>
-              <div className="flex gap-6 px-2">
-                <div className="flex items-center gap-1">
-                  <PlayCircleOutlined className="text-mainColor" />
-                  <h1 className="flex items-center">
-                    {courseVideos?.length}
-                    <span className="apply-fonts-normal text-[13px] mr-1">
-                      محاضرة
-                    </span>
-                  </h1>
-                </div>
+          {/* Progress Bar */}
+          {user.role === "student" && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>
+                  {numberOfCompletedVideo} من {getTotalVideos()} فيديو
+                </span>
+                <span>{getCompletionPercentage()}%</span>
               </div>
-              <div>
-                <h1 className="font-semibold text-green-400">
-                  {numberOfCompletedVideo}/{courseVideos?.length}
-                </h1>
+              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-700 ease-out"
+                  style={{ width: `${getCompletionPercentage()}%` }}
+                />
               </div>
             </div>
+          )}
+        </div>
 
-            {/* محتوى Accordion */}
-            {isOpenAccordion && ( // عرض المحتوى فقط إذا كان الـ Accordion مفتوحًا
-              <div className="py-2 px-2 overflow-y-scroll max-h-72 ">
-                {courseVideos?.length ? (
-                  courseVideos.map((l) => (
-                    <div
-                      key={l._id}
-                      className={`my-2 py-1 px-2 ${
-                        l === lesson
-                          ? "bg-mainColorHoverLight/60"
-                          : " hover:bg-mainColorHoverLight"
-                      } group hoverEle`}
-                      onClick={() => {
-                        setLesson(l);
-                      }}
+        {/* Sections Content */}
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+          {sections.length > 0 ? (
+            <div className="p-4 space-y-3">
+              {sections.map((section, index) => {
+                const sectionCompletedVideos = section.videos.filter((video) =>
+                  video.completedBy.includes("as")
+                ).length;
+
+                return (
+                  <div
+                    key={section._id}
+                    className="bg-white/70 backdrop-blur-sm border border-gray-200/50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+                  >
+                    {/* Section Header */}
+                    <button
+                      onClick={() => toggleAccordion(index)}
+                      className="w-full p-4 flex items-center justify-between hover:bg-gray-50/80 transition-colors group"
                     >
-                      <div
-                        className={`flex items-center justify-between ${
-                          l === lesson ? "text-white" : "group-hover:text-white"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          {loadingVideoId === l._id ? (
-                            // Spinner أثناء التحميل
-                            <div className="w-4 h-4 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                          ) : user.role === "teacher" ||
-                            user.role === "admin" ? (
-                            <></>
-                          ) : (
-                            <input
-                              type="checkbox"
-                              className="w-4 h-4 cursor-pointer"
-                              checked={
-                                l.completedBy.includes(userId || "no") ||
-                                completedVideos.includes(l._id)
-                              }
-                              onChange={() => {
-                                handleCompleteVideo(l._id);
-                              }}
-                            />
-                          )}
-                          <h1 className="font-semibold text-base">
-                            {l.lessonTitle}
-                          </h1>
-                        </div>
-
+                      <div className="flex items-center gap-3">
                         <div
-                          className={`flex items-center gap-1 ${
-                            l === lesson
-                              ? "text-white"
-                              : "group-hover:text-white"
+                          className={`p-2 rounded-lg transition-colors ${
+                            isOpenAccordion[index]?.value
+                              ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                              : "bg-gray-100 text-gray-600"
                           }`}
                         >
-                          <AccessTimeOutlined />
-
-                          <p>
-                            {
-                              //@ts-expect-error:fix
-                              formatDuration(l.duration.toFixed())
-                            }
+                          <PlayCircleOutlined className="text-lg" />
+                        </div>
+                        <div className="text-right">
+                          <h3 className="font-semibold text-gray-800 apply-fonts-normal text-sm">
+                            {section.title}
+                          </h3>
+                          <p className="text-xs text-gray-500">
+                            {section.videos.length} فيديو
                           </p>
                         </div>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <h1 className="apply-fonts-normal">لا توجد أي دروس حاليا</h1>
-                )}
-              </div>
-            )}
-          </div>
-        </section>
-        {/* Share Course Links */}
-        <div className="">
-          <p className="apply-fonts-medium mb-3 ">شارك هذه الدورة :</p>
-          <div className="flex gap-4 justify-center">
-            <Link
-              href={`https://www.facebook.com/sharer/sharer.php?u=${courseUrl}`}
-              className=" px-4 py-2 rounded-lg hover:border-gray-400 hoverEle bg-gray-100 border"
-            >
-              <Facebook className="text-courseTextSection" />
-            </Link>
-            <Link
-              href={`https://twitter.com/intent/tweet?url=${courseUrl}`}
-              className="bg-gray-100 px-4 py-2 rounded-lg hover:border-gray-400 hoverEle border"
-            >
-              <Twitter className="text-courseTextSection" />
-            </Link>
-            <Link
-              href="#"
-              className="bg-gray-100 px-4 py-2 rounded-lg hover:border-gray-400 hoverEle border"
-            >
-              <Instagram className="text-courseTextSection" />
-            </Link>
-            <button
-              onClick={copyLink}
-              className="bg-gray-100 border px-3 py-2 rounded-lg hover:border-gray-400 hoverEle flex items-center gap-1"
-            >
-              <h1 className="apply-fonts-normal text-[11px] text-gray-700">
-                نسخ الرابط
-              </h1>
 
-              <ContentCopyOutlined
-                sx={{ fontSize: "14px" }}
-                className="text-courseTextSection "
-              />
-            </button>
-          </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-center">
+                          <div className="text-sm font-semibold text-green-500">
+                            {sectionCompletedVideos}/{section.videos.length}
+                          </div>
+                        </div>
+                        <ExpandMore
+                          className={`text-gray-400 transition-transform duration-300 ${
+                            isOpenAccordion[index]?.value ? "rotate-180" : ""
+                          }`}
+                        />
+                      </div>
+                    </button>
+
+                    {/* Section Content */}
+                    {isOpenAccordion[index]?.value && (
+                      <div className="border-t border-gray-200/50">
+                        {section.videos?.length ? (
+                          <div className="p-2 space-y-1 max-h-80 overflow-y-auto">
+                            {section.videos.map((video, videoIndex) => {
+                              const isCompleted =
+                                video.completedBy.includes(userId || "no") ||
+                                completedVideos.includes(video._id);
+                              const isActive = video === lesson;
+
+                              return (
+                                <div
+                                  key={video._id}
+                                  className={`group rounded-lg transition-all duration-200 ${
+                                    isActive
+                                      ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md"
+                                      : "hover:bg-gray-50 hover:shadow-sm"
+                                  }`}
+                                >
+                                  <div
+                                    className="p-3 cursor-pointer flex items-center justify-between"
+                                    onClick={() => setLesson(video)}
+                                  >
+                                    <div className="flex items-center gap-3 flex-1">
+                                      <div className="flex items-center">
+                                        <span
+                                          className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                            isActive
+                                              ? "bg-white/20 text-white"
+                                              : "bg-gray-100 text-gray-600"
+                                          }`}
+                                        >
+                                          {videoIndex + 1}
+                                        </span>
+                                      </div>
+
+                                      {user.role !== "teacher" &&
+                                        user.role !== "admin" && (
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleCompleteVideo(video._id);
+                                            }}
+                                            className="flex-shrink-0"
+                                          >
+                                            {loadingVideoId === video._id ? (
+                                              <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                            ) : isCompleted ? (
+                                              <CheckCircle
+                                                className={`w-5 h-5 ${
+                                                  isActive
+                                                    ? "text-white"
+                                                    : "text-green-500"
+                                                }`}
+                                              />
+                                            ) : (
+                                              <RadioButtonUnchecked
+                                                className={`w-5 h-5 ${
+                                                  isActive
+                                                    ? "text-white/70"
+                                                    : "text-gray-400"
+                                                }`}
+                                              />
+                                            )}
+                                          </button>
+                                        )}
+
+                                      <div className="flex-1 min-w-0">
+                                        <h4
+                                          className={`font-medium text-sm truncate ${
+                                            isActive
+                                              ? "text-white"
+                                              : "text-gray-800"
+                                          }`}
+                                        >
+                                          {video.lessonTitle}
+                                        </h4>
+                                      </div>
+                                    </div>
+
+                                    <div
+                                      className={`flex items-center gap-1 text-xs ${
+                                        isActive
+                                          ? "text-white/80"
+                                          : "text-gray-500"
+                                      }`}
+                                    >
+                                      <AccessTimeOutlined className="w-4 h-4" />
+                                      <span>{video.duration}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="p-4 text-center text-gray-500 apply-fonts-normal">
+                            لا توجد فيديوهات في هذا القسم
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="p-6 text-center text-gray-500">
+              لا توجد أقسام متاحة حالياً
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl transform transition-all">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-gray-800">شارك الدورة</h3>
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <Close className="text-gray-500" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <Link
+                href={`https://www.facebook.com/sharer/sharer.php?u=${courseUrl}`}
+                className="flex flex-col items-center gap-2 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors group"
+                target="_blank"
+              >
+                <Facebook className="text-blue-600 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-blue-800">
+                  فيسبوك
+                </span>
+              </Link>
+
+              <Link
+                href={`https://twitter.com/intent/tweet?url=${courseUrl}`}
+                className="flex flex-col items-center gap-2 p-4 bg-sky-50 hover:bg-sky-100 rounded-lg transition-colors group"
+                target="_blank"
+              >
+                <Twitter className="text-sky-600 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-sky-800">تويتر</span>
+              </Link>
+
+              <Link
+                href="#"
+                className="flex flex-col items-center gap-2 p-4 bg-pink-50 hover:bg-pink-100 rounded-lg transition-colors group"
+              >
+                <Instagram className="text-pink-600 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-pink-800">
+                  إنستجرام
+                </span>
+              </Link>
+
+              <button
+                onClick={copyLink}
+                className="flex flex-col items-center gap-2 p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+              >
+                <ContentCopyOutlined className="text-gray-600 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-gray-800">
+                  نسخ الرابط
+                </span>
+              </button>
+            </div>
+
+            <div className="pt-4 border-t border-gray-200">
+              <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                <input
+                  type="text"
+                  value={`${process.env.NEXT_PUBLIC_BASE_URL}${pathname}`}
+                  readOnly
+                  className="flex-1 bg-transparent text-sm text-gray-600 outline-none"
+                />
+                <button
+                  onClick={copyLink}
+                  className="px-3 py-1 bg-blue-500 text-white text-xs rounded-md hover:bg-blue-600 transition-colors"
+                >
+                  نسخ
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
