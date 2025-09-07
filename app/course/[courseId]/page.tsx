@@ -11,13 +11,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+export const dynamic = "force-dynamic";
 interface Props {
   params: Promise<{ courseId: string }>;
 }
 export async function generateStaticParams() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`, {
-    cache: "default",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/ids`
+  );
   const data = await res.json();
   console.log(data);
   return data.courses.map((course: { _id: string }) => ({
@@ -30,10 +31,7 @@ const page = async ({ params }: Props) => {
     const courseId = (await params).courseId;
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`,
-      {
-        cache: "default",
-      }
+      `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`
     );
 
     if (!res.ok) {

@@ -3,22 +3,19 @@ import { fetchUserServer } from "@/lib/fetchUserServer";
 import UserProvider from "@/providers/UserProvider";
 import { redirect } from "next/navigation";
 import { ToastContainer } from "react-toastify";
-
+export const dynamic = "force-dynamic";
 interface Props {
   params: Promise<{ courseId: string }>;
 }
 
 export async function generateMetadata({ params }: Props) {
   const courseData = await fetch(
-    `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${
-      (
-        await params
-      ).courseId
-    }`,
-    {
-      cache: "default",
-    }
+    `${
+      process.env.NEXT_PUBLIC_BACK_URL
+    }/api/courses/courseTitleAndDescription/${(await params).courseId}`,
+    
   );
+
   const data = await courseData.json();
   return {
     title: data.course ? data.course.title : "Error",
@@ -32,7 +29,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await fetchUserServer();
-  
+
   if (!user) {
     redirect("/login");
   }

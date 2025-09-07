@@ -36,13 +36,11 @@ export const useUserStore = create<{
 
           headers: {
             "Content-Type": "application/json",
-           
           },
         }
       );
       set({ user: res.data.user });
     } catch (error) {
-      console.log("error userStore", error);
       set({
         user: {
           _id: "",

@@ -3,7 +3,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { Metadata } from "next";
 import Footer from "@/components/footer/Footer";
-
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "الدورات",
   description: ".....",

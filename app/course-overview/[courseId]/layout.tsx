@@ -3,21 +3,16 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { fetchUserServer } from "@/lib/fetchUserServer";
 import UserProvider from "@/providers/UserProvider";
-
+export const dynamic = "force-dynamic";
 interface Props {
   params: Promise<{ courseId: string }>;
 }
 
 export async function generateMetadata({ params }: Props) {
   const courseData = await fetch(
-    `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${
-      (
-        await params
-      ).courseId
-    }`,
-    {
-      cache: "default",
-    }
+    `${
+      process.env.NEXT_PUBLIC_BACK_URL
+    }/api/courses/courseTitleAndDescription/${(await params).courseId}`
   );
   const data = await courseData.json();
   return {

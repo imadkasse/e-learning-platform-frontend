@@ -21,9 +21,11 @@ const Students = async ({ searchParams }: StudentsProps) => {
       if (filter) {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/searchUsers?query=${filter}`,
+
           {
             credentials: "include",
             headers: token ? { Authorization: `Bearer ${token}` } : {},
+            cache: "no-store",
           }
         );
         const data = await res.json();
@@ -33,6 +35,7 @@ const Students = async ({ searchParams }: StudentsProps) => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/users`, {
         credentials: "include",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
+        cache: "no-store",
       });
       const data = await res.json();
       return data.users.filter((user: User) => user.role === "student");

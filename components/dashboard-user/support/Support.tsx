@@ -61,6 +61,7 @@ const Support = () => {
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/faq/myFaqs`,
           {
             credentials: "include",
+            cache: "no-store",
           }
         );
         const data = await res.json();

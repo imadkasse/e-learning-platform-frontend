@@ -24,7 +24,7 @@ export async function middleware(req: NextRequest) {
           Cookie: `token=${token}`, // إرسال الـ token مباشرة
           "User-Agent": "NextJS-Middleware", // تمييز الطلبات
         },
-        cache: "no-cache",
+        cache: "no-store",
       }
     );
 
@@ -83,5 +83,7 @@ export const config = {
     "/dashboard-teacher/:path*", // يحمي صفحات الـ teacher dashboard
     "/dashboard-user/:path*", // يحمي صفحات الـ student dashboard
     "/dashboard-admin/:path*", // يحمي صفحات الـ admin dashboard
+    "/add-course", // يحمي صفحات الـ add-course
+    "/edit-course/:path*", // يحمي صفحات الـ edit-course
   ],
 };

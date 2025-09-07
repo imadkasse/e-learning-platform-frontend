@@ -4,7 +4,7 @@ export async function fetchUserServer() {
       `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
       {
         credentials: "include",
-        cache: "no-cache",
+        cache: "no-store",
       }
     );
     if (!res.ok) {

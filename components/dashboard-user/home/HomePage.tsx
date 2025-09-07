@@ -20,6 +20,7 @@ const HomePage = async () => {
         {
           credentials: "include",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
+          cache: "no-store",
         }
       );
       const data = await res.json();
@@ -28,6 +29,7 @@ const HomePage = async () => {
       const resUser = await fetch(`${process.env.BACK_URL}/api/users/me`, {
         credentials: "include",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
+        cache: "no-store",
       });
       const userData = await resUser.json();
       user = userData.user;

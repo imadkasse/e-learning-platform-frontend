@@ -24,6 +24,7 @@ const Courses = async ({ searchParams }: CoursesProps) => {
           {
             credentials: "include",
             headers: token ? { Authorization: `Bearer ${token}` } : {},
+            cache: "no-store",
           }
         );
         const data = await res.json();
@@ -35,6 +36,7 @@ const Courses = async ({ searchParams }: CoursesProps) => {
         {
           credentials: "include",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
+          cache: "no-store",
         }
       );
       const data = await res.json();

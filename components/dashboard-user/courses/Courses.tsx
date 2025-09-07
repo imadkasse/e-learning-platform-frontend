@@ -15,14 +15,20 @@ const Courses = async ({ searchParams }: CoursesProps) => {
     try {
       if (filter) {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCourses?query=${filter}`
+          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCourses?query=${filter}`,
+          {
+            cache: "no-store",
+          }
         );
         const data = await res.json();
         return data.courses;
       }
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`// please add page and limit 
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`,
+        {
+          cache: "no-store",
+        } // please add page and limit
       );
       const data = await res.json();
 
@@ -32,7 +38,7 @@ const Courses = async ({ searchParams }: CoursesProps) => {
     }
   };
   const courses: Course[] = await fetchCourses();
-  
+
   return (
     <>
       <div className="  lg:custom-width rounded-xl px-4 py-5  overflow-y-scroll relative h-[93vh]">

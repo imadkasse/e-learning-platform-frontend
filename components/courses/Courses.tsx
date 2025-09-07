@@ -10,13 +10,7 @@ type ShowCourse = {
 
 const Courses = async () => {
   const data = await fetch(
-    `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/getCategory`,
-    {
-      cache: "force-cache",
-      next: {
-        revalidate: 3600,
-      },
-    }
+    `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/getCategory`
   );
   const coursesData = await data.json();
 

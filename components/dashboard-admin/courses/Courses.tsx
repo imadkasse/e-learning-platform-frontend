@@ -10,19 +10,24 @@ interface CoursesProps {
 }
 const Courses = async ({ searchParams }: CoursesProps) => {
   const { filter } = searchParams;
-  
 
   const fetchCourse = async () => {
     try {
       if (filter) {
         const data = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCourses?query=${filter}`
+          `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/searchCourses?query=${filter}`,
+          {
+            cache: "no-store",
+          }
         );
         const res = await data.json();
         return res.courses;
       }
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses`,
+        {
+          cache: "no-store",
+        }
       );
       const data = await res.json();
       return data.courses;

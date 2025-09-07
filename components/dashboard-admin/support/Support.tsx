@@ -16,6 +16,7 @@ const Support = () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACK_URL}/api/faq`, {
           credentials: "include",
+          cache: "no-store",
         });
         const data = await res.json();
         setFaqs(data.data.faqs);

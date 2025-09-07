@@ -10,16 +10,13 @@ import React, { FormEvent, useEffect, useState } from "react";
 const AddReview = ({ courseId }: { courseId: string }) => {
   const [rating, setRating] = useState<number>();
   const [content, setContent] = useState<string>("");
-  const {user} = useUserStore()
+  const { user } = useUserStore();
   const { course, setCourse } = useCourse();
 
   useEffect(() => {
     const getCourse = async (courseId: string) => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`,
-        {
-          cache: "no-store",
-        }
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${courseId}`
       );
       const data = await res.json();
       setCourse(data.course);

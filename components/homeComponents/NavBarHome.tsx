@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   CloseOutlined,
   LogoutOutlined,
@@ -41,7 +41,7 @@ const NavBarHome = () => {
   };
   const loading = useUserStore((state) => state.loading);
 
-  const user = useUserStore((state) => state.user);
+  const { user, fetchUser } = useUserStore();
 
   const role = user.role === "student" ? "user" : user.role;
 
@@ -204,7 +204,12 @@ const NavBarHome = () => {
     };
     return colorMap[color] ?? colorMap.gray;
   };
-
+  useEffect(() => {
+    const getUserInfo = async () => {
+      await fetchUser();
+    };
+    getUserInfo();
+  }, [fetchUser]);
   return (
     <div className="h-[80px] flex items-center justify-around  sticky top-0 z-50 bg-white w-full">
       <Link href={`/`} className="flex items-center flex-row-reverse  md:gap-3">
