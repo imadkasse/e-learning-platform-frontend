@@ -39,7 +39,8 @@ export const useUserStore = create<{
         }
       );
       set({ user: res.data.user });
-    } catch {
+    } catch(error) {
+      console.log("error userStore", error);
       set({
         user: {
           _id: "",

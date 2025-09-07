@@ -2,7 +2,6 @@ import SideBar from "@/components/dashboard-teacher/sideBar/SideBar";
 import { fetchUserServer } from "@/lib/fetchUserServer";
 import UserProvider from "@/providers/UserProvider";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
 import React from "react";
 import { ToastContainer } from "react-toastify";
 
