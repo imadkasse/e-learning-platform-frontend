@@ -38,6 +38,26 @@ export async function middleware(req: NextRequest) {
         );
       }
     }
+    if (req.nextUrl.pathname.startsWith("/dashboard-admin")) {
+      if (user.role !== "admin") {
+        return NextResponse.redirect(
+          new URL(
+            `/dashboard-${user.role === "student" ? "user" : user.role}`,
+            req.url
+          )
+        );
+      }
+    }
+    if (req.nextUrl.pathname.startsWith("/dashboard-user")) {
+      if (user.role !== "student") {
+        return NextResponse.redirect(
+          new URL(
+            `/dashboard-${user.role === "student" ? "user" : user.role}`,
+            req.url
+          )
+        );
+      }
+    }
 
     return NextResponse.next();
   } catch (error) {

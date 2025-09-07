@@ -75,8 +75,7 @@ const Login = () => {
       const data = { email: email, password: password };
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`,
-        data,
-        { withCredentials: true }
+        data
       );
       if (!res.data.user.active) {
         showToast(
