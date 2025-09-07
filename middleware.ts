@@ -3,21 +3,28 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
-
+  console.log(
+    "🍪 Token from middleware cookies:",
+    token ? "Found" : "Not found"
+  );
   // لو مافي حتى توكن → رجّع المستخدم للـ login
-  if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
+  // if (!token) {
+  //   return NextResponse.redirect(new URL("/login", req.url));
+  // }
 
   try {
     // نعمل طلب للـ API الخارجي /users/me
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
       {
-        headers: token
-          ? { Authorization: `Bearer ${token}` } // لو التوكن موجود استعمله
-          : {},
+        method: "GET",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `token=${token}`, // إرسال الـ token مباشرة
+          "User-Agent": "NextJS-Middleware", // تمييز الطلبات
+        },
+        cache: "no-cache",
       }
     );
 
@@ -27,6 +34,10 @@ export async function middleware(req: NextRequest) {
 
     const data = await res.json();
     const user = data.user;
+    // التحقق من وجود المستخدم
+    if (!user || !user.role) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
     // التحقق من الدور
     if (req.nextUrl.pathname.startsWith("/dashboard-teacher")) {
       if (user.role !== "teacher") {

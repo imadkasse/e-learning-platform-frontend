@@ -2,9 +2,6 @@
 import axios from "axios";
 import { create } from "zustand";
 import { User } from "@/types/user";
-
-
-
 export const useUserStore = create<{
   user: User;
   fetchUser: () => Promise<void>;
@@ -36,10 +33,15 @@ export const useUserStore = create<{
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
         {
           withCredentials: true,
+
+          headers: {
+            "Content-Type": "application/json",
+           
+          },
         }
       );
       set({ user: res.data.user });
-    } catch(error) {
+    } catch (error) {
       console.log("error userStore", error);
       set({
         user: {

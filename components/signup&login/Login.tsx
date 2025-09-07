@@ -75,7 +75,10 @@ const Login = () => {
       const data = { email: email, password: password };
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`,
-        data
+        data,
+        {
+          withCredentials: true,
+        }
       );
       if (!res.data.user.active) {
         showToast(
@@ -93,7 +96,8 @@ const Login = () => {
       router.push(`/dashboard-${role}`);
     } catch (error) {
       // @ts-expect-error: fix after time
-      showToast("error", error.response.data.error);
+      showToast("error", error.response.data.message);
+      console.log(error);
     } finally {
       setLoading(false);
     }
