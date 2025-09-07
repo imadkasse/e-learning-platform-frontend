@@ -17,12 +17,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await fetchUserServer();
-  if (!user) {
-    redirect("/login");
-  }
-  if (user.role !== "admin") {
-    redirect(`/dashboard-${user.role === "student" ? "user" : user.role}`);
-  }
+  // if (!user) {
+  //   redirect("/login");
+  // }
+  // if (user.role !== "admin") {
+  //   redirect(`/dashboard-${user.role === "student" ? "user" : user.role}`);
+  // }
   return (
     <>
       <div className="flex gap-3 p-[20px] h-screen">

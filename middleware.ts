@@ -14,6 +14,9 @@ export async function middleware(req: NextRequest) {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
       {
+        headers: token
+          ? { Authorization: `Bearer ${token}` } // لو التوكن موجود استعمله
+          : {},
         credentials: "include",
       }
     );
@@ -24,7 +27,6 @@ export async function middleware(req: NextRequest) {
 
     const data = await res.json();
     const user = data.user;
-
     // التحقق من الدور
     if (req.nextUrl.pathname.startsWith("/dashboard-teacher")) {
       if (user.role !== "teacher") {
@@ -48,5 +50,7 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     "/dashboard-teacher/:path*", // يحمي صفحات الـ teacher dashboard
+    "/dashboard-user/:path*", // يحمي صفحات الـ student dashboard
+    "/dashboard-admin/:path*", // يحمي صفحات الـ admin dashboard
   ],
 };
