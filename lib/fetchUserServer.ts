@@ -12,6 +12,10 @@ export async function fetchUserServer() {
         headers: token
           ? { Authorization: `Bearer ${token}` } // لو التوكن موجود استعمله
           : {},
+        cache: "no-cache",
+        next: {
+          revalidate: 60,
+        },
       }
     );
     const data = await res.json();

@@ -36,7 +36,6 @@ export const useUserStore = create<{
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/me`,
         {
           withCredentials: true,
-          
         }
       );
       set({ user: res.data.user });
