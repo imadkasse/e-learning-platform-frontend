@@ -17,8 +17,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await fetchUserServer();
-  // if (!user) {
-  //   redirect("/login");
+  // if (user) {
+  console.log("user from / layout :", user);
   // }
 
   // if (user.role == "student") {
