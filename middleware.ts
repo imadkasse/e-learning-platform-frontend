@@ -85,5 +85,6 @@ export const config = {
     "/dashboard-admin/:path*", // يحمي صفحات الـ admin dashboard
     "/add-course", // يحمي صفحات الـ add-course
     "/edit-course/:path*", // يحمي صفحات الـ edit-course
+    "/course/:courseId", // يحمي صفحات الـ edit-course
   ],
 };

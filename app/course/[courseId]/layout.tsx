@@ -30,9 +30,7 @@ export default async function RootLayout({
 }>) {
   const user = await fetchUserServer();
 
-  if (!user) {
-    redirect("/login");
-  }
+
   return (
     <>
       <div>
