@@ -107,7 +107,7 @@ const Settings = () => {
       setLoadingUpdate(false);
     }
   };
-
+  
   return (
     <>
       <div className=" lg:custom-width rounded-xl px-4 py-5 h-[93vh]  overflow-y-scroll">
