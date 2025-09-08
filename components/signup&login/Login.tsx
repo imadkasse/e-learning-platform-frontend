@@ -74,7 +74,7 @@ const Login = () => {
     try {
       const data = { email: email, password: password };
       const res = await axios.post(
-        `/api/auth/login`,
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`,
         data,
         {
           withCredentials: true,
