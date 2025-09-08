@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: Props) {
   );
   const data = await courseData.json();
   return {
-    title: data.course ? data.course.title : "Error",
-    description: data.course ? data.course.description : "Error",
+    title: data.course ? data.course.title : "",
+    description: data.course ? data.course.description : "",
   };
 }
 

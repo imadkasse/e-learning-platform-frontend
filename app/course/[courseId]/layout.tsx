@@ -11,8 +11,7 @@ export async function generateMetadata({ params }: Props) {
   const courseData = await fetch(
     `${
       process.env.NEXT_PUBLIC_BACK_URL
-    }/api/courses/courseTitleAndDescription/${(await params).courseId}`,
-    
+    }/api/courses/courseTitleAndDescription/${(await params).courseId}`
   );
 
   const data = await courseData.json();
@@ -28,7 +27,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await fetchUserServer();
-
 
   return (
     <>
