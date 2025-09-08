@@ -3,14 +3,11 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
-  console.log(
-    "🍪 Token from middleware cookies:",
-    token ? "Found" : "Not found"
-  );
+
   // لو مافي حتى توكن → رجّع المستخدم للـ login
-  // if (!token) {
-  //   return NextResponse.redirect(new URL("/login", req.url));
-  // }
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
 
   try {
     // نعمل طلب للـ API الخارجي /users/me
