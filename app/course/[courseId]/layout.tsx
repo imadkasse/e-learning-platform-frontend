@@ -1,7 +1,6 @@
 import "@/app/globals.css";
 import { fetchUserServer } from "@/lib/fetchUserServer";
 import UserProvider from "@/providers/UserProvider";
-import { redirect } from "next/navigation";
 import { ToastContainer } from "react-toastify";
 export const dynamic = "force-dynamic";
 interface Props {
