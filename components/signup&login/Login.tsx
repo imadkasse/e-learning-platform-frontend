@@ -93,7 +93,7 @@ const Login = () => {
       await fetchUser();
       console.log(res.data);
       console.log("document.cookie", document.cookie);
-      router.push(`/dashboard-${role}`);
+      router.replace(`/dashboard-${role}`);
     } catch (error) {
       // @ts-expect-error: fix after time
       showToast("error", error.response.data.message);
