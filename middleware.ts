@@ -26,45 +26,43 @@ export async function middleware(req: NextRequest) {
     );
 
     if (!res.ok) {
+      console.error("Auth failed:", res.status, await res.text());
       return NextResponse.redirect(new URL("/login", req.url));
     }
 
     const data = await res.json();
     const user = data.user;
     // التحقق من وجود المستخدم
-    if (!user || !user.role) {
+    if (!user?.role) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
+    const path = req.nextUrl.pathname;
     // التحقق من الدور
-    if (req.nextUrl.pathname.startsWith("/dashboard-teacher")) {
-      if (user.role !== "teacher") {
-        return NextResponse.redirect(
-          new URL(
-            `/dashboard-${user.role === "student" ? "user" : user.role}`,
-            req.url
-          )
-        );
-      }
+    if (path.startsWith("/dashboard-teacher") && user.role !== "teacher") {
+      return NextResponse.redirect(
+        new URL(
+          `/dashboard-${user.role === "student" ? "user" : user.role}`,
+          req.url
+        )
+      );
     }
-    if (req.nextUrl.pathname.startsWith("/dashboard-admin")) {
-      if (user.role !== "admin") {
-        return NextResponse.redirect(
-          new URL(
-            `/dashboard-${user.role === "student" ? "user" : user.role}`,
-            req.url
-          )
-        );
-      }
+
+    if (path.startsWith("/dashboard-admin") && user.role !== "admin") {
+      return NextResponse.redirect(
+        new URL(
+          `/dashboard-${user.role === "student" ? "user" : user.role}`,
+          req.url
+        )
+      );
     }
-    if (req.nextUrl.pathname.startsWith("/dashboard-user")) {
-      if (user.role !== "student") {
-        return NextResponse.redirect(
-          new URL(
-            `/dashboard-${user.role === "student" ? "user" : user.role}`,
-            req.url
-          )
-        );
-      }
+
+    if (path.startsWith("/dashboard-user") && user.role !== "student") {
+      return NextResponse.redirect(
+        new URL(
+          `/dashboard-${user.role === "student" ? "user" : user.role}`,
+          req.url
+        )
+      );
     }
 
     return NextResponse.next();
