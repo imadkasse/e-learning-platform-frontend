@@ -2,7 +2,6 @@ import SideBar from "@/components/dashboard-admin/sideBar/SideBar";
 import { fetchUserServer } from "@/lib/fetchUserServer";
 import UserProvider from "@/providers/UserProvider";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
 import React from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -21,9 +20,7 @@ export default async function RootLayout({
   // if (!user) {
   //   redirect("/login");
   // }
-  if (user.role !== "admin") {
-    redirect(`/dashboard-${user.role === "student" ? "user" : user.role}`);
-  }
+  
   return (
     <>
       <div className="flex gap-3 p-[20px] h-screen">

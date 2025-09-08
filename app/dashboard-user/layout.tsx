@@ -2,7 +2,6 @@ import SideBar from "@/components/dashboard-user/sideBar/SideBar";
 import { fetchUserServer } from "@/lib/fetchUserServer";
 import UserProvider from "@/providers/UserProvider";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
 import React from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -23,9 +22,7 @@ export default async function RootLayout({
   //   redirect("/login");
   // }
 
-  if (user.role !== "student") {
-    redirect(`/dashboard-${user.role}`);
-  }
+
 
   return (
     <>
