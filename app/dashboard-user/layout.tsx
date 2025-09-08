@@ -16,6 +16,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await fetchUserServer();
+  console.log("currnet user", user);
+
   // if (!user) {
   //   redirect("/login");
   // }
