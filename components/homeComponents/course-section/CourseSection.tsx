@@ -8,7 +8,7 @@ const CourseSection = async () => {
     `${process.env.BACK_URL}/api/courses?page=1&limit=4`,
     {
       next: {
-        revalidate: 3600,
+        revalidate: 180,
       },
     }
   );
@@ -27,11 +27,10 @@ const CourseSection = async () => {
               key={course._id}
               courseImg={course.imageCover}
               courseName={course.title}
-              numberOfVideo={12} // edit this 
+              numberOfVideo={12} // edit this
               courseUrl={course._id}
               studentsNumber={course.enrolledStudents.length}
             />
-            
           );
         })}
       </div>
