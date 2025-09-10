@@ -1,7 +1,7 @@
 "use client";
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import axios from "axios";
 
 import "react-toastify/dist/ReactToastify.css";
@@ -9,20 +9,27 @@ import { useRouter } from "next/navigation";
 import showToast from "@/utils/showToast";
 import UpdatePassword from "@/components/utlisComponenets/UpdatePassword";
 import Spinner from "@/components/spinner/Spinner";
+import { User } from "@/types/user";
+interface Props {
+  userFetcher: User | null;
+}
 
-const Settings = () => {
+const Settings = ({ userFetcher }: Props) => {
   const router = useRouter();
   const [loading, setloading] = useState<boolean>(false);
 
   const loadingUser = useUserStore((state) => state.loading);
 
-  const user = useUserStore((state) => state.user);
+  const { user, setUser } = useUserStore();
 
-  const [name, setName] = useState(user.username);
-  const [email, setEmail] = useState(user.email);
-  const [numPhone, setNumPhone] = useState(user.phoneNumber);
+  const [name, setName] = useState(userFetcher?.username || "");
+  const [email, setEmail] = useState(userFetcher?.email || "");
+  const [numPhone, setNumPhone] = useState(userFetcher?.phoneNumber || "");
   const [image, setImage] = useState<File>();
   const [imageUrl, setImageUrl] = useState<string>("");
+  useEffect(() => {
+    if (userFetcher) setUser(userFetcher);
+  }, [userFetcher, setUser]);
 
   if (loadingUser) {
     return (

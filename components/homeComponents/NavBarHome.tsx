@@ -21,7 +21,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { Link as ScrollLink } from "react-scroll";
 import { useUserStore } from "@/store/userStore";
-import Cookie from "js-cookie";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import showToast from "@/utils/showToast";
@@ -53,7 +52,6 @@ const NavBarHome = () => {
         { withCredentials: true }
       );
       showToast("success", "تم تسجيل الخروج بنجاح");
-      Cookie.remove("token");
       setUserMenuToggle(false);
       window.location.reload();
     } catch (error) {

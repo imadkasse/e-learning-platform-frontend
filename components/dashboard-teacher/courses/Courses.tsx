@@ -48,7 +48,6 @@ const Courses = async ({ searchParams }: CoursesProps) => {
   };
 
   const courses: Course[] = await getMyCourses();
-  console.log(courses);
 
   return (
     <div className=" lg:custom-width rounded-xl px-4 py-5  overflow-y-scroll relative h-[93vh]">

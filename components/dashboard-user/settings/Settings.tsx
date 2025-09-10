@@ -1,7 +1,7 @@
 "use client";
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,8 +17,13 @@ import {
   Phone,
   Clock,
 } from "lucide-react";
+import { User } from "@/types/user";
 
-const Settings = () => {
+interface Props {
+  userFetcher: User | null;
+}
+
+const Settings = ({ userFetcher }: Props) => {
   const router = useRouter();
 
   const [loadingUpdate, setLoadingUpdate] = useState<boolean>(false);
@@ -26,11 +31,12 @@ const Settings = () => {
 
   const { loading } = useUserStore();
 
-  const user = useUserStore((state) => state.user);
+  const { user, setUser } = useUserStore();
 
-  const [name, setName] = useState(user.username);
-  const [email, setEmail] = useState(user.email);
-  const [numPhone, setNumPhone] = useState(user.phoneNumber);
+  const [name, setName] = useState(userFetcher?.username || "");
+  const [email, setEmail] = useState(userFetcher?.email || "");
+  const [numPhone, setNumPhone] = useState(userFetcher?.phoneNumber || "");
+
   const [image, setImage] = useState<File>();
 
   // بيانات وسائل التواصل
@@ -69,7 +75,11 @@ const Settings = () => {
       window.open("https://instagram.com/platform_support", "_blank");
     }
   };
-
+  useEffect(() => {
+    if (userFetcher) {
+      setUser(userFetcher);
+    }
+  }, [userFetcher, setUser]);
   if (loading) {
     return (
       <div className="bg-wygColor lg:custom-width rounded-xl px-4 py-5 h-[93vh] ">
@@ -89,7 +99,7 @@ const Settings = () => {
     formData.append("phoneNumber", numPhone);
     setLoadingUpdate(true);
     try {
-      await axios.patch(
+      const res = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/users/updateMe`,
         formData,
         {
@@ -97,7 +107,7 @@ const Settings = () => {
         }
       );
       showToast("success", "تم تحديث البيانات بنجاح ");
-
+      setUser(res.data.user);
       router.refresh();
     } catch (error) {
       console.log(error);
@@ -107,7 +117,7 @@ const Settings = () => {
       setLoadingUpdate(false);
     }
   };
-  
+
   return (
     <>
       <div className=" lg:custom-width rounded-xl px-4 py-5 h-[93vh]  overflow-y-scroll">
