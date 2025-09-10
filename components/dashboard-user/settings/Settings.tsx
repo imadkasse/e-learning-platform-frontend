@@ -29,9 +29,7 @@ const Settings = ({ userFetcher }: Props) => {
   const [loadingUpdate, setLoadingUpdate] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const { loading } = useUserStore();
-
-  const { user, setUser } = useUserStore();
+  const { user, setUser, loading } = useUserStore();
 
   const [name, setName] = useState(userFetcher?.username || "");
   const [email, setEmail] = useState(userFetcher?.email || "");
