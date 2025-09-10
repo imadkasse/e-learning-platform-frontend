@@ -18,13 +18,13 @@ const NavBarCourse = () => {
       ? "teacher"
       : "admin";
   // when user is  exists
-  const urls = [
-    {
-      href: `/dashboard-${role}`,
-      title: "الرئيسية",
-      icon: HomeOutlined,
-    },
-  ];
+  // const urls = [
+  //   {
+  //     href: `/dashboard-${role}`,
+  //     title: "الرئيسية",
+  //     icon: HomeOutlined,
+  //   },
+  // ];
 
   return (
     <div className="sticky top-3 z-20 bg-sideBarBgColo text-white  rounded-3xl flex items-center flex-row-reverse justify-between px-5 py-1">
