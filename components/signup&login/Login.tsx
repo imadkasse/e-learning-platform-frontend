@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import showToast from "@/utils/showToast";
 import { useUserStore } from "@/store/userStore";
 import * as z from "zod";
+import { Loader2 } from "lucide-react";
 
 const UserSchema = z.object({
   email: z.string().email("البريد الإلكتروني غير صالح"),
@@ -91,8 +92,6 @@ const Login = () => {
       const role =
         res.data.user.role === "student" ? "user" : res.data.user.role;
       await fetchUser();
-      console.log(res.data);
-      console.log("document.cookie", document.cookie);
       router.replace(`/dashboard-${role}`);
     } catch (error) {
       // @ts-expect-error: fix after time
@@ -187,7 +186,11 @@ const Login = () => {
             loading ? "bg-mainColorHoverLight" : "bg-mainColor"
           }`}
         >
-          {loading ? "جاري تسجيل الدخول ..." : "تسجيل الدخول "}
+          {loading ? (
+            <Loader2 className="animate-spin text-center w-full" size={22} />
+          ) : (
+            "تسجيل الدخول "
+          )}
         </button>
 
         <button

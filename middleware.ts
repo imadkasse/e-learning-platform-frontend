@@ -64,7 +64,19 @@ export async function middleware(req: NextRequest) {
         )
       );
     }
+    // protected /edit-course and /add-course (only for teachers)
 
+    if (
+      (path.startsWith("/edit-course") && user.role !== "teacher") ||
+      (path.startsWith("/add-course") && user.role !== "teacher")
+    ) {
+      return NextResponse.redirect(
+        new URL(
+          `/dashboard-${user.role === "student" ? "user" : user.role}`,
+          req.url
+        )
+      );
+    }
     return NextResponse.next();
   } catch (error) {
     console.error("Middleware error:", error);

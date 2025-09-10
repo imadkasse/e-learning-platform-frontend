@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import showToast from "@/utils/showToast";
 import * as z from "zod";
+import { Loader2 } from "lucide-react";
 const UserSchema = z
   .object({
     username: z.string().min(3, "اسم المستخدم يجب أن يكون 3 أحرف على الأقل"),
@@ -288,7 +289,11 @@ const SignUp = () => {
             loading ? "bg-mainColorHoverLight" : "bg-mainColor"
           }`}
         >
-          {loading ? "جاري التسجيل ..." : "التسجيل "}
+          {loading ? (
+            <Loader2 className="animate-spin text-center w-full" size={22} />
+          ) : (
+            "التسجيل "
+          )}
         </button>
 
         <button

@@ -50,6 +50,7 @@ interface ConfirmModalProps {
   confirmText?: string;
   cancelText?: string;
   type?: "danger" | "warning" | "info";
+  loading?: boolean;
 }
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
@@ -61,6 +62,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   confirmText = "تأكيد",
   cancelText = "إلغاء",
   type = "danger",
+  loading = false,
 }) => {
   if (!isOpen) return null;
 
@@ -111,15 +113,21 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <div className="flex items-center gap-3 justify-end p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
           <button
             onClick={onCancel}
+            disabled={loading}
             className="px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
+            disabled={loading}
             className={`px-6 py-2 text-white rounded-lg transition-all duration-300 transform hover:scale-105 ${colors.button}`}
           >
-            {confirmText}
+            {loading ? (
+              <Loader2 className="animate-spin mx-auto" size={18} />
+            ) : (
+              confirmText
+            )}
           </button>
         </div>
       </div>
@@ -141,12 +149,14 @@ const CourseEditPage = ({ id }: { id: string }) => {
     message: string;
     onConfirm: () => void;
     type?: "danger" | "warning" | "info";
+    loading?: boolean;
   }>({
     isOpen: false,
     title: "",
     message: "",
     onConfirm: () => {},
     type: "danger",
+    loading: false,
   });
 
   // Section
@@ -259,7 +269,8 @@ const CourseEditPage = ({ id }: { id: string }) => {
     title: string,
     message: string,
     onConfirm: () => void,
-    type: "danger" | "warning" | "info" = "danger"
+    type: "danger" | "warning" | "info" = "danger",
+    loading?: boolean
   ) => {
     setConfirmModal({
       isOpen: true,
@@ -267,6 +278,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
       message,
       onConfirm,
       type,
+      loading,
     });
   };
 
@@ -327,6 +339,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
     setEditSectionLoading(true);
     if (!newTitle.trim()) {
       showToast("error", "عنوان القسم مطلوب");
+      return;
     }
     try {
       await axios.put(
@@ -381,7 +394,8 @@ const CourseEditPage = ({ id }: { id: string }) => {
       "حذف القسم",
       "هل أنت متأكد من حذف هذا القسم؟ سيتم حذف جميع الفيديوهات والملفات المرتبطة به.",
       performDelete,
-      "danger"
+      "danger",
+      deleteSectionLoading
     );
   };
 
@@ -544,7 +558,8 @@ const CourseEditPage = ({ id }: { id: string }) => {
       "حذف الفيديو",
       "هل أنت متأكد من حذف هذا الفيديو؟ سيتم حذف جميع الملفات المرتبطة به أيضاً.",
       performDelete,
-      "danger"
+      "danger",
+      deleteVideoLoading
     );
   };
 
@@ -670,7 +685,8 @@ const CourseEditPage = ({ id }: { id: string }) => {
       "حذف الملف",
       "هل أنت متأكد من حذف هذا الملف؟",
       performDelete,
-      "danger"
+      "danger",
+      DeleteFileLoading
     );
   };
 
@@ -1012,12 +1028,21 @@ const CourseEditPage = ({ id }: { id: string }) => {
                                 autoFocus
                               />
                               <button
-                                onClick={() =>
+                                onClick={() => {
+                                  if (
+                                    editingSectionTitle.trim() ===
+                                    section.title.trim()
+                                  ) {
+                                    showToast("info", "العنوان لم يتغير");
+                                    setEditSectionLoading(false);
+                                    return;
+                                  }
+
                                   updateSection(
                                     section._id,
                                     editingSectionTitle
-                                  )
-                                }
+                                  );
+                                }}
                                 disabled={editSectionLoading}
                                 className={`px-3 py-2 rounded-lg transition-colors duration-300 ${
                                   editSectionLoading
@@ -1361,6 +1386,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
           onConfirm={confirmModal.onConfirm}
           onCancel={hideConfirmModal}
           type={confirmModal.type}
+          loading={confirmModal.loading}
         />
 
         {/* Section Modal */}
