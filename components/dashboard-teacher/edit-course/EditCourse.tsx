@@ -114,7 +114,9 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           <button
             onClick={onCancel}
             disabled={loading}
-            className="px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+            className={`${
+              loading ? "cursor-not-allowed" : ""
+            } px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200`}
           >
             {cancelText}
           </button>
