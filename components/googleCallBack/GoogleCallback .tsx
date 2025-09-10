@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { User } from "@/types/user";
+import showToast from "@/utils/showToast";
 
 const GoogleCallback = () => {
   const router = useRouter();
@@ -39,6 +40,13 @@ const GoogleCallback = () => {
 
   useEffect(() => {
     if (!loading && userData) {
+      if (!userData.active) {
+        showToast(
+          "error",
+          "الحساب غير مفعل حاليا، الرجاء التواصل مع الدعم لتفعيله"
+        );
+        return; // ما نعمل redirect
+      }
       if (userData.role === "student") {
         router.push("/dashboard-user");
       } else if (userData.role === "admin") {

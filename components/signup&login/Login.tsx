@@ -182,6 +182,7 @@ const Login = () => {
 
         <button
           type="submit"
+          disabled={loading}
           className={`apply-fonts-normal !my-4 w-full px-4 py-2.5 mx-auto block text-sm  text-white hoverEle rounded hover:bg-mainColorHoverLight ${
             loading ? "bg-mainColorHoverLight" : "bg-mainColor"
           }`}
@@ -192,6 +193,7 @@ const Login = () => {
         <button
           type="button"
           onClick={handleLoginWithGoogle}
+          disabled={loading}
           className="group flex justify-between items-center  apply-fonts-normal !mt-5 w-full  px-4 py-2.5 mx-auto  text-sm border-mainColor border-2 hoverEle rounded hover:bg-mainColor hover:text-white"
         >
           <p>التسجيل بإستخدام Google </p>

@@ -88,6 +88,19 @@ const Settings = ({ userFetcher }: Props) => {
 
   const handelupdate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!name?.trim()) {
+      showToast("error", "الاسم مطلوب");
+      return;
+    }
+
+    if (!email?.trim()) {
+      showToast("error", "البريد الإلكتروني مطلوب");
+      return;
+    }
+    if (!numPhone?.trim()) {
+      showToast("error", "رقم الهاتف مطلوب");
+      return;
+    }
     const formData = new FormData();
     if (image) {
       formData.append("thumbnail", image);
@@ -277,6 +290,7 @@ const Settings = ({ userFetcher }: Props) => {
             <div className="flex items-center space-x-4">
               <button
                 type="submit"
+                disabled={loadingUpdate}
                 className={`apply-fonts-normal text-white ${
                   loadingUpdate
                     ? "animate-pulse bg-mainColorHoverLight cursor-not-allowed"
