@@ -151,6 +151,9 @@ const CourseEditPage = ({ id }: { id: string }) => {
 
   // Section
   const [addSectionLoading, setAddSectionLoading] = useState<boolean>(false);
+  const [editSectionLoading, setEditSectionLoading] = useState<boolean>(false);
+  const [deleteSectionLoading, setDeleteSectionLoading] =
+    useState<boolean>(false);
   const [showSectionModal, setShowSectionModal] = useState<boolean>(false);
   const [newSectionTitle, setNewSectionTitle] = useState<string>("");
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
@@ -158,6 +161,8 @@ const CourseEditPage = ({ id }: { id: string }) => {
 
   // Videos
   const [addVideoLoading, setAddVideoLoading] = useState<boolean>(false);
+  const [editVideoLoading, setEditVideoLoading] = useState<boolean>(false);
+  const [deleteVideoLoading, setDeleteVideoLoading] = useState<boolean>(false);
   const [showVideoModal, setShowVideoModal] = useState<boolean>(false);
   const [newVideoTitle, setNewVideoTitle] = useState<string>("");
   const [newVideoDescription, setNewVideoDescription] = useState<string>("");
@@ -170,6 +175,8 @@ const CourseEditPage = ({ id }: { id: string }) => {
   // Files
   const [showFileModal, setShowFileModal] = useState<boolean>(false);
   const [addFileLoading, setAddFileLoading] = useState<boolean>(false);
+  const [editFileLoading, setEditFileLoading] = useState<boolean>(false);
+  const [DeleteFileLoading, setDeleteFileLoading] = useState<boolean>(false);
   const [newFileName, setNewFileName] = useState<string>("");
   const [newFile, setNewFile] = useState<File | null>(null);
   const [currentVideoId, setCurrentVideoId] = useState<string>("");
@@ -318,6 +325,10 @@ const CourseEditPage = ({ id }: { id: string }) => {
   };
 
   const updateSection = async (sectionId: string, newTitle: string) => {
+    setEditSectionLoading(true);
+    if (!newTitle.trim()) {
+      showToast("error", "عنوان القسم مطلوب");
+    }
     try {
       await axios.put(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}/sections/${sectionId}`,
@@ -339,11 +350,14 @@ const CourseEditPage = ({ id }: { id: string }) => {
     } catch (error) {
       console.error("خطأ في تحديث القسم:", error);
       showToast("error", "حدث خطأ في تحديث القسم");
+    } finally {
+      setEditSectionLoading(false);
     }
   };
 
   const deleteSection = async (sectionId: string) => {
     const performDelete = async () => {
+      setDeleteSectionLoading(true);
       try {
         await axios.delete(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}/sections/${sectionId}`,
@@ -359,6 +373,8 @@ const CourseEditPage = ({ id }: { id: string }) => {
         console.error("خطأ في حذف القسم:", error);
         showToast("error", "حدث خطأ في حذف القسم");
         hideConfirmModal();
+      } finally {
+        setDeleteSectionLoading(false);
       }
     };
 
@@ -455,7 +471,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
     videoId: string,
     newTitle: string
   ) => {
-    console.log("new title", newTitle);
+    setEditVideoLoading(true);
     try {
       await axios.put(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}/sections/${sectionId}/videos/${videoId}`,
@@ -486,11 +502,14 @@ const CourseEditPage = ({ id }: { id: string }) => {
     } catch (error) {
       console.error("خطأ في تحديث الفيديو:", error);
       showToast("error", "حدث خطأ في تحديث الفيديو");
+    } finally {
+      setEditVideoLoading(false);
     }
   };
 
   const deleteVideo = async (sectionId: string, videoId: string) => {
     const performDelete = async () => {
+      setDeleteVideoLoading(true);
       try {
         await axios.delete(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}/sections/${sectionId}/videos/${videoId}`,
@@ -517,6 +536,8 @@ const CourseEditPage = ({ id }: { id: string }) => {
         console.error("خطأ في حذف الفيديو:", error);
         showToast("error", "حدث خطأ في حذف الفيديو");
         hideConfirmModal();
+      } finally {
+        setDeleteVideoLoading(false);
       }
     };
 
@@ -607,6 +628,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
     fileId: string
   ) => {
     const performDelete = async () => {
+      setDeleteFileLoading(true);
       try {
         await axios.delete(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}/sections/${sectionId}/videos/${videoId}/files/${fileId}`,
@@ -640,6 +662,8 @@ const CourseEditPage = ({ id }: { id: string }) => {
         console.error("خطأ في حذف الملف:", error);
         showToast("error", "حدث خطأ في حذف الملف");
         hideConfirmModal();
+      } finally {
+        setDeleteFileLoading(false);
       }
     };
 
@@ -995,16 +1019,26 @@ const CourseEditPage = ({ id }: { id: string }) => {
                                     editingSectionTitle
                                   )
                                 }
-                                className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors duration-300"
+                                disabled={editSectionLoading}
+                                className={`px-3 py-2 rounded-lg transition-colors duration-300 ${
+                                  editSectionLoading
+                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    : "bg-green-500 hover:bg-green-600 text-white"
+                                }`}
                               >
-                                <Save size={16} />
+                                {editSectionLoading ? (
+                                  <Loader2 className="animate-spin" size={16} />
+                                ) : (
+                                  <Save size={16} />
+                                )}
                               </button>
                               <button
                                 onClick={() => {
                                   setEditingSectionId(null);
                                   setEditingSectionTitle("");
                                 }}
-                                className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors duration-300"
+                                disabled={editSectionLoading}
+                                className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors duration-300 disabled:opacity-50"
                               >
                                 <X size={16} />
                               </button>
@@ -1040,9 +1074,18 @@ const CourseEditPage = ({ id }: { id: string }) => {
                           </button>
                           <button
                             onClick={() => deleteSection(section._id)}
-                            className="text-[#EE3D45] hover:text-[#FF5F68] p-2 rounded-lg hover:bg-red-50 transition-colors duration-300"
+                            disabled={deleteSectionLoading}
+                            className={`p-2 rounded-lg transition-colors duration-300 ${
+                              deleteSectionLoading
+                                ? "text-gray-400 cursor-not-allowed"
+                                : "text-[#EE3D45] hover:text-[#FF5F68] hover:bg-red-50"
+                            }`}
                           >
-                            <Trash2 size={16} />
+                            {deleteSectionLoading ? (
+                              <Loader2 className="animate-spin" size={16} />
+                            ) : (
+                              <Trash2 size={16} />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -1082,16 +1125,29 @@ const CourseEditPage = ({ id }: { id: string }) => {
                                           editingVideoTitle
                                         )
                                       }
-                                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors duration-300"
+                                      disabled={editVideoLoading}
+                                      className={`px-3 py-2 rounded-lg transition-colors duration-300 ${
+                                        editVideoLoading
+                                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                          : "bg-green-500 hover:bg-green-600 text-white"
+                                      }`}
                                     >
-                                      <Save size={16} />
+                                      {editVideoLoading ? (
+                                        <Loader2
+                                          className="animate-spin"
+                                          size={16}
+                                        />
+                                      ) : (
+                                        <Save size={16} />
+                                      )}
                                     </button>
                                     <button
                                       onClick={() => {
                                         setEditingVideoId(null);
                                         setEditingVideoTitle("");
                                       }}
-                                      className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors duration-300"
+                                      disabled={editVideoLoading}
+                                      className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors duration-300 disabled:opacity-50"
                                     >
                                       <X size={16} />
                                     </button>
@@ -1165,10 +1221,22 @@ const CourseEditPage = ({ id }: { id: string }) => {
                                   onClick={() =>
                                     deleteVideo(section._id, video._id)
                                   }
-                                  className="text-[#EE3D45] hover:text-[#FF5F68] p-2 rounded-lg hover:bg-red-50 transition-colors duration-300"
+                                  disabled={deleteVideoLoading}
+                                  className={`p-2 rounded-lg transition-colors duration-300 ${
+                                    deleteVideoLoading
+                                      ? "text-gray-400 cursor-not-allowed"
+                                      : "text-[#EE3D45] hover:text-[#FF5F68] hover:bg-red-50"
+                                  }`}
                                   title="حذف الفيديو"
                                 >
-                                  <Trash2 size={16} />
+                                  {deleteVideoLoading ? (
+                                    <Loader2
+                                      className="animate-spin"
+                                      size={16}
+                                    />
+                                  ) : (
+                                    <Trash2 size={16} />
+                                  )}
                                 </button>
                               </div>
                             </div>
@@ -1219,10 +1287,22 @@ const CourseEditPage = ({ id }: { id: string }) => {
                                                 file._id
                                               )
                                             }
-                                            className="text-[#EE3D45] hover:text-[#FF5F68] p-2 rounded-lg hover:bg-red-50 transition-colors duration-300 opacity-0 group-hover:opacity-100"
+                                            disabled={DeleteFileLoading}
+                                            className={`p-2 rounded-lg transition-colors duration-300 opacity-0 group-hover:opacity-100 ${
+                                              DeleteFileLoading
+                                                ? "text-gray-400 cursor-not-allowed"
+                                                : "text-[#EE3D45] hover:text-[#FF5F68] hover:bg-red-50"
+                                            }`}
                                             title="حذف الملف"
                                           >
-                                            <Trash2 size={14} />
+                                            {DeleteFileLoading ? (
+                                              <Loader2
+                                                className="animate-spin"
+                                                size={14}
+                                              />
+                                            ) : (
+                                              <Trash2 size={14} />
+                                            )}
                                           </button>
                                         </div>
                                       </div>
