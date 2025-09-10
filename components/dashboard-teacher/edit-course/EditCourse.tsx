@@ -175,7 +175,6 @@ const CourseEditPage = ({ id }: { id: string }) => {
   // Files
   const [showFileModal, setShowFileModal] = useState<boolean>(false);
   const [addFileLoading, setAddFileLoading] = useState<boolean>(false);
-  const [editFileLoading, setEditFileLoading] = useState<boolean>(false);
   const [DeleteFileLoading, setDeleteFileLoading] = useState<boolean>(false);
   const [newFileName, setNewFileName] = useState<string>("");
   const [newFile, setNewFile] = useState<File | null>(null);
