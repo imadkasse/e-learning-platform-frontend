@@ -1,9 +1,13 @@
 import Settings from "@/components/dashboard-teacher/settings/Settings";
+import { cookies } from "next/headers";
 import React from "react";
 const fetchingUser = async () => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
   try {
     const res = await fetch(`${process.env.BACK_URL}/api/users/me`, {
       credentials: "include",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
       cache: "no-store",
     });
     if (!res.ok) {
