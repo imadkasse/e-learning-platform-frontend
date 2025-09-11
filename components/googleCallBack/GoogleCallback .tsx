@@ -41,11 +41,11 @@ const GoogleCallback = () => {
   useEffect(() => {
     if (!loading && userData) {
       if (!userData.active) {
-        showToast(
-          "error",
-          "الحساب غير مفعل حاليا، الرجاء التواصل مع الدعم لتفعيله"
-        );
-        return; // ما نعمل redirect
+        // showToast(
+        //   "error",
+        //   "الحساب غير مفعل حاليا، الرجاء التواصل مع الدعم لتفعيله"
+        // );
+        router.push("/"); // ما نعمل redirect
       }
       if (userData.role === "student") {
         router.push("/dashboard-user");

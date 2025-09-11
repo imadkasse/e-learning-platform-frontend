@@ -1491,6 +1491,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
                 </div>
                 <button
                   onClick={closeVideoModal}
+                  disabled={addVideoLoading}
                   className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-all duration-200"
                 >
                   <X size={20} />
