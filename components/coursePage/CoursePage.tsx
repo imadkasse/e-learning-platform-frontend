@@ -30,10 +30,10 @@ type Props = {
 const CoursePage = ({ course }: Props) => {
   const { lesson, setLesson } = useLesson();
 
-  const [isEnrolled, setIsEnrolled] = useState<boolean | undefined>(undefined);
-  const [isPublichedCourse, setIsPublichedCourse] = useState<
-    boolean | undefined
-  >(undefined);
+  // const [isEnrolled, setIsEnrolled] = useState<boolean | undefined>(undefined);
+  // const [isPublichedCourse, setIsPublichedCourse] = useState<
+  //   boolean | undefined
+  // >(undefined);
   const [showAllFiles, setShowAllFiles] = useState(false);
 
   const checkIsEnrolledCourse = (
@@ -179,12 +179,12 @@ const CoursePage = ({ course }: Props) => {
   // }
 
   //check is user buying course
-  if (user.role === "student" && !isEnrolled) {
+  if (user.role === "student" && !isEnrolledMemo) {
     redirect(`/course-overview/${course._id}`);
   }
 
   // check is the course uploaded by teacher
-  if (user.role === "teacher" && !isPublichedCourse) {
+  if (user.role === "teacher" && !isPublichedCourseMemo) {
     redirect(`/dashboard-teacher/courses`);
   }
 
