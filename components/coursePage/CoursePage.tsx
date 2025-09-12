@@ -10,7 +10,7 @@ import {
 } from "@mui/icons-material";
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CourseCardDetails from "./CourseCardDetails";
 import { Course } from "@/types/course";
 import { useUserStore } from "@/store/userStore";
@@ -67,25 +67,37 @@ const CoursePage = ({ course }: Props) => {
     }
   }, [setLesson, course]);
 
-  useEffect(() => {
-    const checkIsPublichedCourse = (
-      userId: string,
-      course: Course | undefined
-    ) => {
-      return (
-        course?.instructor._id === userId &&
-        user.publishedCourses.some((c) => c._id === course?._id)
-      );
-    };
-    if (user._id && course) {
-      const enrollmentStatus = checkIsEnrolledCourse(user._id, course);
-      setIsEnrolled(enrollmentStatus);
-      const publichedStatus = checkIsPublichedCourse(user._id, course);
-      setIsPublichedCourse(publichedStatus);
-    }
-    console.log("isEnrolled :", isEnrolled);
-    console.log("isPublichedCourse :", isPublichedCourse);
-  }, [user, course]);
+  // useEffect(() => {
+  //   const checkIsPublichedCourse = (
+  //     userId: string,
+  //     course: Course | undefined
+  //   ) => {
+  //     return (
+  //       course?.instructor._id === userId &&
+  //       user.publishedCourses.some((c) => c._id === course?._id)
+  //     );
+  //   };
+  //   if (user._id && course) {
+  //     const enrollmentStatus = checkIsEnrolledCourse(user._id, course);
+  //     setIsEnrolled(enrollmentStatus);
+  //     const publichedStatus = checkIsPublichedCourse(user._id, course);
+  //     setIsPublichedCourse(publichedStatus);
+  //   }
+  //   console.log("isEnrolled :", isEnrolled);
+  //   console.log("isPublichedCourse :", isPublichedCourse);
+  // }, [user, course]);
+  const isEnrolledMemo = useMemo(() => {
+    if (!user._id || !course) return false;
+    return checkIsEnrolledCourse(user._id, course);
+  }, [user._id, course]);
+
+  const isPublichedCourseMemo = useMemo(() => {
+    if (!user._id || !course) return false;
+    return (
+      course?.instructor._id === user._id &&
+      user.publishedCourses.some((c) => c._id === course?._id)
+    );
+  }, [user._id, course, user.publishedCourses]);
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
@@ -131,7 +143,7 @@ const CoursePage = ({ course }: Props) => {
   };
 
   //add spinner
-  if (isEnrolled === undefined || isPublichedCourse === undefined) {
+  if (isEnrolledMemo === null || isPublichedCourseMemo === null) {
     return <Spinner />;
   }
 
