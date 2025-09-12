@@ -134,37 +134,39 @@ const CoursePage = ({ course }: Props) => {
   if (isEnrolled === undefined || isPublichedCourse === undefined) {
     return <Spinner />;
   }
+  console.log("isEnrolled :", isEnrolled);
+  console.log("isPublichedCourse :", isPublichedCourse);
 
   //check is user logged in
-  if (!user._id) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 border border-amber-200 rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
-            <div className="text-center mb-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
-                <LoginOutlined className="text-white text-3xl" />
-              </div>
-              <h2 className="apply-fonts-medium text-2xl text-amber-800 mb-2">
-                مرحباً بك!
-              </h2>
-              <p className="apply-fonts-normal text-amber-700 leading-relaxed">
-                يرجى تسجيل الدخول للاستمتاع بمحتوى الدورة التدريبية والاستفادة
-                من جميع المميزات المتاحة.
-              </p>
-            </div>
-            <Link
-              href={"/login"}
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium px-6 py-3 rounded-xl shadow-lg flex items-center justify-center gap-3 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
-            >
-              <LoginOutlined />
-              <span>تسجيل الدخول</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (!user._id) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center p-4">
+  //       <div className="max-w-md w-full">
+  //         <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 border border-amber-200 rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
+  //           <div className="text-center mb-6">
+  //             <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
+  //               <LoginOutlined className="text-white text-3xl" />
+  //             </div>
+  //             <h2 className="apply-fonts-medium text-2xl text-amber-800 mb-2">
+  //               مرحباً بك!
+  //             </h2>
+  //             <p className="apply-fonts-normal text-amber-700 leading-relaxed">
+  //               يرجى تسجيل الدخول للاستمتاع بمحتوى الدورة التدريبية والاستفادة
+  //               من جميع المميزات المتاحة.
+  //             </p>
+  //           </div>
+  //           <Link
+  //             href={"/login"}
+  //             className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-medium px-6 py-3 rounded-xl shadow-lg flex items-center justify-center gap-3 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+  //           >
+  //             <LoginOutlined />
+  //             <span>تسجيل الدخول</span>
+  //           </Link>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   //check is user buying course
   if (user.role === "student" && !isEnrolled) {
