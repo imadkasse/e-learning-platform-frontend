@@ -1,7 +1,7 @@
 "use client";
 import {
   DescriptionOutlined,
-  LoginOutlined,
+
   People,
   Star,
   Download,
@@ -15,7 +15,6 @@ import React, { useEffect, useState } from "react";
 import CourseCardDetails from "./CourseCardDetails";
 import { Course } from "@/types/course";
 import { useUserStore } from "@/store/userStore";
-import Link from "next/link";
 import Spinner from "../spinner/Spinner";
 import { useLesson } from "@/store/lessonStore";
 import "react-toastify/dist/ReactToastify.css";

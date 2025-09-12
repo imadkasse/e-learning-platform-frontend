@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { User } from "@/types/user";
-import showToast from "@/utils/showToast";
+// import showToast from "@/utils/showToast";
 
 const GoogleCallback = () => {
   const router = useRouter();
