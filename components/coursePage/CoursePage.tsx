@@ -1,7 +1,6 @@
 "use client";
 import {
   DescriptionOutlined,
-
   People,
   Star,
   Download,
@@ -84,6 +83,8 @@ const CoursePage = ({ course }: Props) => {
       const publichedStatus = checkIsPublichedCourse(user._id, course);
       setIsPublichedCourse(publichedStatus);
     }
+    console.log("isEnrolled :", isEnrolled);
+    console.log("isPublichedCourse :", isPublichedCourse);
   }, [user, course]);
 
   const formatFileSize = (bytes: number) => {
@@ -133,8 +134,6 @@ const CoursePage = ({ course }: Props) => {
   if (isEnrolled === undefined || isPublichedCourse === undefined) {
     return <Spinner />;
   }
-  console.log("isEnrolled :", isEnrolled);
-  console.log("isPublichedCourse :", isPublichedCourse);
 
   //check is user logged in
   // if (!user._id) {
