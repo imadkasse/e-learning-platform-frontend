@@ -1448,7 +1448,7 @@ function StepSectionsAndVideos({
                                           )
                                       )
                                     }
-                                    disabled
+                                    
                                     className="text-red-500 hover:text-red-700 text-xs"
                                   >
                                     ❌
