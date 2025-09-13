@@ -81,13 +81,7 @@ const Login = () => {
           withCredentials: true,
         }
       );
-      if (!res.data.user.active) {
-        showToast(
-          "error",
-          "الحساب غير مفعل حاليا الرجاء التواصل مع الدعم لتفعيله"
-        );
-        return;
-      }
+      
 
       const role =
         res.data.user.role === "student" ? "user" : res.data.user.role;
