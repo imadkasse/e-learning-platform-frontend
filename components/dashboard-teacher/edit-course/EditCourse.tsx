@@ -370,6 +370,9 @@ const CourseEditPage = ({ id }: { id: string }) => {
   const deleteSection = async (sectionId: string) => {
     const performDelete = async () => {
       setDeleteSectionLoading(true);
+      setConfirmModal((prev) => {
+        return { ...prev, loading: true };
+      });
       try {
         await axios.delete(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}/sections/${sectionId}`,
@@ -387,6 +390,9 @@ const CourseEditPage = ({ id }: { id: string }) => {
         hideConfirmModal();
       } finally {
         setDeleteSectionLoading(false);
+        setConfirmModal((prev) => {
+          return { ...prev, loading: false };
+        });
       }
     };
 
@@ -523,6 +529,9 @@ const CourseEditPage = ({ id }: { id: string }) => {
   const deleteVideo = async (sectionId: string, videoId: string) => {
     const performDelete = async () => {
       setDeleteVideoLoading(true);
+      setConfirmModal((prev) => {
+        return { ...prev, loading: true };
+      });
       try {
         await axios.delete(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}/sections/${sectionId}/videos/${videoId}`,
@@ -551,6 +560,9 @@ const CourseEditPage = ({ id }: { id: string }) => {
         hideConfirmModal();
       } finally {
         setDeleteVideoLoading(false);
+        setConfirmModal((prev) => {
+          return { ...prev, loading: false };
+        });
       }
     };
 
@@ -643,6 +655,9 @@ const CourseEditPage = ({ id }: { id: string }) => {
   ) => {
     const performDelete = async () => {
       setDeleteFileLoading(true);
+      setConfirmModal((prev) => {
+        return { ...prev, loading: true };
+      });
       try {
         await axios.delete(
           `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${course?._id}/sections/${sectionId}/videos/${videoId}/files/${fileId}`,
@@ -678,6 +693,9 @@ const CourseEditPage = ({ id }: { id: string }) => {
         hideConfirmModal();
       } finally {
         setDeleteFileLoading(false);
+        setConfirmModal((prev) => {
+          return { ...prev, loading: false };
+        });
       }
     };
 
