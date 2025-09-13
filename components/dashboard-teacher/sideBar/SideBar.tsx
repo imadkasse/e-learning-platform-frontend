@@ -8,6 +8,7 @@ import {
   Play,
   Settings,
   LucideProps,
+  Loader2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,6 +22,8 @@ import showToast from "@/utils/showToast";
 const SideBar = () => {
   const router = useRouter();
   const [toggleSidebar, setToggleSidebar] = useState<boolean>(false);
+  const [logoutLoading, setLogoutLoading] = useState<boolean>(false);
+
   const { fetchUser } = useUserStore();
 
   const handleToggle = () => {
@@ -30,8 +33,9 @@ const SideBar = () => {
   const pathName = usePathname();
 
   const handleLogout = async () => {
+    setLogoutLoading(true);
     try {
-       await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/logout`,
         {},
         { withCredentials: true }
@@ -43,6 +47,8 @@ const SideBar = () => {
     } catch (error) {
       console.log(error);
       showToast("error", "تم تسجيل الخروج بنجاح");
+    } finally {
+      setLogoutLoading(false);
     }
   };
 
@@ -66,7 +72,6 @@ const SideBar = () => {
   ];
 
   const bottomMenuItems = [
-
     {
       href: "/dashboard-teacher/settings",
       icon: Settings,
@@ -183,13 +188,20 @@ const SideBar = () => {
           {/* Logout Button */}
           <button
             onClick={handleLogout}
+            disabled={logoutLoading}
             className="group w-full flex items-center gap-4 py-3 px-4 rounded-xl transition-all duration-200 hover:bg-red-500/50 hover:scale-[1.02]"
           >
-            <LogOut
-              size={20}
-              className="text-red-400 group-hover:text-white transition-colors duration-200 flex-shrink-0"
-            />
-            <span className="text-sm font-medium">تسجيل الخروج</span>
+            {logoutLoading ? (
+              <Loader2 size={20} className="text-center" />
+            ) : (
+              <>
+                <LogOut
+                  size={20}
+                  className="text-red-400 group-hover:text-white transition-colors duration-200 flex-shrink-0"
+                />
+                <span className="text-sm font-medium">تسجيل الخروج</span>
+              </>
+            )}
           </button>
         </nav>
       </div>
@@ -246,13 +258,20 @@ const SideBar = () => {
           {/* Logout Button */}
           <button
             onClick={handleLogout}
+            disabled={logoutLoading}
             className="group w-full flex items-center gap-4 py-3 px-4 rounded-xl transition-all duration-200 hover:bg-red-500/50 hover:scale-[1.02] border border-red-400/20"
           >
-            <LogOut
-              size={20}
-              className="text-red-400 group-hover:text-white transition-colors duration-200 flex-shrink-0"
-            />
-            <span className="text-sm font-medium">تسجيل الخروج</span>
+            {logoutLoading ? (
+              <Loader2 size={20} className="text-center" />
+            ) : (
+              <>
+                <LogOut
+                  size={20}
+                  className="text-red-400 group-hover:text-white transition-colors duration-200 flex-shrink-0"
+                />
+                <span className="text-sm font-medium">تسجيل الخروج</span>
+              </>
+            )}
           </button>
         </nav>
       </div>
