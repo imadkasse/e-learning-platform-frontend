@@ -401,7 +401,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
       "هل أنت متأكد من حذف هذا القسم؟ سيتم حذف جميع الفيديوهات والملفات المرتبطة به.",
       performDelete,
       "danger",
-      deleteSectionLoading
+      
     );
   };
 
@@ -571,7 +571,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
       "هل أنت متأكد من حذف هذا الفيديو؟ سيتم حذف جميع الملفات المرتبطة به أيضاً.",
       performDelete,
       "danger",
-      deleteVideoLoading
+      
     );
   };
 
@@ -704,7 +704,6 @@ const CourseEditPage = ({ id }: { id: string }) => {
       "هل أنت متأكد من حذف هذا الملف؟",
       performDelete,
       "danger",
-      DeleteFileLoading
     );
   };
 
