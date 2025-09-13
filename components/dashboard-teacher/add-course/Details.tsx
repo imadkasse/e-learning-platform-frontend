@@ -715,7 +715,13 @@ export default function CourseUploader() {
                     <div className="flex gap-3 justify-end">
                       <button
                         onClick={() => setShowDeleteModal(false)}
-                        className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium apply-fonts-normal hover:bg-gray-200 transition-colors"
+                        disabled={
+                          loadingDeleteVideo !== "" ||
+                          loadingDeleteCourse ||
+                          deleteSectionLoading ||
+                          deleteFileLoading
+                        }
+                        className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium apply-fonts-normal hover:bg-gray-200 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         إلغاء
                       </button>
