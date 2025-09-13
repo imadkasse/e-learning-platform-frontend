@@ -127,6 +127,7 @@ export default function CourseUploader() {
   const [loadingUploadFile, setLoadingUploadFile] = useState<string>("");
   const [loadingDeleteCourse, setLoadingDeleteCourse] = useState(false);
   const [deleteSectionLoading, setDeleteSectionLoading] = useState(false);
+  const [deleteFileLoading, setDeleteFileLoading] = useState(false);
 
   // Modal states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -414,6 +415,7 @@ export default function CourseUploader() {
     videoId: string,
     fileId: string
   ) => {
+    setDeleteFileLoading(true);
     try {
       await axios.delete(
         `${baseUrl}/api/courses/${currentCourse._id}/sections/${sectionId}/videos/${videoId}/files/${fileId}`,
@@ -446,6 +448,7 @@ export default function CourseUploader() {
       showToast("error", "حدث خطأ أثناء حذف الملف");
     } finally {
       setShowDeleteModal(false);
+      setDeleteFileLoading(false);
     }
   };
 
@@ -721,13 +724,15 @@ export default function CourseUploader() {
                         disabled={
                           loadingDeleteVideo !== "" ||
                           loadingDeleteCourse ||
-                          deleteSectionLoading
+                          deleteSectionLoading ||
+                          deleteFileLoading
                         }
                         className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium apply-fonts-normal hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                       >
                         {loadingDeleteVideo !== "" ||
                         loadingDeleteCourse ||
-                        deleteSectionLoading ? (
+                        deleteSectionLoading ||
+                        deleteFileLoading ? (
                           <>
                             <Loader className="animate-spin w-4 h-4" />
                             جارٍ الحذف...
@@ -1448,7 +1453,6 @@ function StepSectionsAndVideos({
                                           )
                                       )
                                     }
-                                    
                                     className="text-red-500 hover:text-red-700 text-xs"
                                   >
                                     ❌
