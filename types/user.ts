@@ -21,4 +21,5 @@ export type User = {
   notifications: Notifcation[];
   createdAt?: string;
   balance?: number;
+  googleId?: string;
 };

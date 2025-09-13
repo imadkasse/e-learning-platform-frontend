@@ -22,7 +22,7 @@ const GoogleCallback = () => {
 
       setUserData(response.data.user);
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      // console.error("Error fetching user data:", error);
       if (
         // @ts-expect-error: fix after time
         error.response.data.message ===

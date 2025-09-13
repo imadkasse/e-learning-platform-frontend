@@ -304,7 +304,7 @@ const Settings = ({ userFetcher }: Props) => {
         )}
 
         {/* Edit Password*/}
-        <UpdatePassword />
+        {user.googleId ? <></> : <UpdatePassword />}
       </div>
 
       {/* Modal وسائل التواصل */}
