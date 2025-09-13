@@ -9,6 +9,7 @@ import {
   ChevronDown,
   ChevronUp,
   Folder,
+  Video,
 } from "lucide-react";
 import React, { useState } from "react";
 
@@ -123,20 +124,47 @@ export const CoursePage = ({ course }: Props) => {
 
             {/* Welcome Video */}
             <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
-              <div className="p-6">
-                <div
-                  className="relative w-full rounded-xl overflow-hidden shadow-inner"
-                  style={{ paddingTop: "56.25%" }}
-                >
-                  <iframe
-                    src={`${baseUrlVideo}/${course.sections[0].videos[0]?.url}?autoplay=false&loop=false&muted=false&preload=false&responsive=false`}
-                    loading="lazy"
-                    className="absolute top-0 left-0 w-full h-full border-0"
-                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
+              {course.sections[0].videos[0] ? (
+                <div className="p-6">
+                  <div
+                    className="relative w-full rounded-xl overflow-hidden shadow-inner"
+                    style={{ paddingTop: "56.25%" }}
+                  >
+                    <iframe
+                      src={`${baseUrlVideo}/${course.sections[0].videos[0]?.url}?autoplay=false&loop=false&muted=false&preload=false&responsive=false`}
+                      loading="lazy"
+                      className="absolute top-0 left-0 w-full h-full border-0"
+                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
+                  <div className="p-6">
+                    <div
+                      className="relative w-full rounded-xl overflow-hidden shadow-inner bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center"
+                      style={{ paddingTop: "56.25%" }}
+                    >
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
+                        {/* أيقونة رئيسية */}
+                        <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mb-4">
+                          <Video className="w-8 h-8 text-slate-400" />
+                        </div>
+
+                        {/* النص الرئيسي */}
+                        <h3 className="text-lg font-semibold text-slate-700 mb-2">
+                          لا توجد فيديوهات متاحة
+                        </h3>
+
+                        <p className="text-slate-500 text-sm mb-6 max-w-sm">
+                          لم يتم رفع أي فيديوهات لهذا القسم بعد
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Course Description */}

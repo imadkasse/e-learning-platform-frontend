@@ -52,7 +52,7 @@ const GoogleCallback = () => {
       } else if (userData.role === "admin") {
         router.push("/dashboard-admin");
       } else {
-        router.push("/sigunp");
+        router.push("/signup");
       }
     }
   }, [loading, userData, router]);

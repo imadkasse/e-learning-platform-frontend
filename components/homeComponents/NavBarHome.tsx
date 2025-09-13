@@ -38,9 +38,8 @@ const NavBarHome = () => {
   const handleOpenToggle = () => {
     setMenuToggle(true);
   };
-  const loading = useUserStore((state) => state.loading);
 
-  const { user, fetchUser } = useUserStore();
+  const { user, fetchUser, loading } = useUserStore();
 
   const role = user.role === "student" ? "user" : user.role;
 
