@@ -19,6 +19,9 @@ const GoogleCallback = () => {
           withCredentials: true,
         }
       );
+      if (!response.data.user.active) {
+        return;
+      }
       setUserData(response.data.user);
     } catch (error) {
       console.error("Error fetching user data:", error);
