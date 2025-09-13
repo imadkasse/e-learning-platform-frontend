@@ -3,13 +3,14 @@ import showToast from "@/utils/showToast";
 import axios from "axios";
 import React, { FormEvent, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
+import { Eye, EyeOff } from "lucide-react";
 
 const UpdatePassword = () => {
   const [loadingUpdatePassword, setloadingUpdatePassword] =
     useState<boolean>(false);
 
   const [currentPassword, setCurrentPassword] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [password, setPassword] = useState<string>(""); // this is new Password
   const [passwordConfirm, setPasswordConfirm] = useState<string>("");
   const handleUpdatePassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,12 +35,25 @@ const UpdatePassword = () => {
       setloadingUpdatePassword(false);
     }
   };
+
+  const [showPassword, setShowPassword] = useState({
+    currentPassword: false,
+    password: false,
+    passwordConfirm: false,
+  });
+  const toggleShowPassword = (label: keyof typeof showPassword) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [label]: !prev[label], // قلب القيمة بدل ما تثبتها true دائمًا
+    }));
+  };
+
   return (
     <>
       <h2 className="apply-fonts-medium  my-5">تحديث كلمة المرور</h2>
       <form className="space-y-4" onSubmit={handleUpdatePassword}>
         {/* current password */}
-        <div>
+        <div className="relative">
           <label
             htmlFor="currentPassword"
             className="apply-fonts-normal  block text-sm font-medium text-gray-700"
@@ -55,9 +69,20 @@ const UpdatePassword = () => {
             onChange={(e) => setCurrentPassword(e.target.value)}
             required
           />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+            onClick={() => toggleShowPassword("currentPassword")}
+          >
+            {showPassword.currentPassword ? (
+              <EyeOff size={20} />
+            ) : (
+              <Eye size={20} />
+            )}
+          </button>
         </div>
         {/* new password */}
-        <div>
+        <div className="relative">
           <label
             htmlFor="password"
             className="apply-fonts-normal  block text-sm font-medium text-gray-700"
@@ -73,9 +98,20 @@ const UpdatePassword = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+            onClick={() => toggleShowPassword("currentPassword")}
+          >
+            {showPassword.currentPassword ? (
+              <EyeOff size={20} />
+            ) : (
+              <Eye size={20} />
+            )}
+          </button>
         </div>
         {/* confirm password  */}
-        <div>
+        <div className="relative">
           <label
             htmlFor="passwordConfirm"
             className="apply-fonts-normal block text-sm font-medium text-gray-700"
@@ -91,6 +127,17 @@ const UpdatePassword = () => {
             onChange={(e) => setPasswordConfirm(e.target.value)}
             required
           />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+            onClick={() => toggleShowPassword("currentPassword")}
+          >
+            {showPassword.currentPassword ? (
+              <EyeOff size={20} />
+            ) : (
+              <Eye size={20} />
+            )}
+          </button>
         </div>
 
         <button
