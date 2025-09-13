@@ -216,7 +216,7 @@ const SideBar = () => {
             className="group w-full flex items-center gap-4 py-3 px-4 rounded-xl transition-all duration-200 hover:bg-red-500/50 hover:scale-[1.02]"
           >
             {logoutLoading ? (
-              <Loader2 size={20} className="text-center" />
+              <Loader2 size={20} className="animate-spin text-center w-full" />
             ) : (
               <>
                 <LogOut
@@ -286,7 +286,7 @@ const SideBar = () => {
             className="group w-full flex items-center gap-4 py-3 px-4 rounded-xl transition-all duration-200 hover:bg-red-500/50 hover:scale-[1.02] border border-red-400/20"
           >
             {logoutLoading ? (
-              <Loader2 size={20} className="text-center" />
+              <Loader2 size={20} className="animate-spin text-center w-full"/>
             ) : (
               <>
                 <LogOut
