@@ -131,7 +131,7 @@ export default function CourseUploader() {
   // Modal states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteModalConfig, setDeleteModalConfig] = useState<{
-    type: "video" | "file" | "course";
+    type: "video" | "file" | "course" | "section";
     title: string;
     message: string;
     onConfirm: () => void;
@@ -497,7 +497,7 @@ export default function CourseUploader() {
   };
 
   const openDeleteModal = (
-    type: "video" | "file" | "course",
+    type: "video" | "file" | "course" | "section",
     title: string,
     message: string,
     onConfirm: () => void
@@ -719,11 +719,15 @@ export default function CourseUploader() {
                       <button
                         onClick={deleteModalConfig.onConfirm}
                         disabled={
-                          loadingDeleteVideo !== "" || loadingDeleteCourse
+                          loadingDeleteVideo !== "" ||
+                          loadingDeleteCourse ||
+                          deleteSectionLoading
                         }
                         className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium apply-fonts-normal hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                       >
-                        {loadingDeleteVideo !== "" || loadingDeleteCourse ? (
+                        {loadingDeleteVideo !== "" ||
+                        loadingDeleteCourse ||
+                        deleteSectionLoading ? (
                           <>
                             <Loader className="animate-spin w-4 h-4" />
                             جارٍ الحذف...
@@ -989,7 +993,7 @@ interface StepSectionsAndVideosProps {
   ) => void;
   loadingUploadFile: string;
   openDeleteModal: (
-    type: "video" | "file" | "course",
+    type: "video" | "file" | "course" | "section",
     title: string,
     message: string,
     onConfirm: () => void
@@ -1121,7 +1125,7 @@ function StepSectionsAndVideos({
                 <button
                   onClick={() =>
                     openDeleteModal(
-                      "video", // يمكن تغييرها لـ "section" إذا أردت نوع منفصل
+                      "section", // يمكن تغييرها لـ "section" إذا أردت نوع منفصل
                       "حذف القسم",
                       `هل أنت متأكد من حذف قسم "${section.title}"؟ سيتم حذف جميع الفيديوهات والملفات المرتبطة به نهائياً.`,
                       () => handleDeleteSction(section._id)
