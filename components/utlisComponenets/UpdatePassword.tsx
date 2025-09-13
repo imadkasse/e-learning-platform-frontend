@@ -53,91 +53,95 @@ const UpdatePassword = () => {
       <h2 className="apply-fonts-medium  my-5">تحديث كلمة المرور</h2>
       <form className="space-y-4" onSubmit={handleUpdatePassword}>
         {/* current password */}
-        <div className="relative">
+        <div>
           <label
             htmlFor="currentPassword"
-            className="apply-fonts-normal  block text-sm font-medium text-gray-700"
+            className="apply-fonts-normal block text-sm font-medium text-gray-700"
           >
             كلمة المرور القديمة
           </label>
-          <input
-            id="currentPassword"
-            type="password"
-            placeholder="*********"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            required
-          />
-          <button
-            type="button"
-            className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-            onClick={() => toggleShowPassword("currentPassword")}
-          >
-            {showPassword.currentPassword ? (
-              <EyeOff size={20} />
-            ) : (
-              <Eye size={20} />
-            )}
-          </button>
+          <div className="relative">
+            <input
+              id="currentPassword"
+              type={showPassword.currentPassword ? "text" : "password"}
+              placeholder="*********"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 pr-10"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+              onClick={() => toggleShowPassword("currentPassword")}
+            >
+              {showPassword.currentPassword ? (
+                <EyeOff size={20} />
+              ) : (
+                <Eye size={20} />
+              )}
+            </button>
+          </div>
         </div>
+
         {/* new password */}
-        <div className="relative">
+        <div>
           <label
             htmlFor="password"
-            className="apply-fonts-normal  block text-sm font-medium text-gray-700"
+            className="apply-fonts-normal block text-sm font-medium text-gray-700"
           >
             كلمة المرور الجديدة
           </label>
-          <input
-            id="password"
-            placeholder="*********"
-            type="password"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button
-            type="button"
-            className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-            onClick={() => toggleShowPassword("currentPassword")}
-          >
-            {showPassword.currentPassword ? (
-              <EyeOff size={20} />
-            ) : (
-              <Eye size={20} />
-            )}
-          </button>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword.password ? "text" : "password"}
+              placeholder="*********"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 pr-10"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+              onClick={() => toggleShowPassword("password")}
+            >
+              {showPassword.password ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
         </div>
-        {/* confirm password  */}
-        <div className="relative">
+
+        {/* confirm password */}
+        <div>
           <label
             htmlFor="passwordConfirm"
             className="apply-fonts-normal block text-sm font-medium text-gray-700"
           >
             تأكيد كلمة المرور الجديدة
           </label>
-          <input
-            id="passwordConfirm"
-            type="password"
-            placeholder="*********"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            value={passwordConfirm}
-            onChange={(e) => setPasswordConfirm(e.target.value)}
-            required
-          />
-          <button
-            type="button"
-            className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-            onClick={() => toggleShowPassword("currentPassword")}
-          >
-            {showPassword.currentPassword ? (
-              <EyeOff size={20} />
-            ) : (
-              <Eye size={20} />
-            )}
-          </button>
+          <div className="relative">
+            <input
+              id="passwordConfirm"
+              type={showPassword.passwordConfirm ? "text" : "password"}
+              placeholder="*********"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 pr-10"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+              onClick={() => toggleShowPassword("passwordConfirm")}
+            >
+              {showPassword.passwordConfirm ? (
+                <EyeOff size={20} />
+              ) : (
+                <Eye size={20} />
+              )}
+            </button>
+          </div>
         </div>
 
         <button
