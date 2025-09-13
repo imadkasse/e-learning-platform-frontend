@@ -11,7 +11,7 @@ import {
   Folder,
   Video,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import CourseCard from "./CourseCard";
 import AddReview from "./Reviews/AddReview";
@@ -61,20 +61,30 @@ export const CoursePage = ({ course }: Props) => {
       seconds.toString().padStart(2, "0"),
     ].join(":");
   }
-  const duration = formatDuration(
-    course.sections.reduce(
-      (total, section) =>
-        total +
-        section.videos.reduce(
-          (sectionTotal, video) => sectionTotal + parseDuration(video.duration),
+  const duration = useMemo(
+    () =>
+      formatDuration(
+        course.sections.reduce(
+          (total, section) =>
+            total +
+            section.videos.reduce(
+              (sectionTotal, video) =>
+                sectionTotal + parseDuration(video.duration),
+              0
+            ),
           0
-        ),
-      0
-    )
+        )
+      ),
+    [course.sections]
   );
-  const videosNumber = course.sections.reduce((acc, section) => {
-    return acc + (section.videos?.length || 0);
-  }, 0);
+  const videosNumber = useMemo(
+    () =>
+      course.sections.reduce(
+        (acc, section) => acc + (section.videos?.length || 0),
+        0
+      ),
+    [course.sections]
+  );
 
   return (
     <div className="h-screen">

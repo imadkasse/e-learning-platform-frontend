@@ -43,6 +43,7 @@ const CourseCard = ({
   const [appliedCoupon, setAppliedCoupon] = useState<string>("");
   const [originalPrice] = useState(price);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState<boolean>(false);
+  
 
   const handelOpenAndColsed = () => {
     setIsOpen(!isOpen);
@@ -273,7 +274,9 @@ const CourseCard = ({
           <div className="p-6 pt-0">
             {user.role === "teacher" || user.role === "admin" ? (
               <div className="text-center py-4 text-slate-500 bg-slate-100 rounded-xl">
-                <span className="apply-fonts-normal">أنت مدرس في المنصة</span>
+                <span className="apply-fonts-normal">
+                  أنت {user.role === "teacher" ? "مدرس" : "مدير"} في المنصة
+                </span>
               </div>
             ) : (
               <button
