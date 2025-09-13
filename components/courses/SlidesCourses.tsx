@@ -30,7 +30,7 @@ const SlidesCourses = ({ courses }: Props) => {
           return (
             <div key={index}>
               <h2 className="text-3xl font-bold text-gray-800 apply-fonts-normal">
-                {coursesAndCate.category}
+                {coursesAndCate.category ? coursesAndCate.category : "أخرى"}
               </h2>
               <div className="px-4 py-4">
                 <Swiper
