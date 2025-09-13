@@ -45,7 +45,8 @@ const GoogleCallback = () => {
         //   "error",
         //   "الحساب غير مفعل حاليا، الرجاء التواصل مع الدعم لتفعيله"
         // );
-        router.push("/"); // ما نعمل redirect
+        router.push("/?inactive=true");
+        return;
       }
       if (userData.role === "student") {
         router.push("/dashboard-user");

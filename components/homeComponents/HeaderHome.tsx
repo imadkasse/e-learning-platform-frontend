@@ -1,11 +1,22 @@
 "use client";
 import { LocalLibrary, PlayArrow, StarOutlined } from "@mui/icons-material";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import showToast from "@/utils/showToast";
 
 const HeaderHome = () => {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get("inactive") === "true") {
+      showToast(
+        "error",
+        "الحساب غير مفعل حاليا، الرجاء التواصل مع الدعم لتفعيله"
+      );
+    }
+  }, [searchParams]);
   return (
     <div className=" my-24 flex items-center justify-between xs:flex-col md:flex-row overflow-hidden">
       <motion.div
