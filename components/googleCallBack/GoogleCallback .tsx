@@ -20,6 +20,7 @@ const GoogleCallback = () => {
         }
       );
       if (!response.data.user.active) {
+        router.push("/?inactive=true");
         return;
       }
       setUserData(response.data.user);
@@ -43,14 +44,6 @@ const GoogleCallback = () => {
 
   useEffect(() => {
     if (!loading && userData) {
-      if (!userData.active) {
-        // showToast(
-        //   "error",
-        //   "الحساب غير مفعل حاليا، الرجاء التواصل مع الدعم لتفعيله"
-        // );
-        router.push("/?inactive=true");
-        return;
-      }
       if (userData.role === "student") {
         router.push("/dashboard-user");
       } else if (userData.role === "admin") {
