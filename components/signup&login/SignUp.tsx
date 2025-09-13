@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import showToast from "@/utils/showToast";
 import * as z from "zod";
 import { Loader2 } from "lucide-react";
+import { useUserStore } from "@/store/userStore";
 const UserSchema = z
   .object({
     username: z.string().min(3, "اسم المستخدم يجب أن يكون 3 أحرف على الأقل"),
@@ -33,6 +34,8 @@ const SignUp = () => {
 
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [, setPasswordIsMatch] = useState(false);
+
+  const { fetchUser } = useUserStore();
 
   const [isValid, setIsValid] = useState(false);
   // errors
@@ -142,11 +145,14 @@ const SignUp = () => {
     try {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/signup`,
-        formData
+        formData,
+        {
+          withCredentials: true,
+        }
       );
       const role = res.data.user.role === "student" ? "user" : "";
-
-      router.push(`/dashboard-${role}`);
+      await fetchUser();
+      router.replace(`/dashboard-${role}`);
     } catch (error) {
       // @ts-expect-error: fix after time
       showToast("error", error.response.data.message);
