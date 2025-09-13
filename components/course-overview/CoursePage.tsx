@@ -124,7 +124,7 @@ export const CoursePage = ({ course }: Props) => {
 
             {/* Welcome Video */}
             <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-8">
-              {course.sections[0].videos[0] ? (
+              {course?.sections?.[0]?.videos?.length > 0 ? (
                 <div className="p-6">
                   <div
                     className="relative w-full rounded-xl overflow-hidden shadow-inner"
