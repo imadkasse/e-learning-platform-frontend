@@ -5,12 +5,15 @@ interface Props {
 }
 export async function generateMetadata({ params }: Props) {
   const courseData = await fetch(
-    `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${(await params).courseId}`
+    `${
+      process.env.NEXT_PUBLIC_BACK_URL
+    }/api/courses/courseTitleAndDescription/${(await params).courseId}`
   );
-  const course = await courseData.json();
-  console.log(course.course.title)
+
+  const data = await courseData.json();
   return {
-    title: course.course.title,
+    title: data.course ? data.course.title : "Error",
+    description: data.course ? data.course.description : "Error",
   };
 }
 
