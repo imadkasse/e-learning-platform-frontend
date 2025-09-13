@@ -19,13 +19,18 @@ const GoogleCallback = () => {
           withCredentials: true,
         }
       );
-      if (!response.data.user.active) {
-        router.push("/?inactive=true");
-        return;
-      }
+
       setUserData(response.data.user);
     } catch (error) {
       console.error("Error fetching user data:", error);
+      if (
+        // @ts-expect-error: fix after time
+        error.response.data.message ===
+        "الحساب غير مفعل حاليا، الرجاء التواصل مع الدعم لتفعيله"
+      ) {
+        router.push("/?inactive=true");
+        return;
+      }
       router.push("/signup");
     } finally {
       setLoading(false);
