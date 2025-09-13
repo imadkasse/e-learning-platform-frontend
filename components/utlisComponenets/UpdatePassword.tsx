@@ -72,7 +72,7 @@ const UpdatePassword = () => {
             />
             <button
               type="button"
-              className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+              className="absolute inset-y-0 left-3 flex items-center text-gray-500"
               onClick={() => toggleShowPassword("currentPassword")}
             >
               {showPassword.currentPassword ? (
@@ -104,7 +104,7 @@ const UpdatePassword = () => {
             />
             <button
               type="button"
-              className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+              className="absolute inset-y-0 left-3 flex items-center text-gray-500"
               onClick={() => toggleShowPassword("password")}
             >
               {showPassword.password ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -132,7 +132,7 @@ const UpdatePassword = () => {
             />
             <button
               type="button"
-              className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+              className="absolute inset-y-0 left-3 flex items-center text-gray-500"
               onClick={() => toggleShowPassword("passwordConfirm")}
             >
               {showPassword.passwordConfirm ? (
