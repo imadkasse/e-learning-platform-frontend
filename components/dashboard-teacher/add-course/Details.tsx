@@ -126,6 +126,7 @@ export default function CourseUploader() {
   const [loadingDeleteVideo, setLoadingDeleteVideo] = useState<string>("");
   const [loadingUploadFile, setLoadingUploadFile] = useState<string>("");
   const [loadingDeleteCourse, setLoadingDeleteCourse] = useState(false);
+  const [deleteSectionLoading, setDeleteSectionLoading] = useState(false);
 
   // Modal states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -235,6 +236,26 @@ export default function CourseUploader() {
       showToast("error", "حدث خطأ أثناء إنشاء القسم");
     } finally {
       setloadingAddSection(false);
+    }
+  };
+  const handleDeleteSection = async (sectionId: string) => {
+    setDeleteSectionLoading(true);
+
+    try {
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${currentCourse?._id}/sections/${sectionId}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      setSections(sections.filter((section) => section._id !== sectionId));
+      showToast("success", "تم حذف القسم بنجاح");
+    } catch (error) {
+      console.error("خطأ في حذف القسم:", error);
+      showToast("error", "حدث خطأ في حذف القسم");
+    } finally {
+      setDeleteSectionLoading(false);
     }
   };
 
@@ -564,6 +585,8 @@ export default function CourseUploader() {
                 loadingAddSection={loadingAddSection}
                 currentCourse={currentCourse}
                 handleAddSctions={handleAddSctions}
+                handleDeleteSction={handleDeleteSection}
+                deleteSectionLoading={deleteSectionLoading}
                 title={title}
                 setTitle={setTitle}
                 addVideoToSection={addVideoToSection}
@@ -938,6 +961,7 @@ interface StepSectionsAndVideosProps {
   sections: Section[];
   loadingAddSection: boolean;
   handleAddSctions: () => void;
+  handleDeleteSction: (sectionId: string) => void;
   currentCourse: Course;
   title: string;
   setTitle: Dispatch<SetStateAction<string>>;
@@ -949,6 +973,7 @@ interface StepSectionsAndVideosProps {
     description: string
   ) => void;
   loadingAddVideoToSection: boolean;
+  deleteSectionLoading: boolean;
   deleteVideo: (sectionId: string, videoId: string) => void;
   loadingDeleteVideo: string;
   addFileToVideo: (
@@ -985,6 +1010,8 @@ function StepSectionsAndVideos({
   deleteFileFromVideo,
   loadingUploadFile,
   openDeleteModal,
+  handleDeleteSction,
+  deleteSectionLoading,
 }: StepSectionsAndVideosProps) {
   const [videosUpload, setVideosUpload] = useState<
     Record<string, VideoUpload[]>
@@ -1084,12 +1111,38 @@ function StepSectionsAndVideos({
           >
             {/* Section Header */}
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-800 apply-fonts-normal flex items-center gap-2">
-                <div className="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  {sectionIndex + 1}
-                </div>
-                {section.title}
-              </h3>
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold text-gray-800 apply-fonts-normal flex items-center gap-2">
+                  <div className="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    {sectionIndex + 1}
+                  </div>
+                  {section.title}
+                </h3>
+                <button
+                  onClick={() =>
+                    openDeleteModal(
+                      "video", // يمكن تغييرها لـ "section" إذا أردت نوع منفصل
+                      "حذف القسم",
+                      `هل أنت متأكد من حذف قسم "${section.title}"؟ سيتم حذف جميع الفيديوهات والملفات المرتبطة به نهائياً.`,
+                      () => handleDeleteSction(section._id)
+                    )
+                  }
+                  disabled={deleteSectionLoading}
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-medium apply-fonts-normal flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {deleteSectionLoading ? (
+                    <>
+                      <Loader className="animate-spin w-4 h-4" />
+                      جارٍ الحذف...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      حذف القسم
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="p-6 space-y-6">
@@ -1182,7 +1235,7 @@ function StepSectionsAndVideos({
                           }
                         }}
                         disabled={loadingAddVideoToSection}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium apply-fonts-normal flex items-center gap-2 disabled:opacity-50"
+                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium apply-fonts-normal flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {loadingAddVideoToSection ? (
                           <>
@@ -1203,7 +1256,8 @@ function StepSectionsAndVideos({
                         onClick={() =>
                           removeVideoField(section._id, videoIndex)
                         }
-                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-medium apply-fonts-normal flex items-center gap-2"
+                        disabled={loadingAddVideoToSection}
+                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-medium apply-fonts-normal flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <X className="w-4 h-4" />
                         حذف
@@ -1264,7 +1318,7 @@ function StepSectionsAndVideos({
                               )
                             }
                             disabled={loadingDeleteVideo === video._id}
-                            className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-colors text-sm font-medium flex items-center gap-1 disabled:opacity-50"
+                            className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-colors text-sm font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {loadingDeleteVideo === video._id ? (
                               <Loader className="animate-spin w-3 h-3" />
@@ -1390,6 +1444,7 @@ function StepSectionsAndVideos({
                                           )
                                       )
                                     }
+                                    disabled
                                     className="text-red-500 hover:text-red-700 text-xs"
                                   >
                                     ❌
