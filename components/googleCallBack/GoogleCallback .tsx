@@ -37,6 +37,7 @@ const GoogleCallback = () => {
     if (token) {
       fetchUserData();
     } else {
+      setUserData(null);
       setLoading(false);
       router.push("/signup");
     }
@@ -62,7 +63,11 @@ const GoogleCallback = () => {
     );
   }
 
-  return null;
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <p>جاري التوجيه...</p>
+    </div>
+  );
 };
 
 export default GoogleCallback;
