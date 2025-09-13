@@ -74,7 +74,7 @@ const page = async ({ params }: PageProps) => {
                   <div className="grid grid-cols-1 gap-3">
                     <Link
                       href={`/edit-course/${courseId}`}
-                      className="flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                      className="flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl group"
                     >
                       <RefreshCw
                         size={20}
