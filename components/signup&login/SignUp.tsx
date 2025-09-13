@@ -150,7 +150,8 @@ const SignUp = () => {
           withCredentials: true,
         }
       );
-      const role = res.data.user.role === "student" ? "user" : "";
+      const role =
+        res.data.user.role === "student" ? "user" : res.data.user.role;
       await fetchUser();
       router.replace(`/dashboard-${role}`);
     } catch (error) {
