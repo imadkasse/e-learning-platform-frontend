@@ -101,6 +101,23 @@ const page = async ({ params }: PageProps) => {
                       <span>تصفح الدورات</span>
                     </Link>
                   </div>
+                  {/* Help Section */}
+                  <div className="mt-8 p-4 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <AlertCircle size={14} className="text-amber-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-amber-800 mb-1 apply-fonts-medium text-sm">
+                          تحتاج مساعدة؟
+                        </h3>
+                        <p className="text-amber-700 text-xs apply-fonts-normal leading-relaxed">
+                          إذا كنت تعتقد أن هذا خطأ، يمكنك التواصل مع فريق الدعم
+                          أو المحاولة مرة أخرى لاحقاً.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
