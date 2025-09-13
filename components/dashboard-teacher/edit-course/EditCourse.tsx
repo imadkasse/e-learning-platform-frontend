@@ -1,7 +1,7 @@
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import {
   BookOpen,
   DollarSign,
@@ -135,11 +135,12 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   );
 };
 
-const CourseEditPage = ({ id }: { id: string }) => {
+const CourseEditPage = ({ courseFetcher }: { courseFetcher: Course }) => {
   const router = useRouter();
-  const [course, setCourse] = useState<Course>();
-  const [sections, setSections] = useState<Section[]>([]);
-  const [concepts, setConcepts] = useState<string[]>([]);
+
+  const [course, setCourse] = useState<Course>(courseFetcher);
+  const [sections, setSections] = useState<Section[]>(courseFetcher.sections);
+  const [concepts, setConcepts] = useState<string[]>(courseFetcher.concepts);
   const [editeCourseLoading, setEditeCourseLoading] = useState<boolean>(false);
 
   // Confirm Modal State
@@ -195,7 +196,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
 
   // for showing the image cover of course
   const [imageCoverPreview, setImageCoverPreview] = useState<string | null>(
-    null
+    courseFetcher.imageCover
   );
 
   const handleImageCoverChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -213,21 +214,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
     setCourseData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const getCourse = async (id: string) => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACK_URL}/api/courses/${id}`,
-      {
-        cache: "no-store",
-      }
-    );
 
-    const data = await res.json();
-    setCourse(data.course);
-    setCourseData(data.course);
-    setSections(data.course.sections);
-    setConcepts(data.course.concepts);
-    setImageCoverPreview(data.course.imageCover);
-  };
 
   const [activeTab, setActiveTab] = useState("details");
   const [courseData, setCourseData] = useState<CourseDetails>({
@@ -247,10 +234,16 @@ const CourseEditPage = ({ id }: { id: string }) => {
   ];
 
   const categories = [
-    { value: "programming", label: "البرمجة" },
-    { value: "design", label: "التصميم" },
-    { value: "marketing", label: "التسويق" },
-    { value: "business", label: "الأعمال" },
+    { value: "رياضيات", label: "رياضيات" },
+    { value: "فيزياء", label: "فيزياء" },
+    { value: "علوم", label: "علوم" },
+    { value: "أدب", label: "أدب" },
+    { value: "شريعة", label: "شريعة" },
+    { value: "إجتماعيات", label: "إجتماعيات" },
+    { value: "فلسفة", label: "فلسفة" },
+    { value: "إقتصاد", label: "إقتصاد" },
+    { value: "محاسبة", label: "محاسبة" },
+    { value: "أخرى", label: "أخرى" },
   ];
 
   const addConcept = () => {
@@ -400,8 +393,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
       "حذف القسم",
       "هل أنت متأكد من حذف هذا القسم؟ سيتم حذف جميع الفيديوهات والملفات المرتبطة به.",
       performDelete,
-      "danger",
-      
+      "danger"
     );
   };
 
@@ -570,8 +562,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
       "حذف الفيديو",
       "هل أنت متأكد من حذف هذا الفيديو؟ سيتم حذف جميع الملفات المرتبطة به أيضاً.",
       performDelete,
-      "danger",
-      
+      "danger"
     );
   };
 
@@ -703,7 +694,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
       "حذف الملف",
       "هل أنت متأكد من حذف هذا الملف؟",
       performDelete,
-      "danger",
+      "danger"
     );
   };
 
@@ -748,10 +739,6 @@ const CourseEditPage = ({ id }: { id: string }) => {
       setEditeCourseLoading(false);
     }
   };
-
-  useEffect(() => {
-    getCourse(id);
-  }, [id]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 ">
