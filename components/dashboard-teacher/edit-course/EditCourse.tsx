@@ -114,9 +114,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           <button
             onClick={onCancel}
             disabled={loading}
-            className={`${
-              loading ? "cursor-not-allowed" : ""
-            } px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200`}
+            className={` px-6 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:cursor-not-allowed`}
           >
             {cancelText}
           </button>
@@ -1407,7 +1405,8 @@ const CourseEditPage = ({ id }: { id: string }) => {
                 </div>
                 <button
                   onClick={closeSectionModal}
-                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                  disabled={addSectionLoading}
+                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 disabled:cursor-not-allowed"
                 >
                   <X size={20} />
                 </button>
@@ -1492,7 +1491,7 @@ const CourseEditPage = ({ id }: { id: string }) => {
                 <button
                   onClick={closeVideoModal}
                   disabled={addVideoLoading}
-                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 disabled:cursor-not-allowed"
                 >
                   <X size={20} />
                 </button>
@@ -1678,7 +1677,8 @@ const CourseEditPage = ({ id }: { id: string }) => {
                 </div>
                 <button
                   onClick={closeFileModal}
-                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                  disabled={addFileLoading}
+                  className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 disabled:cursor-not-allowed"
                 >
                   <X size={20} />
                 </button>
